@@ -246,14 +246,6 @@ li { margin: .3rem 0; }
   filter: drop-shadow(0 0 16px rgba(224, 36, 44, .6)) contrast(1.06);
 }
 
-.masthead__figure figcaption {
-  margin-top: .15rem;
-  font-family: var(--font-pix);
-  font-size: .68rem;
-  text-align: center;
-  color: var(--ink-faint);
-}
-
 .masthead__main { text-align: center; }
 
 .masthead__title {
