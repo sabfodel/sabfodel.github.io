@@ -38,5 +38,5 @@ write into the state vector at once got caught at compile time.
 ## Next
 
 - A stabiliser simulator, to escape the exponential cost for Clifford circuits
-- Syndrome measurement on a small [toric code](/notes/toric-code/) lattice
+- Syndrome measurement on a small toric code lattice
 - Density-matrix mode and noise channels

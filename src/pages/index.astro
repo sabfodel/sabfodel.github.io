@@ -18,17 +18,8 @@ const projects = (await getCollection('projects')).sort(
 ---
 
 <Base>
-  <Panel title="welcome" note="◈ ◈ ◈">
-    <p>
-      This is my corner of the web. I study physics — second year, mostly circling condensed
-      matter and quantum information. What I work through ends up here as notes, and what I
-      build ends up here as projects.
-    </p>
-    <p style="margin-bottom:0">
-      It's an archive for me first. If any of it happens to be useful to you, all the better.
-      Turn the lights off, it reads better that way. 🕯
-    </p>
-  </Panel>
+  {/* Karşılama metnini buraya yazabilirsin:
+      <Panel title="welcome" note="◈ ◈ ◈"><p>...</p></Panel> */}
 
   <Panel title="notes" note={`${notes.length} entries`}>
     <EntryList

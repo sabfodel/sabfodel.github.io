@@ -1,6 +1,7 @@
 export const SITE = {
   title: 'sabfodel',
-  tagline: 'Physics notes, projects, and code written after midnight.',
+  // Başlığın altında görünen satır — kendi cümlenle değiştir.
+  tagline: 'Physics notes, projects, and things I am learning.',
   description:
     'Notes on condensed matter physics and quantum information, plus the things I build.',
   author: 'sabfodel',
@@ -20,11 +21,9 @@ export const NAV = [
   { href: '/about/',    label: 'about' },
 ];
 
+// Üstteki kayan yazı. Buraya ne yazarsan o akar — istediğin gibi değiştir.
 export const TICKER = [
-  'currently reading up on <b>quantum error correction</b>',
-  'this site is handmade ✝ no template, no theme, no cookies',
-  '<b>second-year</b> physics student ✝ condensed matter + quantum info',
-  'learning the <b>violin</b> ✝ badly, but less badly than last month',
-  'code: <b>rust</b> ✝ notes: <b>obsidian</b> ✝ mood: <b>variable</b>',
+  '<b>under construction</b> ✝ as all good pages are',
+  'no template ✝ no theme ✝ no cookies ✝ no tracking',
   'best viewed at <b>1024×768</b> or above ✝ turn the lights off',
 ];
