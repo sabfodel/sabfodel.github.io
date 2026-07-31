@@ -1,0 +1,14 @@
+---
+const blinkies = [
+  { text: 'best viewed in the dark', variant: '' },
+  { text: 'i ♥ condensed matter', variant: 'blinkie--pink' },
+  { text: 'made by hand, not by cms', variant: 'blinkie--bone' },
+  { text: 'rust user btw', variant: 'blinkie--void' },
+  { text: 'no ai slop here', variant: 'blinkie--pink' },
+  { text: 'entangled & confused', variant: '' },
+];
+---
+
+<ul class="blinkies">
+  {blinkies.map((b) => <li class={`blinkie ${b.variant}`}>{b.text}</li>)}
+</ul>

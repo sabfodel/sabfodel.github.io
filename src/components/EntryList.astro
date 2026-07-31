@@ -1,0 +1,43 @@
+---
+import { formatDate, isoDate } from '../utils';
+import type { EntryItem } from '../types';
+
+interface Props {
+  items: EntryItem[];
+  empty?: string;
+}
+
+const { items, empty = 'Nothing here yet.' } = Astro.props;
+---
+
+{
+  items.length === 0 ? (
+    <p class="empty">{empty}</p>
+  ) : (
+    <ul class="entries">
+      {items.map((item) => (
+        <li class="entry">
+          <p class="entry__meta">
+            {item.date && <time datetime={isoDate(item.date)}>{formatDate(item.date)}</time>}
+            {item.extra && <span>{item.extra}</span>}
+          </p>
+          <h3 class="entry__title">
+            <a href={item.href}>{item.title}</a>
+          </h3>
+          {item.summary && <p class="entry__sum">{item.summary}</p>}
+          {item.tags && item.tags.length > 0 && (
+            <ul class="tags">
+              {item.tags.map((t) => (
+                <li>
+                  <a class="tag" href={`/tags/${encodeURIComponent(t)}/`}>
+                    {t}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </li>
+      ))}
+    </ul>
+  )
+}

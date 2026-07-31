@@ -1,0 +1,84 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Panel from '../components/Panel.astro';
+import EntryList from '../components/EntryList.astro';
+import { byDateDesc, STATUS, tagsWithoutLang } from '../utils';
+
+const notes = (await getCollection('notes', (n) => !n.data.draft)).sort(byDateDesc).slice(0, 5);
+const posts = (await getCollection('journal', (p) => !p.data.draft)).sort(byDateDesc).slice(0, 3);
+const projects = (await getCollection('projects')).sort(
+  (a, b) => b.data.order - a.data.order || byDateDesc(a, b)
+);
+---
+
+<Base>
+  <Panel title="welcome" note="◈ ◈ ◈">
+    <p>
+      This is my corner of the web. I study physics — second year, mostly circling condensed
+      matter and quantum information. What I work through ends up here as notes, and what I
+      build ends up here as projects.
+    </p>
+    <p style="margin-bottom:0">
+      It's an archive for me first. If any of it happens to be useful to you, all the better.
+      Turn the lights off, it reads better that way. 🕯
+    </p>
+  </Panel>
+
+  <Panel title="notes" note={`${notes.length} entries`}>
+    <EntryList
+      items={notes.map((n) => ({
+        href: `/notes/${n.id}/`,
+        title: n.data.title,
+        date: n.data.date,
+        summary: n.data.summary,
+        tags: n.data.tags,
+        extra: n.data.field,
+      }))}
+      empty="No notes written up yet."
+    />
+    <p style="margin:1rem 0 0"><a href="/notes/">all notes →</a></p>
+  </Panel>
+
+  <Panel title="projects" note={`${projects.length} entries`}>
+    {
+      projects.length === 0 ? (
+        <p class="empty">No projects yet.</p>
+      ) : (
+        <ul class="grid-cards">
+          {projects.map((p) => (
+            <li class="card">
+              <h3 class="card__title"><a href={`/projects/${p.id}/`}>{p.data.title}</a></h3>
+              <p class="card__sum">{p.data.summary}</p>
+              <ul class="tags">
+                <li class="tag">{STATUS[p.data.status]}</li>
+                {p.data.lang && <li class="tag">{p.data.lang}</li>}
+                {tagsWithoutLang(p.data.tags, p.data.lang)
+                  .slice(0, 2)
+                  .map((t) => <li class="tag">{t}</li>)}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+    <p style="margin:1.1rem 0 0"><a href="/projects/">all projects →</a></p>
+  </Panel>
+
+  {
+    posts.length > 0 && (
+      <Panel title="from the journal" note={`${posts.length} entries`}>
+        <EntryList
+          items={posts.map((p) => ({
+            href: `/journal/${p.id}/`,
+            title: p.data.title,
+            date: p.data.date,
+            summary: p.data.summary,
+            tags: p.data.tags,
+          }))}
+        />
+        <p style="margin:1rem 0 0"><a href="/journal/">all journal entries →</a></p>
+      </Panel>
+    )
+  }
+</Base>

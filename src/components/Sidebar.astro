@@ -1,0 +1,100 @@
+---
+import { getCollection } from 'astro:content';
+import Panel from './Panel.astro';
+import Blinkies from './Blinkies.astro';
+import { byDateDesc, formatDate, STATUS } from '../utils';
+import { SITE } from '../site';
+
+const notes = (await getCollection('notes', (n) => !n.data.draft)).sort(byDateDesc).slice(0, 5);
+const posts = (await getCollection('journal', (p) => !p.data.draft)).sort(byDateDesc).slice(0, 4);
+const projects = (await getCollection('projects'))
+  .sort((a, b) => b.data.order - a.data.order)
+  .slice(0, 4);
+
+const allTags = [
+  ...(await getCollection('notes')).flatMap((e) => e.data.tags),
+  ...(await getCollection('journal')).flatMap((e) => e.data.tags),
+  ...(await getCollection('projects')).flatMap((e) => e.data.tags),
+];
+const counts = new Map<string, number>();
+for (const t of allTags) counts.set(t, (counts.get(t) ?? 0) + 1);
+const topTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12);
+---
+
+<aside class="side" aria-label="Sidebar">
+  {
+    notes.length > 0 && (
+      <Panel title="latest notes" note="◈">
+        <ul>
+          {notes.map((n) => (
+            <li>
+              <a href={`/notes/${n.id}/`}>{n.data.title}</a>
+              <span class="mini">{formatDate(n.data.date)}</span>
+            </li>
+          ))}
+        </ul>
+      </Panel>
+    )
+  }
+
+  {
+    projects.length > 0 && (
+      <Panel title="projects" note="◈">
+        <ul>
+          {projects.map((p) => (
+            <li>
+              <a href={`/projects/${p.id}/`}>{p.data.title}</a>
+              <span class="mini">
+                {STATUS[p.data.status]}
+                {p.data.lang ? ` · ${p.data.lang}` : ''}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </Panel>
+    )
+  }
+
+  {
+    posts.length > 0 && (
+      <Panel title="from the journal" note="◈">
+        <ul>
+          {posts.map((p) => (
+            <li>
+              <a href={`/journal/${p.id}/`}>{p.data.title}</a>
+              <span class="mini">{formatDate(p.data.date)}</span>
+            </li>
+          ))}
+        </ul>
+      </Panel>
+    )
+  }
+
+  {
+    topTags.length > 0 && (
+      <Panel title="tags" note="◈">
+        <ul class="tags">
+          {topTags.map(([tag, n]) => (
+            <li>
+              <a class="tag" href={`/tags/${encodeURIComponent(tag)}/`}>
+                {tag} <span class="muted">{n}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </Panel>
+    )
+  }
+
+  <Panel title="badges" note="◈">
+    <Blinkies />
+  </Panel>
+
+  <Panel title="elsewhere" note="◈">
+    <ul>
+      <li><a href={SITE.github}>github</a><span class="mini">sabfodel</span></li>
+      <li><a href={`mailto:${SITE.email}`}>email</a><span class="mini">say something</span></li>
+      <li><a href="/rss.xml">rss</a><span class="mini">subscribe to the feed</span></li>
+    </ul>
+  </Panel>
+</aside>

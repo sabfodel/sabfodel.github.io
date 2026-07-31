@@ -1,0 +1,27 @@
+---
+import { getCollection, render } from 'astro:content';
+import Entry from '../../layouts/Entry.astro';
+import { STATUS } from '../../utils';
+
+export const getStaticPaths = async () => {
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({ params: { slug: project.id }, props: { project } }));
+};
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+const d = project.data;
+---
+
+<Entry
+  title={d.title}
+  kicker={`project · ${STATUS[d.status]}${d.lang ? ` · ${d.lang}` : ''}`}
+  date={d.date}
+  summary={d.summary}
+  tags={d.tags}
+  backHref="/projects/"
+  backLabel="all projects"
+>
+  {d.repo && <p><a href={d.repo}>▸ source: {d.repo.replace('https://', '')}</a></p>}
+  <Content />
+</Entry>

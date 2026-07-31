@@ -1,0 +1,49 @@
+---
+import Base from './Base.astro';
+import { formatDate, isoDate } from '../utils';
+
+interface Props {
+  title: string;
+  kicker?: string;
+  date?: Date;
+  summary?: string;
+  tags?: string[];
+  backHref: string;
+  backLabel: string;
+}
+
+const { title, kicker, date, summary, tags = [], backHref, backLabel } = Astro.props;
+---
+
+<Base title={title} description={summary}>
+  <article class="sheet">
+    <header class="entry-head">
+      {kicker && <p class="kicker" style="margin:0">{kicker}</p>}
+      <h1>{title}</h1>
+      {date && (
+        <p class="entry__meta" style="margin:0">
+          <time datetime={isoDate(date)}>{formatDate(date)}</time>
+        </p>
+      )}
+      {summary && <p class="muted" style="margin:.6rem 0 0">{summary}</p>}
+      {tags.length > 0 && (
+        <ul class="tags">
+          {tags.map((t) => (
+            <li>
+              <a class="tag" href={`/tags/${encodeURIComponent(t)}/`}>{t}</a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </header>
+
+    <div class="prose">
+      <slot />
+    </div>
+
+    <nav class="pager">
+      <a href={backHref}>← {backLabel}</a>
+      <a href="#main">↑ back to top</a>
+    </nav>
+  </article>
+</Base>

@@ -1,0 +1,20 @@
+---
+interface Props {
+  title: string;
+  /** Sağ üstteki küçük not (ör. "12 girdi") */
+  note?: string;
+  class?: string;
+}
+
+const { title, note, class: klass = '' } = Astro.props;
+---
+
+<section class={`panel ${klass}`}>
+  <header class="panel__hd">
+    <span>{title}</span>
+    {note ? <span class="dots">{note}</span> : <span class="dots">▪ ▪ ▪</span>}
+  </header>
+  <div class="panel__bd">
+    <slot />
+  </div>
+</section>

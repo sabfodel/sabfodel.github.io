@@ -1,0 +1,64 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Panel from '../../components/Panel.astro';
+import EntryList from '../../components/EntryList.astro';
+import type { EntryItem } from '../../types';
+
+export const getStaticPaths = async () => {
+  const notes = await getCollection('notes', (n) => !n.data.draft);
+  const journal = await getCollection('journal', (p) => !p.data.draft);
+  const projects = await getCollection('projects');
+
+  const items: (EntryItem & { tags: string[] })[] = [
+    ...notes.map((n) => ({
+      href: `/notes/${n.id}/`,
+      title: n.data.title,
+      date: n.data.date,
+      summary: n.data.summary,
+      tags: n.data.tags,
+      extra: 'note',
+    })),
+    ...projects.map((p) => ({
+      href: `/projects/${p.id}/`,
+      title: p.data.title,
+      date: p.data.date,
+      summary: p.data.summary,
+      tags: p.data.tags,
+      extra: 'project',
+    })),
+    ...journal.map((p) => ({
+      href: `/journal/${p.id}/`,
+      title: p.data.title,
+      date: p.data.date,
+      summary: p.data.summary,
+      tags: p.data.tags,
+      extra: 'journal',
+    })),
+  ];
+
+  const tags = new Set(items.flatMap((i) => i.tags));
+
+  return [...tags].map((tag) => ({
+    params: { tag },
+    props: {
+      tag,
+      items: items
+        .filter((i) => i.tags.includes(tag))
+        .sort((a, b) => (b.date?.valueOf() ?? 0) - (a.date?.valueOf() ?? 0)),
+    },
+  }));
+};
+
+const { tag, items } = Astro.props;
+---
+
+<Base title={`#${tag}`} description={`Everything tagged "${tag}".`}>
+  <Panel title={`tag: ${tag}`} note={`${items.length} entries`}>
+    <p style="margin-top:0" class="muted">
+      Notes, projects and journal entries carrying this tag, all in one place.
+    </p>
+    <EntryList items={items} empty="Nothing matches this tag." />
+    <p style="margin:1.2rem 0 0"><a href="/">← home</a></p>
+  </Panel>
+</Base>

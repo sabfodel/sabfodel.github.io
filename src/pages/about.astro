@@ -1,0 +1,52 @@
+---
+import Base from '../layouts/Base.astro';
+import Panel from '../components/Panel.astro';
+import Blinkies from '../components/Blinkies.astro';
+import { SITE } from '../site';
+---
+
+<Base title="about" description="Who I am and what's on this site.">
+  <Panel title="about" note="◈ ◈ ◈">
+    <div class="prose">
+      <p>
+        Hello. I'm a second-year physics student. My interests sit in condensed matter and
+        quantum information — I lean theoretical, though I haven't written off the
+        experimental side. Topological phases, quantum error correction, and the places
+        where those two meet are what's occupying me at the moment.
+      </p>
+      <p>
+        In my spare time I write Rust. Usually projects that start with "what would I learn
+        if I built this from scratch?" — a quantum circuit simulator, an N-body gravity
+        integrator, a ray tracer that follows light around a black hole.
+      </p>
+
+      <h2>What's here</h2>
+      <ul>
+        <li><a href="/notes/">notes</a> — physics written up properly: derivations, intuition, dead ends</li>
+        <li><a href="/projects/">projects</a> — what I've built and what it taught me</li>
+        <li><a href="/journal/">journal</a> — everything that doesn't fit the other two</li>
+      </ul>
+
+      <h2>This site</h2>
+      <p>
+        Built by hand with Astro. No template, no theme, no cookies, no tracking, no ads.
+        Posts live as plain Markdown files; equations are typeset with KaTeX. There's an
+        <a href="/rss.xml">RSS feed</a>, because a feed reader is still the best thing the
+        web ever produced.
+      </p>
+      <p>
+        The design is a nod to old personal pages — dark, red, beveled, with a marquee and
+        a hit counter that counts nothing. Best viewed with the lights off.
+      </p>
+
+      <h2>Contact</h2>
+      <p>
+        <a href={`mailto:${SITE.email}`}>{SITE.email}</a> ·
+        <a href={SITE.github}>github/sabfodel</a>
+      </p>
+    </div>
+
+    <hr />
+    <Blinkies />
+  </Panel>
+</Base>
