@@ -24,7 +24,17 @@ export const STATUS: Record<string, string> = {
   paused: 'paused',
   done: 'finished',
   idea: 'idea',
+  reading: 'reading',
+  abandoned: 'abandoned',
+  planned: 'up next',
 };
+
+/** 4 -> "★★★★" + "☆" */
+export function starParts(rating: number | undefined): { on: string; off: string } {
+  if (rating === undefined) return { on: '', off: '' };
+  const full = Math.round(rating);
+  return { on: '★'.repeat(full), off: '☆'.repeat(Math.max(0, 5 - full)) };
+}
 
 /** The card already shows a language badge — don't repeat it as a tag. */
 export function tagsWithoutLang(tags: string[], lang?: string): string[] {

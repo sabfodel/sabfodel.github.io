@@ -6,8 +6,16 @@ import { SITE } from '../site';
 export async function GET(context: APIContext) {
   const notes = await getCollection('notes', (n) => !n.data.draft);
   const journal = await getCollection('journal', (p) => !p.data.draft);
+  const practice = await getCollection('practice', (p) => !p.data.draft);
 
   const items = [
+    ...practice.map((p) => ({
+      title: p.data.title,
+      pubDate: p.data.date,
+      description: p.data.summary ?? '',
+      link: `/practice/${p.id}/`,
+      categories: p.data.tags,
+    })),
     ...notes.map((n) => ({
       title: n.data.title,
       pubDate: n.data.date,

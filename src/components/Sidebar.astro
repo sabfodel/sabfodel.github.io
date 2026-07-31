@@ -2,19 +2,25 @@
 import { getCollection } from 'astro:content';
 import Panel from './Panel.astro';
 import Blinkies from './Blinkies.astro';
-import { byDateDesc, formatDate, STATUS } from '../utils';
+import { byDateDesc, formatDate, starParts, STATUS } from '../utils';
 import { SITE } from '../site';
 
-const notes = (await getCollection('notes', (n) => !n.data.draft)).sort(byDateDesc).slice(0, 5);
-const posts = (await getCollection('journal', (p) => !p.data.draft)).sort(byDateDesc).slice(0, 4);
+const notes = (await getCollection('notes', (n) => !n.data.draft)).sort(byDateDesc).slice(0, 4);
+const posts = (await getCollection('journal', (p) => !p.data.draft)).sort(byDateDesc).slice(0, 3);
+const practice = (await getCollection('practice', (p) => !p.data.draft))
+  .sort(byDateDesc)
+  .slice(0, 3);
 const projects = (await getCollection('projects'))
   .sort((a, b) => b.data.order - a.data.order)
   .slice(0, 4);
+const nowReading = (await getCollection('reading', (b) => b.data.status === 'reading')).slice(0, 3);
 
 const allTags = [
   ...(await getCollection('notes')).flatMap((e) => e.data.tags),
   ...(await getCollection('journal')).flatMap((e) => e.data.tags),
   ...(await getCollection('projects')).flatMap((e) => e.data.tags),
+  ...(await getCollection('practice')).flatMap((e) => e.data.tags),
+  ...(await getCollection('reading')).flatMap((e) => e.data.tags),
 ];
 const counts = new Map<string, number>();
 for (const t of allTags) counts.set(t, (counts.get(t) ?? 0) + 1);
@@ -22,6 +28,29 @@ const topTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12);
 ---
 
 <aside class="side" aria-label="Sidebar">
+  {
+    nowReading.length > 0 && (
+      <Panel title="currently reading" note="◈">
+        <ul>
+          {nowReading.map((b) => {
+            const s = starParts(b.data.rating);
+            return (
+              <li>
+                <a href={`/reading/${b.id}/`}>{b.data.title}</a>
+                <span class="mini">
+                  {b.data.author}
+                  {b.data.rating !== undefined && (
+                    <span class="stars"> {s.on}<span class="off">{s.off}</span></span>
+                  )}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      </Panel>
+    )
+  }
+
   {
     notes.length > 0 && (
       <Panel title="latest notes" note="◈">
@@ -48,6 +77,21 @@ const topTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12);
                 {STATUS[p.data.status]}
                 {p.data.lang ? ` · ${p.data.lang}` : ''}
               </span>
+            </li>
+          ))}
+        </ul>
+      </Panel>
+    )
+  }
+
+  {
+    practice.length > 0 && (
+      <Panel title="practice log" note="◈">
+        <ul>
+          {practice.map((p) => (
+            <li>
+              <a href={`/practice/${p.id}/`}>{p.data.title}</a>
+              <span class="mini">{p.data.discipline} · {formatDate(p.data.date)}</span>
             </li>
           ))}
         </ul>

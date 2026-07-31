@@ -1,0 +1,14 @@
+{
+  "attachmentFolderPath": "public/img",
+  "newLinkFormat": "shortest",
+  "useMarkdownLinks": false,
+  "alwaysUpdateLinks": true,
+  "showUnsupportedFiles": false,
+  "userIgnoreFilters": [
+    "node_modules/",
+    "dist/",
+    ".astro/",
+    ".git/",
+    ".github/"
+  ]
+}

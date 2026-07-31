@@ -30,6 +30,38 @@ const projects = defineCollection({
   }),
 });
 
+/** Books, with a review attached. */
+const reading = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/reading' }),
+  schema: z.object({
+    title: z.string(),
+    author: z.string(),
+    year: z.number().optional(),
+    status: z.enum(['reading', 'done', 'abandoned', 'planned']).default('reading'),
+    rating: z.number().min(0).max(5).optional(),
+    started: z.coerce.date().optional(),
+    finished: z.coerce.date().optional(),
+    /** Path under public/, e.g. /img/covers/foo.jpg */
+    cover: z.string().optional(),
+    tags: z.array(z.string()).default([]),
+    summary: z.string().optional(),
+  }),
+});
+
+/** Things I'm learning that aren't physics — violin, and whatever comes next. */
+const practice = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/practice' }),
+  schema: z.object({
+    title: z.string(),
+    date: z.coerce.date(),
+    summary: z.string().optional(),
+    /** Groups entries on the index page, e.g. "violin" */
+    discipline: z.string().default('misc'),
+    tags: z.array(z.string()).default([]),
+    draft: z.boolean().default(false),
+  }),
+});
+
 /** Free-form writing. */
 const journal = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/journal' }),
@@ -43,4 +75,14 @@ const journal = defineCollection({
   }),
 });
 
-export const collections = { notes, projects, journal };
+/** Standalone markdown pages (currently just /uses/). */
+const pages = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/pages' }),
+  schema: z.object({
+    title: z.string(),
+    updated: z.coerce.date().optional(),
+    summary: z.string().optional(),
+  }),
+});
+
+export const collections = { notes, projects, reading, practice, journal, pages };

@@ -1,0 +1,53 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Panel from '../../components/Panel.astro';
+import Shelf from '../../components/Shelf.astro';
+
+const all = await getCollection('reading');
+
+const reading = all.filter((b) => b.data.status === 'reading');
+const done = all
+  .filter((b) => b.data.status === 'done')
+  .sort((a, b) => (b.data.finished?.valueOf() ?? 0) - (a.data.finished?.valueOf() ?? 0));
+const planned = all.filter((b) => b.data.status === 'planned');
+const abandoned = all.filter((b) => b.data.status === 'abandoned');
+---
+
+<Base title="reading" description="Books I've read, am reading, and gave up on — with reviews.">
+  <Panel title="reading" note={`${all.length} books`}>
+    <p style="margin-top:0" class="muted">
+      A reading log with opinions attached. Physics textbooks mostly, but not only — click a
+      cover and you'll get the full review rather than a star rating and nothing else.
+      Ratings are personal and I'll happily argue about them.
+    </p>
+    <p style="margin-bottom:0" class="muted">
+      <strong>{reading.length}</strong> in progress · <strong>{done.length}</strong> finished ·
+      <strong>{planned.length}</strong> up next · <strong>{abandoned.length}</strong> abandoned
+    </p>
+  </Panel>
+
+  <Panel title="currently reading" note={`${reading.length}`}>
+    <Shelf books={reading} empty="Nothing in my hands right now. Suspicious." />
+  </Panel>
+
+  <Panel title="finished" note={`${done.length}`}>
+    <Shelf books={done} empty="Nothing finished yet." />
+  </Panel>
+
+  {
+    planned.length > 0 && (
+      <Panel title="up next" note={`${planned.length}`}>
+        <Shelf books={planned} />
+      </Panel>
+    )
+  }
+
+  {
+    abandoned.length > 0 && (
+      <Panel title="gave up on" note={`${abandoned.length}`}>
+        <Shelf books={abandoned} />
+      </Panel>
+    )
+  }
+</Base>

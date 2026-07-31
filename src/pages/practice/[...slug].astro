@@ -1,0 +1,24 @@
+---
+import { getCollection, render } from 'astro:content';
+import Entry from '../../layouts/Entry.astro';
+
+export const getStaticPaths = async () => {
+  const entries = await getCollection('practice', (e) => !e.data.draft);
+  return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+};
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<Entry
+  title={entry.data.title}
+  kicker={`practice · ${entry.data.discipline}`}
+  date={entry.data.date}
+  summary={entry.data.summary}
+  tags={entry.data.tags}
+  backHref="/practice/"
+  backLabel="all practice entries"
+>
+  <Content />
+</Entry>

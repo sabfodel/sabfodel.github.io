@@ -1,0 +1,67 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { formatDate, starParts, STATUS } from '../../utils';
+
+export const getStaticPaths = async () => {
+  const books = await getCollection('reading');
+  return books.map((book) => ({ params: { slug: book.id }, props: { book } }));
+};
+
+const { book } = Astro.props;
+const { Content } = await render(book);
+const s = starParts(book.data.rating);
+const d = book.data;
+---
+
+<Base title={d.title} description={d.summary}>
+  <article class="sheet">
+    <header class="entry-head">
+      <p class="kicker" style="margin:0">reading · {STATUS[d.status]}</p>
+      <h1>{d.title}</h1>
+      <p class="muted" style="margin:0">{d.author}{d.year ? `, ${d.year}` : ''}</p>
+      {
+        d.rating !== undefined && (
+          <p class="stars" style="margin:.4rem 0 0;font-size:1.15rem">
+            {s.on}<span class="off">{s.off}</span>
+          </p>
+        )
+      }
+      {
+        d.tags.length > 0 && (
+          <ul class="tags">
+            {d.tags.map((t) => (
+              <li><a class="tag" href={`/tags/${encodeURIComponent(t)}/`}>{t}</a></li>
+            ))}
+          </ul>
+        )
+      }
+    </header>
+
+    <div class="book-detail">
+      <div>
+        <div class:list={['book__cover', !d.cover && 'book__cover--blank']}>
+          {d.cover ? <img src={d.cover} alt={`Cover of ${d.title}`} /> : <span>{d.title}</span>}
+        </div>
+        <table style="margin-top:1rem;font-size:.85rem">
+          <tbody>
+            <tr><th>status</th><td>{STATUS[d.status]}</td></tr>
+            {d.started && <tr><th>started</th><td>{formatDate(d.started)}</td></tr>}
+            {d.finished && <tr><th>finished</th><td>{formatDate(d.finished)}</td></tr>}
+            {d.year && <tr><th>published</th><td>{d.year}</td></tr>}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="prose">
+        {d.summary && <p class="muted"><em>{d.summary}</em></p>}
+        <Content />
+      </div>
+    </div>
+
+    <nav class="pager">
+      <a href="/reading/">← back to the shelf</a>
+      <a href="#main">↑ back to top</a>
+    </nav>
+  </article>
+</Base>

@@ -3,10 +3,15 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Panel from '../components/Panel.astro';
 import EntryList from '../components/EntryList.astro';
+import Shelf from '../components/Shelf.astro';
 import { byDateDesc, STATUS, tagsWithoutLang } from '../utils';
 
 const notes = (await getCollection('notes', (n) => !n.data.draft)).sort(byDateDesc).slice(0, 5);
 const posts = (await getCollection('journal', (p) => !p.data.draft)).sort(byDateDesc).slice(0, 3);
+const practice = (await getCollection('practice', (p) => !p.data.draft))
+  .sort(byDateDesc)
+  .slice(0, 3);
+const shelf = (await getCollection('reading')).slice(0, 6);
 const projects = (await getCollection('projects')).sort(
   (a, b) => b.data.order - a.data.order || byDateDesc(a, b)
 );
@@ -64,6 +69,33 @@ const projects = (await getCollection('projects')).sort(
     }
     <p style="margin:1.1rem 0 0"><a href="/projects/">all projects →</a></p>
   </Panel>
+
+  {
+    shelf.length > 0 && (
+      <Panel title="off the shelf" note={`${shelf.length} books`}>
+        <Shelf books={shelf} />
+        <p style="margin:1.1rem 0 0"><a href="/reading/">the whole shelf →</a></p>
+      </Panel>
+    )
+  }
+
+  {
+    practice.length > 0 && (
+      <Panel title="practice log" note={`${practice.length} entries`}>
+        <EntryList
+          items={practice.map((p) => ({
+            href: `/practice/${p.id}/`,
+            title: p.data.title,
+            date: p.data.date,
+            summary: p.data.summary,
+            tags: p.data.tags,
+            extra: p.data.discipline,
+          }))}
+        />
+        <p style="margin:1rem 0 0"><a href="/practice/">all practice entries →</a></p>
+      </Panel>
+    )
+  }
 
   {
     posts.length > 0 && (

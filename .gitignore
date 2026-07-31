@@ -5,3 +5,12 @@ dist/
 *.log
 .env
 .env.production
+
+# Obsidian: ayarlar ve şablonlar repoda kalsın (makineler arası aynı olsun),
+# yerel pencere durumu, önbellek ve eklenti kodu kalmasın.
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/workspaces.json
+.obsidian/cache
+.obsidian/plugins/
+.obsidian/themes/

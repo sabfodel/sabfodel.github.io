@@ -9,6 +9,8 @@ export const getStaticPaths = async () => {
   const notes = await getCollection('notes', (n) => !n.data.draft);
   const journal = await getCollection('journal', (p) => !p.data.draft);
   const projects = await getCollection('projects');
+  const practice = await getCollection('practice', (p) => !p.data.draft);
+  const reading = await getCollection('reading');
 
   const items: (EntryItem & { tags: string[] })[] = [
     ...notes.map((n) => ({
@@ -26,6 +28,22 @@ export const getStaticPaths = async () => {
       summary: p.data.summary,
       tags: p.data.tags,
       extra: 'project',
+    })),
+    ...reading.map((b) => ({
+      href: `/reading/${b.id}/`,
+      title: b.data.title,
+      date: b.data.finished ?? b.data.started,
+      summary: b.data.summary,
+      tags: b.data.tags,
+      extra: `book · ${b.data.author}`,
+    })),
+    ...practice.map((p) => ({
+      href: `/practice/${p.id}/`,
+      title: p.data.title,
+      date: p.data.date,
+      summary: p.data.summary,
+      tags: p.data.tags,
+      extra: `practice · ${p.data.discipline}`,
     })),
     ...journal.map((p) => ({
       href: `/journal/${p.id}/`,
@@ -56,7 +74,8 @@ const { tag, items } = Astro.props;
 <Base title={`#${tag}`} description={`Everything tagged "${tag}".`}>
   <Panel title={`tag: ${tag}`} note={`${items.length} entries`}>
     <p style="margin-top:0" class="muted">
-      Notes, projects and journal entries carrying this tag, all in one place.
+      Everything carrying this tag — notes, projects, books, practice and journal — in one
+      place.
     </p>
     <EntryList items={items} empty="Nothing matches this tag." />
     <p style="margin:1.2rem 0 0"><a href="/">← home</a></p>
