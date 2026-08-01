@@ -6,8 +6,10 @@ export const SITE = {
     'Notes on condensed matter physics and quantum information, plus the things I build.',
   author: 'sabfodel',
   lang: 'en',
-  email: 'sabri00640@gmail.com',
   github: 'https://github.com/sabfodel',
+  // Fotoğraf hesabı — /photos/ sayfasında ve kenar çubuğunda görünür
+  instagram: 'https://instagram.com/sabsabfo',
+  instagramHandle: '@sabsabfo',
 };
 
 export const NAV = [
@@ -16,6 +18,7 @@ export const NAV = [
   { href: '/projects/', label: 'projects' },
   { href: '/reading/',  label: 'reading' },
   { href: '/practice/', label: 'practice' },
+  { href: '/photos/',   label: 'photos' },
   { href: '/journal/',  label: 'journal' },
   { href: '/uses/',     label: 'uses' },
   { href: '/about/',    label: 'about' },
@@ -25,5 +28,4 @@ export const NAV = [
 export const TICKER = [
   '<b>under construction</b> ✝ as all good pages are',
   'no template ✝ no theme ✝ no cookies ✝ no tracking',
-  'best viewed at <b>1024×768</b> or above ✝ turn the lights off',
 ];

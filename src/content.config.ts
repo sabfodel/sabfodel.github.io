@@ -62,6 +62,26 @@ const practice = defineCollection({
   }),
 });
 
+/** Photographs. One entry per frame. */
+const photos = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/photos' }),
+  schema: z.object({
+    title: z.string(),
+    date: z.coerce.date(),
+    /** Path under public/, e.g. /img/photos/geese.jpg */
+    image: z.string(),
+    /** Screen-reader description of the frame */
+    alt: z.string().optional(),
+    /** Shown under the photo, e.g. "Bosphorus, Istanbul" */
+    place: z.string().optional(),
+    caption: z.string().optional(),
+    tags: z.array(z.string()).default([]),
+    /** Bigger tile in the grid — for the ones worth lingering on */
+    feature: z.boolean().default(false),
+    draft: z.boolean().default(false),
+  }),
+});
+
 /** Free-form writing. */
 const journal = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/journal' }),
@@ -85,4 +105,4 @@ const pages = defineCollection({
   }),
 });
 
-export const collections = { notes, projects, reading, practice, journal, pages };
+export const collections = { notes, projects, reading, practice, photos, journal, pages };

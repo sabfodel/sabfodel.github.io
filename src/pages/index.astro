@@ -4,6 +4,7 @@ import Base from '../layouts/Base.astro';
 import Panel from '../components/Panel.astro';
 import EntryList from '../components/EntryList.astro';
 import Shelf from '../components/Shelf.astro';
+import Gallery from '../components/Gallery.astro';
 import { byDateDesc, STATUS, tagsWithoutLang } from '../utils';
 
 const notes = (await getCollection('notes', (n) => !n.data.draft)).sort(byDateDesc).slice(0, 5);
@@ -12,6 +13,9 @@ const practice = (await getCollection('practice', (p) => !p.data.draft))
   .sort(byDateDesc)
   .slice(0, 3);
 const shelf = (await getCollection('reading')).slice(0, 6);
+const frames = (await getCollection('photos', (p) => !p.data.draft))
+  .sort(byDateDesc)
+  .slice(0, 6);
 const projects = (await getCollection('projects')).sort(
   (a, b) => b.data.order - a.data.order || byDateDesc(a, b)
 );
@@ -66,6 +70,15 @@ const projects = (await getCollection('projects')).sort(
       <Panel title="off the shelf" note={`${shelf.length} books`}>
         <Shelf books={shelf} />
         <p style="margin:1.1rem 0 0"><a href="/reading/">the whole shelf →</a></p>
+      </Panel>
+    )
+  }
+
+  {
+    frames.length > 0 && (
+      <Panel title="photos" note={`${frames.length} frames`}>
+        <Gallery photos={frames} />
+        <p style="margin:1.1rem 0 0"><a href="/photos/">all photos →</a></p>
       </Panel>
     )
   }

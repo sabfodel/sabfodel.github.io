@@ -1,5 +1,7 @@
 {
   "attachmentFolderPath": "public/img",
+  "newFileLocation": "folder",
+  "newFileFolderPath": "src/content/journal",
   "newLinkFormat": "shortest",
   "useMarkdownLinks": false,
   "alwaysUpdateLinks": true,

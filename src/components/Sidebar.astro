@@ -137,7 +137,10 @@ const topTags = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12);
   <Panel title="elsewhere" note="◈">
     <ul>
       <li><a href={SITE.github}>github</a><span class="mini">sabfodel</span></li>
-      <li><a href={`mailto:${SITE.email}`}>email</a><span class="mini">say something</span></li>
+      <li>
+        <a href={SITE.instagram}>instagram</a>
+        <span class="mini">{SITE.instagramHandle} · photos</span>
+      </li>
       <li><a href="/rss.xml">rss</a><span class="mini">subscribe to the feed</span></li>
     </ul>
   </Panel>

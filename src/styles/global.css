@@ -529,6 +529,101 @@ a.tag:hover {
   .book-detail > :first-child { max-width: 190px; }
 }
 
+/* --- fotoğraf ızgarası -------------------------------------------------- */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+@media (max-width: 620px) {
+  .gallery { grid-template-columns: repeat(2, 1fr); }
+}
+
+.frame { position: relative; }
+
+/* öne çıkanlar iki kat yer kaplar */
+.frame--feature { grid-column: span 2; grid-row: span 2; }
+
+@media (max-width: 620px) {
+  .frame--feature { grid-column: span 2; grid-row: span 1; }
+}
+
+.frame a {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #0d0405;
+  text-decoration: none;
+}
+
+.frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(.9) brightness(.92);
+  transition: filter .25s ease, transform .35s ease;
+}
+
+.frame a:hover img,
+.frame a:focus-visible img {
+  filter: saturate(1.05) brightness(1.04);
+  transform: scale(1.035);
+}
+
+.frame a:hover,
+.frame a:focus-visible { border-color: var(--red-mid); }
+
+/* başlık, üstüne binen şerit olarak */
+.frame__cap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 1.4rem .5rem .4rem;
+  font-family: var(--font-pix);
+  font-size: .68rem;
+  color: var(--bone);
+  background: linear-gradient(to top, rgba(6, 2, 3, .88), transparent);
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+
+.frame a:hover .frame__cap,
+.frame a:focus-visible .frame__cap { opacity: 1; }
+
+@media (hover: none) {
+  .frame__cap { opacity: 1; }
+}
+
+/* --- tek fotoğraf sayfası ---------------------------------------------- */
+.photo {
+  margin: 0 0 1.2rem;
+  border: 3px ridge var(--line-2);
+  background: #0d0405;
+  line-height: 0;
+}
+
+.photo img { width: 100%; height: auto; display: block; }
+
+.photo__meta {
+  font-family: var(--font-pix);
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--ink-faint);
+  line-height: 1.6;
+  margin: 0 0 1rem;
+}
+
 /* --- proje kartı ------------------------------------------------------- */
 .grid-cards {
   display: grid;
@@ -595,7 +690,7 @@ a.tag:hover {
   width: 110px;
   height: 27px;
   padding: 0 .25rem;
-  border: 2px outset #000;
+  border: 2px outset #1c0d0e;
   font-family: var(--font-pix);
   font-size: .62rem;
   font-weight: 700;
@@ -603,22 +698,23 @@ a.tag:hover {
   letter-spacing: .01em;
   text-align: center;
   text-transform: uppercase;
-  color: #fff;
-  background: linear-gradient(180deg, var(--red-mid), #240508);
-  text-shadow: 0 0 6px currentColor;
-  animation: blink 1.15s steps(1) infinite;
+  /* Düşük kontrast: sönük metin, parlama yok, yumuşak yanıp sönme */
+  color: var(--ink-dim);
+  background: linear-gradient(180deg, #2a1215, #150809);
+  text-shadow: none;
+  animation: blink 1.8s steps(1) infinite;
 }
 
-.blinkie:nth-child(2n) { animation-delay: .55s; }
-.blinkie:nth-child(3n) { animation-delay: .28s; }
+.blinkie:nth-child(2n) { animation-delay: .9s; }
+.blinkie:nth-child(3n) { animation-delay: .45s; }
 
-.blinkie--pink { background: linear-gradient(180deg, #7d2328, #150405); }
-.blinkie--bone { background: linear-gradient(180deg, #4a3a20, #14100a); color: var(--gold); }
-.blinkie--void { background: linear-gradient(180deg, #241416, #080304); }
+.blinkie--pink { background: linear-gradient(180deg, #33161a, #150607); }
+.blinkie--bone { background: linear-gradient(180deg, #2a2318, #12100b); color: #8d7d5b; }
+.blinkie--void { background: linear-gradient(180deg, #1a1113, #0a0405); }
 
 @keyframes blink {
   0%, 49%   { filter: brightness(1); }
-  50%, 100% { filter: brightness(1.7); }
+  50%, 100% { filter: brightness(1.18); }
 }
 
 /* --- yazı sayfası zemini ----------------------------------------------- */

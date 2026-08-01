@@ -11,6 +11,7 @@ export const getStaticPaths = async () => {
   const projects = await getCollection('projects');
   const practice = await getCollection('practice', (p) => !p.data.draft);
   const reading = await getCollection('reading');
+  const photos = await getCollection('photos', (p) => !p.data.draft);
 
   const items: (EntryItem & { tags: string[] })[] = [
     ...notes.map((n) => ({
@@ -36,6 +37,14 @@ export const getStaticPaths = async () => {
       summary: b.data.summary,
       tags: b.data.tags,
       extra: `book · ${b.data.author}`,
+    })),
+    ...photos.map((p) => ({
+      href: `/photos/${p.id}/`,
+      title: p.data.title,
+      date: p.data.date,
+      summary: p.data.caption,
+      tags: p.data.tags,
+      extra: p.data.place ? `photo · ${p.data.place}` : 'photo',
     })),
     ...practice.map((p) => ({
       href: `/practice/${p.id}/`,

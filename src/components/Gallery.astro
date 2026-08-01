@@ -1,0 +1,27 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  photos: CollectionEntry<'photos'>[];
+  empty?: string;
+}
+
+const { photos, empty = 'No photographs yet.' } = Astro.props;
+---
+
+{
+  photos.length === 0 ? (
+    <p class="empty">{empty}</p>
+  ) : (
+    <ul class="gallery">
+      {photos.map((p) => (
+        <li class:list={['frame', p.data.feature && 'frame--feature']}>
+          <a href={`/photos/${p.id}/`}>
+            <img src={p.data.image} alt={p.data.alt ?? p.data.title} loading="lazy" />
+            <span class="frame__cap">{p.data.title}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}

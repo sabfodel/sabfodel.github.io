@@ -5,6 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
+    "_comment": "prebuild: Astro'nun icerik onbellegini siler. Silinen/yeniden adlandirilan .md dosyalari aksi halde uretilmeye devam ediyor.",
+    "prebuild": "node -e \"require('fs').rmSync('node_modules/.astro',{recursive:true,force:true})\"",
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check"

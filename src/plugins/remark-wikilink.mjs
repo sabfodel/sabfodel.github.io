@@ -24,6 +24,7 @@ const SECTIONS = {
   journal: '/journal/',
   reading: '/reading/',
   practice: '/practice/',
+  photos: '/photos/',
 };
 
 const WIKILINK = /(!?)\[\[([^\][\n]+)\]\]/g;
@@ -66,10 +67,16 @@ function buildIndex() {
     }
   }
 
-  const images = new Set();
-  if (fs.existsSync(IMG_DIR)) {
-    for (const f of fs.readdirSync(IMG_DIR)) images.add(f);
-  }
+  // public/img altındaki her şey, alt klasörler dahil: "foto.jpg" -> "/img/photos/foto.jpg"
+  const images = new Map();
+  const walk = (dir, prefix) => {
+    if (!fs.existsSync(dir)) return;
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (e.isDirectory()) walk(path.join(dir, e.name), `${prefix}${e.name}/`);
+      else if (!images.has(e.name)) images.set(e.name, `/img/${prefix}${e.name}`);
+    }
+  };
+  walk(IMG_DIR, '');
 
   return { pages, images };
 }
@@ -102,7 +109,7 @@ export default function remarkWikiLink() {
           if (images.has(rawTarget)) {
             out.push({
               type: 'image',
-              url: `/img/${rawTarget}`,
+              url: images.get(rawTarget),
               alt: rawLabel ?? '',
               title: null,
             });

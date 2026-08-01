@@ -1,0 +1,60 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { byDateDesc, formatDate, isoDate } from '../../utils';
+
+export const getStaticPaths = async () => {
+  const photos = (await getCollection('photos', (p) => !p.data.draft)).sort(byDateDesc);
+  return photos.map((photo, i) => ({
+    params: { slug: photo.id },
+    props: {
+      photo,
+      // yeniden eskiye sıralı: sonraki = daha eski
+      newer: photos[i - 1],
+      older: photos[i + 1],
+    },
+  }));
+};
+
+const { photo, newer, older } = Astro.props;
+const { Content } = await render(photo);
+const d = photo.data;
+---
+
+<Base title={d.title} description={d.caption ?? d.title}>
+  <article class="sheet">
+    <header class="entry-head">
+      <p class="kicker" style="margin:0">photo</p>
+      <h1>{d.title}</h1>
+      <p class="photo__meta" style="margin:.3rem 0 0">
+        <time datetime={isoDate(d.date)}>{formatDate(d.date)}</time>
+        {d.place && <> · {d.place}</>}
+      </p>
+      {
+        d.tags.length > 0 && (
+          <ul class="tags">
+            {d.tags.map((t) => (
+              <li><a class="tag" href={`/tags/${encodeURIComponent(t)}/`}>{t}</a></li>
+            ))}
+          </ul>
+        )
+      }
+    </header>
+
+    <figure class="photo">
+      <img src={d.image} alt={d.alt ?? d.title} />
+    </figure>
+
+    {d.caption && <p class="muted" style="margin:0 0 1rem"><em>{d.caption}</em></p>}
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    <nav class="pager">
+      {newer ? <a href={`/photos/${newer.id}/`}>← newer</a> : <span />}
+      <a href="/photos/">all photos</a>
+      {older ? <a href={`/photos/${older.id}/`}>older →</a> : <span />}
+    </nav>
+  </article>
+</Base>
