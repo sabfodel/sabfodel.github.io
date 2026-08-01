@@ -36,6 +36,14 @@ export function starParts(rating: number | undefined): { on: string; off: string
   return { on: '★'.repeat(full), off: '☆'.repeat(Math.max(0, 5 - full)) };
 }
 
+/** Gallery order: manual `order` first, then newest date. */
+export function byOrderThenDate<T extends { data: { order: number; date: Date } }>(
+  a: T,
+  b: T
+): number {
+  return b.data.order - a.data.order || b.data.date.valueOf() - a.data.date.valueOf();
+}
+
 /** The card already shows a language badge — don't repeat it as a tag. */
 export function tagsWithoutLang(tags: string[], lang?: string): string[] {
   if (!lang) return tags;

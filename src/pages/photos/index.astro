@@ -3,10 +3,10 @@ import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Panel from '../../components/Panel.astro';
 import Gallery from '../../components/Gallery.astro';
-import { byDateDesc } from '../../utils';
+import { byOrderThenDate } from '../../utils';
 import { SITE } from '../../site';
 
-const photos = (await getCollection('photos', (p) => !p.data.draft)).sort(byDateDesc);
+const photos = (await getCollection('photos', (p) => !p.data.draft)).sort(byOrderThenDate);
 ---
 
 <Base title="photos" description="Photographs.">

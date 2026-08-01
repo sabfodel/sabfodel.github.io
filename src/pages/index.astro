@@ -5,7 +5,7 @@ import Panel from '../components/Panel.astro';
 import EntryList from '../components/EntryList.astro';
 import Shelf from '../components/Shelf.astro';
 import Gallery from '../components/Gallery.astro';
-import { byDateDesc, STATUS, tagsWithoutLang } from '../utils';
+import { byDateDesc, byOrderThenDate, STATUS, tagsWithoutLang } from '../utils';
 
 const notes = (await getCollection('notes', (n) => !n.data.draft)).sort(byDateDesc).slice(0, 5);
 const posts = (await getCollection('journal', (p) => !p.data.draft)).sort(byDateDesc).slice(0, 3);
@@ -14,7 +14,7 @@ const practice = (await getCollection('practice', (p) => !p.data.draft))
   .slice(0, 3);
 const shelf = (await getCollection('reading')).slice(0, 6);
 const frames = (await getCollection('photos', (p) => !p.data.draft))
-  .sort(byDateDesc)
+  .sort(byOrderThenDate)
   .slice(0, 6);
 const projects = (await getCollection('projects')).sort(
   (a, b) => b.data.order - a.data.order || byDateDesc(a, b)

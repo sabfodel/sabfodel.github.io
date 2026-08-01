@@ -78,6 +78,8 @@ const photos = defineCollection({
     tags: z.array(z.string()).default([]),
     /** Bigger tile in the grid — for the ones worth lingering on */
     feature: z.boolean().default(false),
+    /** Higher shows first. Leave at 0 to fall back to date order. */
+    order: z.number().default(0),
     draft: z.boolean().default(false),
   }),
 });

@@ -1,15 +1,15 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import { byDateDesc, formatDate, isoDate } from '../../utils';
+import { byOrderThenDate, formatDate, isoDate } from '../../utils';
 
 export const getStaticPaths = async () => {
-  const photos = (await getCollection('photos', (p) => !p.data.draft)).sort(byDateDesc);
+  const photos = (await getCollection('photos', (p) => !p.data.draft)).sort(byOrderThenDate);
   return photos.map((photo, i) => ({
     params: { slug: photo.id },
     props: {
       photo,
-      // yeniden eskiye sıralı: sonraki = daha eski
+      // galeri sırasında önceki / sonraki
       newer: photos[i - 1],
       older: photos[i + 1],
     },
