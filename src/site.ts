@@ -7,7 +7,7 @@ export const SITE = {
   author: 'sabfodel',
   lang: 'en',
   github: 'https://github.com/sabfodel',
-  // Fotoğraf hesabı — /photos/ sayfasında ve kenar çubuğunda görünür
+  // Fotoğraf hesabı — /photos/ sayfasında ve alt bilgide görünür
   instagram: 'https://instagram.com/sabsabfo',
   instagramHandle: '@sabsabfo',
 };
@@ -22,10 +22,4 @@ export const NAV = [
   { href: '/journal/',  label: 'journal' },
   { href: '/uses/',     label: 'uses' },
   { href: '/about/',    label: 'about' },
-];
-
-// Üstteki kayan yazı. Buraya ne yazarsan o akar — istediğin gibi değiştir.
-export const TICKER = [
-  '<b>under construction</b> ✝ as all good pages are',
-  'no template ✝ no theme ✝ no cookies ✝ no tracking',
 ];

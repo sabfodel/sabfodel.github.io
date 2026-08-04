@@ -12,7 +12,7 @@ const { title, note, class: klass = '' } = Astro.props;
 <section class={`panel ${klass}`}>
   <header class="panel__hd">
     <span>{title}</span>
-    {note ? <span class="dots">{note}</span> : <span class="dots">▪ ▪ ▪</span>}
+    {note && <span class="dots">{note}</span>}
   </header>
   <div class="panel__bd">
     <slot />

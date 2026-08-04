@@ -10,7 +10,7 @@ const { Content } = await render(page);
 ---
 
 <Base title={page.data.title} description={page.data.summary}>
-  <Panel title={page.data.title} note="◈ ◈ ◈">
+  <Panel title={page.data.title}>
     {
       page.data.updated && (
         <p class="entry__meta" style="margin:0 0 1rem">

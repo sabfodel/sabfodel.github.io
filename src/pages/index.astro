@@ -21,9 +21,9 @@ const projects = (await getCollection('projects')).sort(
 );
 ---
 
-<Base>
+<Base wide>
   {/* Karşılama metnini buraya yazabilirsin:
-      <Panel title="welcome" note="◈ ◈ ◈"><p>...</p></Panel> */}
+      <Panel title="welcome"><p>...</p></Panel> */}
 
   <Panel title="notes" note={`${notes.length} entries`}>
     <EntryList

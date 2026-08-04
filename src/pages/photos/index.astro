@@ -9,14 +9,14 @@ import { SITE } from '../../site';
 const photos = (await getCollection('photos', (p) => !p.data.draft)).sort(byOrderThenDate);
 ---
 
-<Base title="photos" description="Photographs.">
+<Base title="photos" description="Photographs." wide>
   <Panel title="photos" note={`${photos.length} frames`}>
     <p style="margin:0" class="muted">
       More of these on Instagram — <a href={SITE.instagram}>{SITE.instagramHandle}</a>.
     </p>
   </Panel>
 
-  <Panel title="gallery" note="◈ ◈ ◈">
+  <Panel title="gallery">
     <Gallery
       photos={photos}
       empty="No photographs here yet. Drop a file into public/img/photos/ and add a .md file to src/content/photos/."

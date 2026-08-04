@@ -9,7 +9,7 @@ const projects = (await getCollection('projects')).sort(
 );
 ---
 
-<Base title="projects" description="Things I build: simulators, tools, experiments.">
+<Base title="projects" description="Things I build: simulators, tools, experiments." wide>
   <Panel title="projects" note={`${projects.length} entries`}>
     <p style="margin:0" class="muted">
       Mostly Rust, some Python. Every one of them started with the same question — "what
@@ -17,7 +17,7 @@ const projects = (await getCollection('projects')).sort(
     </p>
   </Panel>
 
-  <Panel title="all of them" note="◈ ◈ ◈">
+  <Panel title="all of them">
     {
       projects.length === 0 ? (
         <p class="empty">No projects yet.</p>

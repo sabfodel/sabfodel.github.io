@@ -1,12 +1,11 @@
 ---
 import Base from '../layouts/Base.astro';
 import Panel from '../components/Panel.astro';
-import Blinkies from '../components/Blinkies.astro';
 import { SITE } from '../site';
 ---
 
 <Base title="about" description="About this site.">
-  <Panel title="about" note="◈ ◈ ◈">
+  <Panel title="about">
     <div class="prose">
       {/* Kendini anlatan bölüm buraya. Kim olduğun, ne okuduğun, ne ilgilendiğin. */}
 
@@ -34,8 +33,5 @@ import { SITE } from '../site';
         <a href={SITE.instagram}>instagram/{SITE.instagramHandle.replace('@', '')}</a>
       </p>
     </div>
-
-    <hr />
-    <Blinkies />
   </Panel>
 </Base>
