@@ -3,11 +3,11 @@
  * LET'S TALK — dev başlık fareyi izleyen bir "ışık" ile aydınlanır; altta hap
  * bağlantılar ve en sonda açılıştaki yörüngeye dönen imza.
  */
-import { SITE, OFF_THE_CLOCK } from '../../site';
+import { SITE } from '../../site';
 const year = new Date().getFullYear();
 ---
 
-<section class="lt" data-lt aria-labelledby="lt-title">
+<section class="lt" data-lt data-sg aria-labelledby="lt-title">
   <div class="lt__spot" data-lt-spot aria-hidden="true"></div>
   <p class="hud lt__kicker">§ 06 — contact</p>
   <h2 id="lt-title" class="lt__h wide-type" data-lt-h>Let’s talk</h2>
@@ -26,10 +26,7 @@ const year = new Date().getFullYear();
 
   <footer class="lt__foot hud">
     <span>© {year} {SITE.title}</span>
-    <span class="lt__off">
-      off the clock:
-      {OFF_THE_CLOCK.map((l) => <a href={l.href}>{l.label}</a>)}
-    </span>
+    <a href="/rss.xml">rss</a>
     <a href="#main">back to top ↑</a>
   </footer>
 </section>
@@ -44,7 +41,7 @@ const year = new Date().getFullYear();
     min-height: 100vh;
     padding: 8rem clamp(1rem, 4vw, 3rem) 6rem;
     overflow: hidden;
-    background: #050608;
+    background: linear-gradient(#050608, rgba(5, 6, 8, .35) 30%, rgba(5, 6, 8, .2));
     text-align: center;
   }
 
@@ -85,7 +82,6 @@ const year = new Date().getFullYear();
 
   .lt__foot a { color: var(--ink-dim); border: 0; }
   .lt__foot a:hover { color: var(--ink); }
-  .lt__off { display: inline-flex; flex-wrap: wrap; gap: .8rem; }
 
   @media (max-width: 640px) {
     .lt__foot { position: static; justify-content: center; margin-top: 3rem; }

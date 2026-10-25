@@ -6,7 +6,8 @@ const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
 
 <header class="topbar topbar--float">
   <a class="mark" href="/" aria-label={`${SITE.title} — home`}>
-    <span class="mark__name">{SITE.title}</span>
+    <canvas class="mark__liquid" data-liquid-logo aria-hidden="true"></canvas>
+    <span class="mark__name mark__nerd" data-liquid-fallback>{'\u{F0768}'} {SITE.title}</span>
     <span class="mark__sub label">/ physics</span>
   </a>
 
@@ -24,3 +25,30 @@ const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
     }
   </nav>
 </header>
+
+<style>
+  .mark { align-items: center; }
+
+  .mark__nerd {
+    font-family: 'BlexMono Nerd', var(--font-mono);
+    font-weight: 700;
+    font-size: 1.2rem;
+    letter-spacing: 0;
+  }
+
+  .mark__liquid { display: none; }
+  .mark.is-liquid .mark__liquid { display: block; }
+  .mark.is-liquid .mark__nerd { display: none; }
+</style>
+
+<script>
+  import { mountLiquid, ATOM } from '../scripts/liquid-logo';
+  import { SITE } from '../site';
+
+  const mark = document.querySelector<HTMLElement>('.mark')!;
+  const canvas = mark.querySelector<HTMLCanvasElement>('[data-liquid-logo]')!;
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  mountLiquid(canvas, { text: `${ATOM} ${SITE.title}`, size: 22, pad: 0.18, still }).then((ok) => {
+    if (ok) mark.classList.add('is-liquid');
+  });
+</script>

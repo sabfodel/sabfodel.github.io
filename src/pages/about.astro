@@ -11,7 +11,7 @@ import { SITE } from '../site';
 
   <div class="ab">
     <figure class="ab__photo">
-      <img src="/img/me/me-portrait.jpg" alt="sabfodel on a balcony" width="900" height="1125" loading="eager" />
+      <img src="/img/me/me-square.jpg" alt="sabfodel on a balcony" width="480" height="480" loading="eager" />
     </figure>
 
     <div class="prose ab__text">
@@ -58,11 +58,6 @@ import { SITE } from '../site';
         {SITE.cv && <> My <a href={SITE.cv}>CV</a> is here.</>}
       </p>
 
-      <h2>Outside physics</h2>
-      <p>
-        I take <a href="/photos/">photos</a>, keep a <a href="/reading/">reading</a> list and a
-        <a href="/journal/">journal</a>.
-      </p>
     </div>
   </div>
 </Base>
@@ -70,31 +65,25 @@ import { SITE } from '../site';
 <style>
   .ab {
     display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: clamp(2rem, 5vw, 5rem);
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: clamp(1.6rem, 4vw, 3.6rem);
     align-items: start;
   }
 
-  .ab__photo {
-    position: sticky;
-    top: 6rem;
-    margin: 0;
-  }
+  .ab__photo { margin: 0; }
 
   .ab__photo img {
     display: block;
-    width: 100%;
-    height: auto;
-    filter: contrast(1.05);
-    box-shadow: 0 40px 80px -40px rgba(0, 0, 0, .9);
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border: 1px solid var(--line-2);
   }
-
-  .ab__photo figcaption { margin-top: .6rem; }
 
   .ab__text { max-width: 62ch; }
 
-  @media (max-width: 820px) {
+  @media (max-width: 720px) {
     .ab { grid-template-columns: minmax(0, 1fr); }
-    .ab__photo { position: static; max-width: 420px; }
+    .ab__photo img { width: 140px; height: 140px; }
   }
 </style>

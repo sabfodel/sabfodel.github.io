@@ -1,5 +1,5 @@
 ---
-import { SITE, NAV, OFF_THE_CLOCK } from '../site';
+import { SITE, NAV } from '../site';
 const year = new Date().getFullYear();
 ---
 
@@ -13,11 +13,7 @@ const year = new Date().getFullYear();
   </nav>
   <div class="ft__row hud">
     <span>© {year} {SITE.title}</span>
-    <span class="ft__off">
-      off the clock:
-      {OFF_THE_CLOCK.map((l) => <a href={l.href}>{l.label}</a>)}
-      <a href="/rss.xml">rss</a>
-    </span>
+    <a href="/rss.xml">rss</a>
     <a href="#main">back to top ↑</a>
   </div>
 </footer>
@@ -30,7 +26,7 @@ const year = new Date().getFullYear();
     margin: 8rem calc(50% - 50vw) 0;
     padding: 5rem clamp(1rem, 4vw, 3rem) 1.4rem;
     border-top: 1px solid var(--line);
-    background: radial-gradient(50% 60% at 50% 40%, rgba(255, 244, 225, .05), transparent 70%), #050608;
+    background: radial-gradient(50% 60% at 50% 40%, rgba(255, 244, 225, .05), transparent 70%);
     text-align: center;
   }
 
@@ -59,7 +55,6 @@ const year = new Date().getFullYear();
 
   .ft__row a { color: var(--ink-dim); border: 0; }
   .ft__row a:hover { color: var(--ink); }
-  .ft__off { display: inline-flex; flex-wrap: wrap; gap: .8rem; }
 
   @media (max-width: 640px) {
     .ft__row { justify-content: center; }

@@ -1,4 +1,5 @@
 import { defineConfig } from 'astro/config';
+import react from '@astrojs/react';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import remarkWikiLink from './src/plugins/remark-wikilink.mjs';
@@ -7,6 +8,8 @@ import remarkWikiLink from './src/plugins/remark-wikilink.mjs';
 // so the site lives at the domain root and needs no `base`.
 export default defineConfig({
   site: 'https://sabfodel.github.io',
+  // Yalnızca ShaderGradient arka planı için (React + three.js adası)
+  integrations: [react()],
   markdown: {
     // remarkMath önce: $...$ matematik düğümlerine ayrılsın, wikilink yalnızca
     // geriye kalan düz metne baksın.

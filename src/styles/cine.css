@@ -29,9 +29,32 @@ html[data-cine] {
   color-scheme: dark;
 }
 
+html[data-cine] { background-color: var(--bg); }
+
 html[data-cine] body {
-  background-color: var(--bg);
+  background-color: transparent;
   overflow-x: clip;
+}
+
+/* ShaderGradient arka planı: sabit, tüm sayfanın arkasında */
+.sg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: #050608;
+}
+
+.sg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(80% 70% at 50% 40%, rgba(5, 6, 8, .05), rgba(5, 6, 8, .35) 100%);
+}
+
+/* iç sayfalarda okunabilirlik için daha koyu */
+html[data-page='inner'] .sg::after {
+  background: linear-gradient(rgba(5, 6, 8, .55), rgba(5, 6, 8, .82) 60vh);
 }
 
 /* Lenis */
@@ -41,7 +64,8 @@ html.lenis, html.lenis body { height: auto; }
 
 main.cine { max-width: none; margin: 0; }
 
-/* Sabit, şeffaf üst bant — "difference" ile açık/koyu her bölümde okunur */
+/* Sabit, şeffaf üst bant. Karışım modu yok (sıvı logonun renkleri bozulmasın);
+   kâğıt zeminli bölümlerin üstündeyken menü yazısı koyulaşır. */
 .topbar--float {
   position: fixed;
   inset: 0 0 auto 0;
@@ -50,17 +74,22 @@ main.cine { max-width: none; margin: 0; }
   padding: 1.1rem clamp(1rem, 3vw, 2.2rem);
   border: 0;
   color: #fff;
-  mix-blend-mode: difference;
   pointer-events: none;
+  transition: color .3s ease;
 }
 
 .topbar--float > * { pointer-events: auto; }
 .topbar--float .mark,
 .topbar--float .mark__sub,
 .topbar--float .nav a,
-.topbar--float .nav a .idx { color: #fff; }
-.topbar--float .nav a[aria-current='page'] { border-bottom-color: #fff; }
+.topbar--float .nav a .idx { color: inherit; text-shadow: 0 1px 12px rgba(0, 0, 0, .45); }
+.topbar--float .nav a .idx { opacity: .6; }
+.topbar--float .nav a[aria-current='page'] { border-bottom-color: currentColor; }
 .topbar--float .nav a:hover { opacity: .7; }
+
+html.on-paper .topbar--float { color: var(--paper-ink); }
+html.on-paper .topbar--float .mark__sub,
+html.on-paper .topbar--float .nav a { text-shadow: none; }
 
 /* --- ortak parçalar --------------------------------------------------- */
 .hud {

@@ -5,15 +5,14 @@ import { SITE } from '../site';
 
 export async function GET(context: APIContext) {
   const notes = await getCollection('notes', (n) => !n.data.draft);
-  const journal = await getCollection('journal', (p) => !p.data.draft);
-  const practice = await getCollection('practice', (p) => !p.data.draft);
+  const projects = await getCollection('projects');
 
   const items = [
-    ...practice.map((p) => ({
+    ...projects.map((p) => ({
       title: p.data.title,
       pubDate: p.data.date,
       description: p.data.summary ?? '',
-      link: `/practice/${p.id}/`,
+      link: `/projects/${p.id}/`,
       categories: p.data.tags,
     })),
     ...notes.map((n) => ({
@@ -22,13 +21,6 @@ export async function GET(context: APIContext) {
       description: n.data.summary ?? '',
       link: `/notes/${n.id}/`,
       categories: n.data.tags,
-    })),
-    ...journal.map((p) => ({
-      title: p.data.title,
-      pubDate: p.data.date,
-      description: p.data.summary ?? '',
-      link: `/journal/${p.id}/`,
-      categories: p.data.tags,
     })),
   ].sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
 

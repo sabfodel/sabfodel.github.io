@@ -61,6 +61,16 @@ import LetsTalk from '../components/cine/LetsTalk.astro';
     })
   );
 
+  // Üst bant kâğıt zeminli bir bölümün üstündeyken menü yazısını koyulaştır
+  document.querySelectorAll<HTMLElement>('.section--paper').forEach((el) =>
+    ScrollTrigger.create({
+      trigger: el,
+      start: 'top 48px',
+      end: 'bottom 48px',
+      onToggle: (s) => document.documentElement.classList.toggle('on-paper', s.isActive),
+    })
+  );
+
   // Görseller / fontlar yüklenince ölçüler değişir
   addEventListener('load', () => ScrollTrigger.refresh());
   document.fonts?.ready.then(() => ScrollTrigger.refresh());

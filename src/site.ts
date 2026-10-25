@@ -6,9 +6,6 @@ export const SITE = {
   author: 'sabfodel',
   lang: 'en',
   github: 'https://github.com/sabfodel',
-  // Fotoğraf hesabı — /photos/ sayfasında ve alt bilgide görünür
-  instagram: 'https://instagram.com/sabsabfo',
-  instagramHandle: '@sabsabfo',
   // TODO: LinkedIn profilini açınca buraya ekle; alt bilgi ve /about/ otomatik gösterir.
   linkedin: '',
   // TODO: CV PDF'ini public/cv.pdf olarak koyunca '/cv.pdf' yaz.
@@ -21,13 +18,4 @@ export const NAV = [
   { href: '/lab/',      label: 'lab' },
   { href: '/notes/',    label: 'notes' },
   { href: '/about/',    label: 'about' },
-];
-
-/** Fizik dışı bölümler — yalnızca alt bilgide durur. */
-export const OFF_THE_CLOCK = [
-  { href: '/photos/',   label: 'photos' },
-  { href: '/reading/',  label: 'reading' },
-  { href: '/practice/', label: 'practice' },
-  { href: '/journal/',  label: 'journal' },
-  { href: '/uses/',     label: 'uses' },
 ];

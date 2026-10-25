@@ -1,6 +1,6 @@
 # sabfodel.github.io
 
-Kişisel site: fizik notları, projeler ve serbest yazılar. Astro ile statik üretim,
+Fizik portfolyosu: projeler, lab ve notlar. Astro ile statik üretim,
 Markdown içerik. Site dili İngilizce.
 
 ## Çalıştırma
@@ -72,19 +72,6 @@ tags: [rust, simulation]
 ---
 ```
 
-### `src/content/journal/` — serbest yazılar
-
-```yaml
----
-title: Hello world, again
-date: 2026-07-31
-summary: Tek cümle.
-tags: [meta, personal]
-mood: decided             # isteğe bağlı
-draft: false
----
-```
-
 ## Denklem yazmak
 
 KaTeX açık. Satır içi `$E = mc^2$`, blok için:
@@ -97,20 +84,19 @@ $$
 
 ## Etiketler
 
-Herhangi bir içerikte kullandığın etiket otomatik olarak `/tags/<ad>/` sayfası üretir ve
-üç bölümün hepsinden o etiketi taşıyan girdileri bir arada listeler. Ayrıca bir şey
-yapman gerekmez.
+Projelerde ve notlarda kullandığın her etiket otomatik olarak `/tags/<ad>/` sayfası üretir.
 
 ## Ayarlar
 
-`src/site.ts` — site başlığı, slogan, gezinme menüsü, üstteki kayan yazı.
-`src/styles/global.css` — bütün renkler en üstteki `:root` bloğunda ("field notes" teması:
-kâğıt zemin, kareli ızgara, pas/çelik mavisi/pirinç vurgular). Fontlar: Source Serif 4 (başlık),
-IBM Plex Sans (gövde), IBM Plex Mono (etiketler) — Google Fonts'tan `Base.astro` içinde.
+`src/site.ts` — site başlığı, açıklama, gezinme menüsü, GitHub / LinkedIn / CV bağlantıları.
+`src/styles/global.css` — renkler en üstteki `:root` bloğunda (tek, koyu tema).
+`src/styles/cine.css` — ana sayfanın sinematik parçaları, üst bant, gradyan katmanı.
+Fontlar: Archivo (başlıklar), IBM Plex Sans (gövde), IBM Plex Mono (etiketler), Source Serif 4
+(denklem/italik) — Google Fonts'tan `Base.astro` içinde; logo için BlexMono Nerd Font.
 
 ### Proje sayfaları
 
-Ana sayfadaki "Selected work" listesine girmesi için projeye `featured: true` ver. İsteğe bağlı
+Ana sayfadaki proje şeridine girmesi için projeye `featured: true` ver. İsteğe bağlı
 alanlar:
 
 ```yaml
@@ -125,27 +111,33 @@ Yazı sırası önerisi: problem → fizik → yöntem → sonuç → sınırlam
 
 ### Lab
 
-`/lab/` etkileşimli deneyler. Bloch küresi `src/components/BlochSphere.astro` içinde; ana
-sayfada da kullanılıyor.
+`/lab/` etkileşimli deneyler. Bloch küresi `src/components/BlochSphere.astro` içinde.
+Kaos (Lorenz, Yu-Wang, Thomas) ana sayfada: `src/components/cine/ChaosLab.astro`.
 
-## Görseller
+## Ana sayfa
 
-- `public/img/bg-taht-salonu.jpg` — sabit sayfa arka planı. `body::before` içinde,
-  üstüne karartma + kan sisi gradyanı biniyor. Metin fazla soluk/fazla karanlık gelirse
-  o kuraldaki `linear-gradient` alfa değerlerini (`.30 / .58 / .78`) oynat.
-- `public/img/claymore.png` — üst bantta duran maskot. Kaynak dosyada şeffaflık **yoktu**
-  (dama deseni gerçek piksel olarak gömülüydü); kenardan taşma-doldurma ile temizlenip
-  saydamlaştırıldı ve karaktere kırpıldı. Değiştirirsen gerçekten alfa kanalı olan bir
-  PNG kullan.
+`src/pages/index.astro` bölümleri sırayla dizer; her bölüm `src/components/cine/` altında
+kendi dosyasında: açılış (`Preloader`), kara delik parçacıkları (`HeroGather`), hakkımda kartı
+(`AboutZoom`), yolculuk (`Journey`), proje şeridi (`CurvedCarousel`), proje halkası
+(`WorksRing`), kaos (`ChaosLab`), yetenekler (`Capabilities`) ve iletişim (`LetsTalk`).
+Kaydırma: Lenis + GSAP ScrollTrigger, `src/scripts/motion.ts`.
 
-Arka plan `background-attachment: fixed` yerine sabit konumlu bir katman olarak duruyor —
-iOS Safari o özelliği düzgün uygulamıyor.
+### Arka plan, logo ve font
 
-### Fontlar
+- `src/components/GradientBg.tsx` — [ruucm/shadergradient](https://github.com/ruucm/shadergradient)
+  ile tüm sayfaların arkasındaki 3B gradyan (React adası, `client:only`). Renkler ve hareket
+  bu dosyadaki `ShaderGradient` özelliklerinde. Yalnızca `data-sg` işaretli bir bölüm
+  ekrandayken canlanır.
+- `src/scripts/liquid-logo.ts` — [collidingScopes/liquid-logo](https://github.com/collidingScopes/liquid-logo)
+  gölgelendiricisinden uyarlanmış sıvı metal "sabfodel" logosu (MIT, lisans metni dosyada).
+  Ön ayar `PRESET` içinde ("Galaxy").
+- `public/fonts/blexmono-nerd-bold.woff2` — BlexMono Nerd Font Bold (IBM Plex Mono'nun Nerd
+  Fonts sürümü), yalnızca Latin harfleri ve birkaç ikonla küçültülmüş. Lisans: SIL OFL 1.1,
+  `public/fonts/BlexMono-Nerd-Font-OFL.txt`.
 
-Gövde Georgia, etiketler Courier New — ikisi de sistem fontu. Dışarıdan yalnızca gotik
-başlık fontu (Pirata One) geliyor.
+### Kaldırılan bölümler
 
-Pikselli font denemek istersen dikkat: **Silkscreen ve DotGothic16'da `ş ğ İ` yok**.
-Pixelify Sans, Press Start 2P ve VT323 latin-ext'i tam taşıyor. Site şu an İngilizce
-olduğu için sorun değil, ama Türkçe içerik eklersen sıkıntı çıkarır.
+Fotoğraf, okuma, pratik, günlük ve `uses` sayfaları siteden kaldırıldı (yalnızca portfolyo
+kalsın diye). İçerik dosyaları `src/content/` altında ve görseller `public/img/photos/`
+altında duruyor; sayfaları geri getirmek için git geçmişindeki `src/pages/photos/` vb.
+klasörleri geri yüklemek yeterli.

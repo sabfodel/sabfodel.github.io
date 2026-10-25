@@ -12,7 +12,7 @@ const STOPS = [
 ];
 ---
 
-<section class="jr pin" data-journey style={`height:${STOPS.length * 80 + 60}vh`} aria-labelledby="jr-title">
+<section class="jr pin" data-journey data-sg style={`height:${STOPS.length * 80 + 60}vh`} aria-labelledby="jr-title">
   <div class="pin__stage jr__stage">
     <p class="jr__row jr__row--top wide-type" data-row="1" aria-hidden="true">Physics · Quantum · Simulation · Physics · Quantum · Simulation · Physics ·</p>
     <p class="jr__row jr__row--bot wide-type" data-row="-1" aria-hidden="true">Rust · Python · Qiskit · Rust · Python · Qiskit · Rust · Python · Qiskit ·</p>
@@ -42,7 +42,7 @@ const STOPS = [
 </section>
 
 <style>
-  .jr { background: #07090c; }
+  .jr { background: rgba(7, 9, 12, .78); }
 
   .jr__stage { display: grid; align-items: center; }
 

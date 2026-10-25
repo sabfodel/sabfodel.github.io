@@ -1,111 +1,82 @@
 ---
 /**
- * Giriş: dev başlığın önünde siyah-beyaz portre. Kaydırınca portre noktalara
- * ayrılır, dağılır ve aynı noktalar gargantua-rs'in kara deliği olarak toplanır.
- * Fare noktaları iter; parçacık evresinde tıklama / boşluk dağıtıp toplar.
+ * GATHER — gargantua-rs render'ı binlerce "foton"a ayrılır. Fare iter, tıklama /
+ * boşluk tuşu dağıtıp toplar, aşağı kaydırma bulutu patlatır. Arkada dev başlık.
  */
 ---
 
-<section class="gx pin" data-gx aria-labelledby="gx-title">
+<section class="gx pin" data-gx data-sg aria-labelledby="gx-title">
   <div class="pin__stage gx__stage">
     <h1 id="gx-title" class="gx__title wide-type" data-gx-title>
       <span class="gx__line"><span class="blur-word">Built</span> <span class="blur-word">from</span></span>
       <span class="gx__line"><span class="blur-word">first</span> <span class="blur-word">principles</span></span>
     </h1>
 
-    <img
-      class="gx__me"
-      data-gx-me
-      src="/img/me/me-cutout.webp"
-      alt="Portrait of sabfodel in a checked shirt"
-      width="1111"
-      height="1090"
-      fetchpriority="high"
-      decoding="async"
-    />
-
     <canvas class="gx__canvas" data-gx-canvas aria-hidden="true"></canvas>
 
     <div class="gx__hud gx__hud--tl hud">
       <span class="spaced gx__tag">Gather</span><br />
-      <span data-gx-sub>self-portrait</span>
+      gargantua-rs · Schwarzschild, r<sub>s</sub> = 1
     </div>
     <div class="gx__hud gx__hud--tr hud" aria-hidden="true">
-      <span data-gx-n>0</span> points<br />
-      <span data-gx-state>photo</span>
+      <span data-gx-n>0</span> photons<br />
+      <span data-gx-state>gathered</span>
     </div>
-    <p class="gx__hud gx__hud--bl">
-      Physics student.<br />I write simulations from scratch.
-    </p>
-    <div class="gx__hud gx__hud--br hud" aria-hidden="true" data-gx-hint>
-      <span class="gx__key">space</span> / click to scatter
+    <div class="gx__hud gx__hud--bl hud">
+      Physics student.<br />
+      I write simulations from scratch.
+    </div>
+    <div class="gx__hud gx__hud--br hud" aria-hidden="true">
+      <span class="gx__key">space</span> / click — scatter · gather
     </div>
     <div class="gx__scroll hud" aria-hidden="true"><span></span>scroll</div>
+    <span class="crosshair" style="left:24px;top:84px"></span>
+    <span class="crosshair" style="right:24px;top:84px"></span>
   </div>
 </section>
 
 <style>
-  .gx { height: 300vh; }
+  .gx { height: 190vh; }
 
+  /* Zemin şeffaf: arkada ShaderGradient var */
   .gx__stage {
-    background:
-      radial-gradient(55% 45% at 50% 60%, rgba(255, 255, 255, .06), transparent 70%),
-      #050608;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(55% 50% at 50% 55%, rgba(5, 6, 8, .7), rgba(5, 6, 8, .15) 100%);
   }
 
   .gx__title {
     position: absolute;
-    left: 0;
-    right: 0;
-    top: 22%;
     z-index: 1;
     text-align: center;
-    font-size: clamp(2.4rem, 9vw, 10rem);
+    font-size: clamp(2.4rem, 8.4vw, 9.4rem);
     color: #ece8df;
     pointer-events: none;
     user-select: none;
-    will-change: transform, opacity, filter;
   }
 
   .gx__line { display: block; white-space: nowrap; }
-  .gx__line + .gx__line { color: transparent; -webkit-text-stroke: 1px rgba(236, 232, 223, .6); }
-
-  .gx__me {
-    position: absolute;
-    left: 50%;
-    bottom: 0;
-    z-index: 2;
-    height: min(78vh, 900px);
-    width: auto;
-    max-width: none;
-    transform: translateX(-50%);
-    -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent 100%);
-    mask-image: linear-gradient(to bottom, #000 72%, transparent 100%);
-    filter: blur(18px);
-    opacity: 0;
-    pointer-events: none;
-    user-select: none;
-  }
+  .gx__line + .gx__line { color: transparent; -webkit-text-stroke: 1px rgba(236, 232, 223, .55); }
 
   .gx__canvas {
     position: absolute;
     inset: 0;
-    z-index: 3;
+    z-index: 2;
     width: 100%;
     height: 100%;
+    cursor: crosshair;
   }
 
   .gx__hud {
     position: absolute;
-    z-index: 4;
-    margin: 0;
+    z-index: 3;
     pointer-events: none;
   }
 
   .gx__hud--tl { left: clamp(1rem, 3vw, 2.2rem); top: 5.2rem; }
   .gx__hud--tr { right: clamp(1rem, 3vw, 2.2rem); top: 5.2rem; text-align: right; }
-  .gx__hud--bl { left: clamp(1rem, 3vw, 2.2rem); bottom: 3.4rem; font-size: .9rem; line-height: 1.5; color: var(--ink-dim); }
-  .gx__hud--br { right: clamp(1rem, 3vw, 2.2rem); bottom: 3.4rem; opacity: 0; transition: opacity .3s; }
+  .gx__hud--bl { left: clamp(1rem, 3vw, 2.2rem); bottom: 3.4rem; max-width: 34ch; text-transform: none; letter-spacing: .04em; font-size: .78rem; color: var(--ink-dim); }
+  .gx__hud--br { right: clamp(1rem, 3vw, 2.2rem); bottom: 3.4rem; }
 
   .gx__tag { color: var(--ink); font-size: .74rem; letter-spacing: .5em; }
 
@@ -119,7 +90,7 @@
 
   .gx__scroll {
     position: absolute;
-    z-index: 4;
+    z-index: 3;
     bottom: 1rem;
     left: 50%;
     display: grid;
@@ -143,145 +114,111 @@
   }
 
   @media (max-width: 640px) {
-    .gx__title { top: 24%; font-size: 11.5vw; }
+    .gx__title { font-size: 11.5vw; }
     .gx__line { white-space: normal; }
-    .gx__me { height: 60vh; }
     .gx__hud--tl, .gx__hud--tr { top: 6.8rem; }
-    .gx__hud--br, .gx__hud--bl { display: none; }
+    .gx__hud--br { display: none; }
+    .gx__hud--bl { bottom: 4.4rem; }
   }
 </style>
 
 <script>
-  import { gsap, ScrollTrigger, fitCanvas, loop, reduceMotion, isSmall, clamp, smooth } from '../../scripts/motion';
+  import { gsap, ScrollTrigger, fitCanvas, loop, reduceMotion, isSmall, clamp } from '../../scripts/motion';
 
   const root = document.querySelector<HTMLElement>('[data-gx]')!;
   const canvas = root.querySelector<HTMLCanvasElement>('[data-gx-canvas]')!;
-  const me = root.querySelector<HTMLImageElement>('[data-gx-me]')!;
-  const title = root.querySelector<HTMLElement>('[data-gx-title]')!;
   const nEl = root.querySelector<HTMLElement>('[data-gx-n]')!;
   const stateEl = root.querySelector<HTMLElement>('[data-gx-state]')!;
-  const subEl = root.querySelector<HTMLElement>('[data-gx-sub]')!;
-  const hint = root.querySelector<HTMLElement>('[data-gx-hint]')!;
   const words = root.querySelectorAll<HTMLElement>('.blur-word');
 
-  // --- giriş: başlık ve portre bulanıktan netliğe ------------------------
-  let revealed = false;
-  const reveal = () => {
+  // --- başlık: bulanıktan netliğe --------------------------------------
+  const reveal = () =>
     gsap.to(words, { opacity: 1, filter: 'blur(0px)', y: 0, duration: 1.3, stagger: 0.09, ease: 'power3.out' });
-    gsap.to(me, {
-      opacity: 1,
-      filter: 'blur(0px)',
-      duration: 1.6,
-      delay: 0.25,
-      ease: 'power2.out',
-      onComplete: () => {
-        revealed = true;
-      },
-    });
-  };
   if (reduceMotion || 'ready' in document.documentElement.dataset) reveal();
   else addEventListener('preloader:done', reveal, { once: true });
 
-  // Başlık fareye hafifçe karşı yönde kayar (derinlik)
-  if (!reduceMotion) {
-    root.addEventListener('pointermove', (e) => {
-      const dx = e.clientX / innerWidth - 0.5, dy = e.clientY / innerHeight - 0.5;
-      gsap.to(title, { x: -dx * 26, y: -dy * 14, duration: 0.8, ease: 'power2.out', overwrite: 'auto' });
-    });
-  }
-
-  // --- parçacıklar --------------------------------------------------------
-  // Her nokta: portredeki yeri (uv), kara delikteki yeri, dağılma yeri
-  type Pt = {
-    pu: number; pv: number; pg: number;
-    bx: number; by: number; bz: number;
-    br: number; bgc: number; bb: number; ba: number;
-    sx: number; sy: number; sz: number;
+  // --- parçacıklar ------------------------------------------------------
+  type P = {
+    x: number; y: number; z: number;      // toplanmış konum (normalleştirilmiş)
+    sx: number; sy: number; sz: number;   // dağılmış konum
+    r: number; g: number; b: number; a: number;
     delay: number;
-    ox: number; oy: number;
+    ox: number; oy: number;               // fare itmesi ofseti
   };
 
-  let pts: Pt[] = [];
+  let pts: P[] = [];
   let W = 0, H = 0;
-  let progress = 0;
-  let scatterTarget = 0, scatter = 0;
+  let scatterTarget = 0;   // tıklama / boşluk
+  let scatter = 0;         // yumuşatılmış
+  let scrollScatter = 0;   // kaydırmadan
   const mouse = { x: -9999, y: -9999, on: false };
+  const labels: number[] = [];
+
   const ctx = fitCanvas(canvas, (w, h) => { W = w; H = h; });
 
-  const load = (src: string) =>
-    new Promise<HTMLImageElement>((res) => {
-      const i = new Image();
-      i.onload = () => res(i);
-      i.src = src;
-    });
-
-  function pixels(img: HTMLImageElement, w: number, h: number) {
-    const c = document.createElement('canvas');
-    c.width = w; c.height = h;
-    const x = c.getContext('2d', { willReadFrequently: true })!;
-    x.drawImage(img, 0, 0, w, h);
-    return x.getImageData(0, 0, w, h).data;
-  }
-
-  Promise.all([load('/img/me/me-cutout.webp'), load('/img/work/gargantua-render.png')]).then(([face, hole]) => {
-    const N = isSmall() ? 5200 : 11000;
-
-    // portre: opak piksellerden düzgün örnekleme
-    const fw = 220, fh = Math.round((220 * face.height) / face.width);
-    const fd = pixels(face, fw, fh);
-    const portrait: [number, number, number][] = [];
-    let guard = 0;
-    while (portrait.length < N && guard++ < N * 40) {
-      const x = (Math.random() * fw) | 0, y = (Math.random() * fh) | 0;
-      const i = (y * fw + x) * 4;
-      if (fd[i + 3] < 140) continue;
-      // alttaki maske geçişini taklit et
-      if (y / fh > 0.72 && Math.random() < (y / fh - 0.72) / 0.28) continue;
-      portrait.push([(x + Math.random()) / fw, (y + Math.random()) / fh, fd[i]]);
+  const img = new Image();
+  img.src = '/img/work/gargantua-render.png';
+  img.onload = () => {
+    const sw = 320, sh = 180;
+    const off = document.createElement('canvas');
+    off.width = sw; off.height = sh;
+    const o = off.getContext('2d', { willReadFrequently: true })!;
+    o.drawImage(img, 0, 0, sw, sh);
+    const data = o.getImageData(0, 0, sw, sh).data;
+    const target = isSmall() ? 5200 : 11000;
+    const cand: P[] = [];
+    for (let y = 0; y < sh; y++) {
+      for (let x = 0; x < sw; x++) {
+        const i = (y * sw + x) * 4;
+        const r = data[i], g = data[i + 1], b = data[i + 2];
+        const lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+        // zemin laciverti dışarıda kalsın; yıldızlar seyrek gelsin
+        if (lum < 0.2) continue;
+        if (Math.random() > lum * 1.15) continue;
+        const u = x / sw - 0.5, v = y / sh - 0.5;
+        // küresel dağılım hedefi
+        const th = Math.random() * Math.PI * 2;
+        const ph = Math.acos(2 * Math.random() - 1);
+        const R = 0.9 + Math.random() * 0.9;
+        cand.push({
+          x: u * 1.78, y: v, z: (lum - 0.55) * 0.35 + (Math.random() - 0.5) * 0.06,
+          sx: R * Math.sin(ph) * Math.cos(th) * 1.4,
+          sy: R * Math.cos(ph) * 0.9,
+          sz: R * Math.sin(ph) * Math.sin(th),
+          r, g, b, a: 0.35 + lum * 0.65,
+          delay: Math.random() * 0.35,
+          ox: 0, oy: 0,
+        });
+      }
     }
-
-    // kara delik: parlaklığa göre ağırlıklı
-    const hw = 320, hh = 180;
-    const hd = pixels(hole, hw, hh);
-    const holePts: number[][] = [];
-    guard = 0;
-    while (holePts.length < N && guard++ < N * 60) {
-      const x = (Math.random() * hw) | 0, y = (Math.random() * hh) | 0;
-      const i = (y * hw + x) * 4;
-      const lum = (0.2126 * hd[i] + 0.7152 * hd[i + 1] + 0.0722 * hd[i + 2]) / 255;
-      if (lum < 0.2 || Math.random() > lum * 1.15) continue;
-      holePts.push([x / hw - 0.5, y / hh - 0.5, lum, hd[i], hd[i + 1], hd[i + 2]]);
+    // hedef sayıya indir
+    for (let i = cand.length - 1; i > 0; i--) {
+      const j = (Math.random() * (i + 1)) | 0;
+      [cand[i], cand[j]] = [cand[j], cand[i]];
     }
+    pts = cand.slice(0, target);
+    nEl.textContent = pts.length.toLocaleString('en-US');
+    // HUD etiketleri: diskin parlak bölgesinden birkaç nokta
+    // ekran boyunca yayılsın: her yatay dilimden bir parlak nokta
+    const nl = isSmall() ? 5 : 8;
+    for (let b = 0; b < nl; b++) {
+      const x0 = -0.75 + (1.5 * b) / nl, x1 = x0 + 1.5 / nl;
+      const k = pts.findIndex((p, i) => p.a > 0.75 && p.x >= x0 && p.x < x1 && !labels.includes(i) && Math.abs(p.y) > 0.08 * (b % 2));
+      if (k >= 0) labels.push(k);
+    }
+    if (reduceMotion) draw(0);
+  };
 
-    const n = Math.min(portrait.length, holePts.length);
-    pts = Array.from({ length: n }, (_, k) => {
-      const [pu, pv, pg] = portrait[k];
-      const [u, v, lum, r, g, b] = holePts[k];
-      const th = Math.random() * Math.PI * 2;
-      const ph = Math.acos(2 * Math.random() - 1);
-      const R = 0.7 + Math.random() * 0.8;
-      return {
-        pu, pv, pg,
-        bx: u * 1.78, by: v, bz: (lum - 0.55) * 0.35 + (Math.random() - 0.5) * 0.06,
-        br: r, bgc: g, bb: b, ba: 0.35 + lum * 0.65,
-        sx: R * Math.sin(ph) * Math.cos(th) * 1.5, sy: R * Math.cos(ph), sz: R * Math.sin(ph) * Math.sin(th),
-        delay: Math.random() * 0.35,
-        ox: 0, oy: 0,
-      };
-    });
-    nEl.textContent = n.toLocaleString('en-US');
-  });
-
-  // --- etkileşim ----------------------------------------------------------
-  const particlePhase = () => progress > 0.2;
+  // --- etkileşim --------------------------------------------------------
   const toggle = () => {
-    if (particlePhase()) scatterTarget = scatterTarget > 0.5 ? 0 : 1;
+    scatterTarget = scatterTarget > 0.5 ? 0 : 1;
+    stateEl.textContent = scatterTarget ? 'scattered' : 'gathered';
   };
   canvas.addEventListener('click', toggle);
   addEventListener('keydown', (e) => {
     if (e.code !== 'Space' || (e.target as HTMLElement)?.closest('input, textarea, button, a')) return;
     const r = root.getBoundingClientRect();
-    if (r.top > 0 || r.bottom < innerHeight || !particlePhase()) return;
+    if (r.bottom < 0 || r.top > innerHeight) return;
     e.preventDefault();
     toggle();
   });
@@ -293,103 +230,103 @@
   });
   canvas.addEventListener('pointerleave', () => (mouse.on = false));
 
-  // --- çizim --------------------------------------------------------------
-  let lastState = '';
-  function draw(t: number) {
-    if (!W) return;
-    const p = progress;
-    const dissolve = smooth(0.08, 0.22, p);       // foto → noktalar
-    const toHole = smooth(0.45, 0.82, p);         // portre → kara delik
-    const scrollScatter = smooth(0.24, 0.42, p) * (1 - smooth(0.55, 0.8, p));
-    const S = clamp(Math.max(scrollScatter, scatter));
-
-    if (revealed) me.style.opacity = String(1 - dissolve);
-    title.style.opacity = String(1 - smooth(0.55, 0.85, p) * 0.82);
-    title.style.filter = `blur(${smooth(0.55, 0.85, p) * 6}px)`;
-    hint.style.opacity = String(smooth(0.2, 0.3, p));
-
-    const state = toHole > 0.6 ? 'black hole' : S > 0.4 ? 'scattered' : dissolve > 0.5 ? 'points' : 'photo';
-    if (state !== lastState) {
-      lastState = state;
-      stateEl.textContent = state;
-      subEl.textContent = toHole > 0.6 ? 'gargantua-rs · Schwarzschild' : 'self-portrait';
-    }
-
-    ctx.clearRect(0, 0, W, H);
-    if (dissolve <= 0.001 || !pts.length) return;
-
-    // portrenin ekrandaki dikdörtgeni (kanvasa göre)
-    const cr = canvas.getBoundingClientRect();
-    const ir = me.getBoundingClientRect();
-    const fx = ir.left - cr.left, fy = ir.top - cr.top, fw = ir.width, fh = ir.height;
-    const cx = W / 2, cy = H / 2;
-    const scale = Math.min(W / 1.95, H / 1.25) * (isSmall() ? 1.05 : 0.92);
-    const spread = Math.min(W, H) * 0.55;
-
-    const yaw = Math.sin(t * 0.00018) * 0.38 * toHole;
-    const pitch = (0.08 + Math.sin(t * 0.00011) * 0.05) * toHole;
-    const cyw = Math.cos(yaw), syw = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
-    const size = isSmall() ? 1.3 : 1.6;
-
-    ctx.globalCompositeOperation = 'lighter';
-    for (let i = 0; i < pts.length; i++) {
-      const q = pts[i];
-      const px = fx + q.pu * fw - cx, py = fy + q.pv * fh - cy;
-      const bx = q.bx * scale, by = q.by * scale, bz = q.bz * scale;
-      let x = px + (bx - px) * toHole;
-      let y = py + (by - py) * toHole;
-      let z = bz * toHole;
-      const k = clamp((S - q.delay * (1 - S)) / (1 - q.delay * 0.5));
-      const e = k * k * (3 - 2 * k);
-      x += (q.sx * spread - x) * e;
-      y += (q.sy * spread - y) * e;
-      z += (q.sz * spread - z) * e;
-      x += Math.sin(t * 0.0011 + i) * 1.2 * dissolve;
-      y += Math.cos(t * 0.0013 + i * 1.7) * 1.2 * dissolve;
-      const x1 = x * cyw + z * syw;
-      const z1 = -x * syw + z * cyw;
-      const y1 = y * cp - z1 * sp;
-      const z2 = y * sp + z1 * cp;
-      const persp = 1 / (1 + z2 / (spread * 2.6));
-      let sx = cx + x1 * persp;
-      let sy = cy + y1 * persp;
-      if (mouse.on) {
-        const dx = sx - mouse.x, dy = sy - mouse.y;
-        const d2 = dx * dx + dy * dy;
-        if (d2 < 12100) {
-          const d = Math.sqrt(d2) || 1;
-          const f = (1 - d / 110) * 7.7;
-          q.ox += (dx / d) * f;
-          q.oy += (dy / d) * f;
-        }
-      }
-      q.ox *= 0.9;
-      q.oy *= 0.9;
-      sx += q.ox;
-      sy += q.oy;
-      const r = q.pg + (q.br - q.pg) * toHole;
-      const g = q.pg + (q.bgc - q.pg) * toHole;
-      const b = q.pg + (q.bb - q.pg) * toHole;
-      const a = (0.85 + (q.ba - 0.85) * toHole) * dissolve * (0.55 + 0.45 * persp) * (1 - S * 0.3);
-      ctx.fillStyle = `rgba(${r | 0},${g | 0},${b | 0},${a})`;
-      ctx.fillRect(sx, sy, size * persp, size * persp);
-    }
-    ctx.globalCompositeOperation = 'source-over';
-  }
-
-  if (reduceMotion) {
-    me.style.opacity = '1';
-    me.style.filter = 'none';
-  } else {
+  if (!reduceMotion) {
     ScrollTrigger.create({
       trigger: root,
       start: 'top top',
       end: 'bottom bottom',
       scrub: true,
-      onUpdate: (s) => (progress = s.progress),
+      onUpdate: (s) => (scrollScatter = s.progress),
     });
+    gsap.to(root.querySelector('[data-gx-title]'), {
+      scale: 0.82,
+      opacity: 0.15,
+      filter: 'blur(6px)',
+      ease: 'none',
+      scrollTrigger: { trigger: root, start: 'top top', end: 'bottom bottom', scrub: true },
+    });
+  }
+
+  // --- çizim ------------------------------------------------------------
+  function draw(t: number) {
+    if (!W || !pts.length) return;
+    ctx.clearRect(0, 0, W, H);
+    ctx.globalCompositeOperation = 'lighter';
+
+    const scale = Math.min(W / 1.95, H / 1.25) * (isSmall() ? 1.05 : 0.92);
+    const cx = W / 2, cy = H / 2 + H * 0.02;
+    const yaw = Math.sin(t * 0.00018) * 0.38;
+    const pitch = 0.08 + Math.sin(t * 0.00011) * 0.05;
+    const cyw = Math.cos(yaw), syw = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
+    const S = clamp(Math.max(scatter, scrollScatter * 1.25));
+    const size = isSmall() ? 1.3 : 1.55;
+    const proj: [number, number][] = [];
+
+    for (let i = 0; i < pts.length; i++) {
+      const p = pts[i];
+      const k = clamp((S - p.delay * (1 - S)) / (1 - p.delay * 0.5));
+      const e = k * k * (3 - 2 * k);
+      let x = p.x + (p.sx - p.x) * e;
+      let y = p.y + (p.sy - p.y) * e;
+      let z = p.z + (p.sz - p.z) * e;
+      // hafif "nefes" titreşimi
+      x += Math.sin(t * 0.0011 + i) * 0.0022;
+      y += Math.cos(t * 0.0013 + i * 1.7) * 0.0022;
+      // dönme
+      const x1 = x * cyw + z * syw;
+      const z1 = -x * syw + z * cyw;
+      const y1 = y * cp - z1 * sp;
+      const z2 = y * sp + z1 * cp;
+      const persp = 2.6 / (2.6 + z2);
+      let px = cx + x1 * scale * persp;
+      let py = cy + y1 * scale * persp;
+      // fare itmesi (yay gibi geri döner)
+      if (mouse.on) {
+        const dx = px - mouse.x, dy = py - mouse.y;
+        const d2 = dx * dx + dy * dy;
+        const R = 110;
+        if (d2 < R * R) {
+          const f = (1 - Math.sqrt(d2) / R) * 22;
+          const d = Math.sqrt(d2) || 1;
+          p.ox += (dx / d) * f * 0.35;
+          p.oy += (dy / d) * f * 0.35;
+        }
+      }
+      p.ox *= 0.9;
+      p.oy *= 0.9;
+      px += p.ox;
+      py += p.oy;
+      proj.push([px, py]);
+      ctx.fillStyle = `rgba(${p.r},${p.g},${p.b},${p.a * (0.55 + 0.45 * persp) * (1 - S * 0.35)})`;
+      ctx.fillRect(px, py, size * persp, size * persp);
+    }
+
+    // HUD: etiketli noktalar ve aralarındaki ince çizgiler
+    ctx.globalCompositeOperation = 'source-over';
+    const fade = 1 - clamp(S * 2.2);
+    if (fade > 0.02 && labels.length) {
+      ctx.strokeStyle = `rgba(236,232,223,${0.22 * fade})`;
+      ctx.lineWidth = 0.6;
+      ctx.beginPath();
+      labels.forEach((li, j) => {
+        const [x, y] = proj[li];
+        if (j === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+      ctx.font = '500 9px "IBM Plex Mono", monospace';
+      ctx.fillStyle = `rgba(236,232,223,${0.75 * fade})`;
+      labels.forEach((li) => {
+        const [x, y] = proj[li];
+        const p = pts[li];
+        ctx.fillRect(x - 1.5, y - 1.5, 3, 3);
+        ctx.fillText(`${(p.x * 2.4).toFixed(2)} ${(p.y * 2.4).toFixed(2)} · ${(p.z * 9).toFixed(2)}`, x + 6, y - 5);
+      });
+    }
+  }
+
+  if (!reduceMotion) {
     loop(root, (t) => {
-      if (progress < 0.2) scatterTarget = 0;
       scatter += (scatterTarget - scatter) * 0.045;
       draw(t);
     });

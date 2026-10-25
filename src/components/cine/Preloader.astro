@@ -4,6 +4,7 @@
  * (genel görelilikteki günberi kayması gibi). Oturum başına bir kez tam oynar.
  */
 import { SITE } from '../../site';
+import { ATOM } from '../../scripts/liquid-logo';
 
 // r(θ) = p / (1 + e·cos(kθ)) — k < 1 olunca elips her turda biraz döner
 const pts: string[] = [];
@@ -26,7 +27,10 @@ const orbit = pts.join(' ');
       <path class="pre__orbit" d={orbit} pathLength="1" />
       <circle class="pre__dot" r="3.2" cx="0" cy="0" />
     </svg>
-    <p class="pre__word spaced">{SITE.title}<span>.</span></p>
+    <div class="pre__word">
+      <canvas data-pre-liquid aria-hidden="true"></canvas>
+      <span class="pre__fallback">{ATOM} {SITE.title}</span>
+    </div>
   </div>
   <p class="pre__meta hud">
     <span>r(θ) = p / (1 + e cos kθ)</span>
@@ -66,16 +70,22 @@ const orbit = pts.join(' ');
 
   .pre__word {
     position: relative;
-    margin: 0;
-    font-size: clamp(1.5rem, 4.4vw, 2.6rem);
-    letter-spacing: .5em;
-    padding-left: .5em;
-    text-shadow: 0 0 22px rgba(255, 255, 255, .45);
+    display: grid;
+    place-items: center;
     filter: blur(10px);
     opacity: 0;
   }
 
-  .pre__word span { color: var(--glow-a); }
+  .pre__word canvas { display: none; }
+  .pre__word.is-liquid canvas { display: block; }
+  .pre__word.is-liquid .pre__fallback { display: none; }
+
+  .pre__fallback {
+    font-family: 'BlexMono Nerd', var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1.8rem, 5vw, 3.2rem);
+    color: #f3efe7;
+  }
 
   .pre__meta {
     text-transform: none;
@@ -92,11 +102,19 @@ const orbit = pts.join(' ');
 
 <script>
   import { gsap, getLenis, initMotion, reduceMotion } from '../../scripts/motion';
+  import { mountLiquid, ATOM } from '../../scripts/liquid-logo';
+  import { SITE } from '../../site';
 
   const root = document.querySelector<HTMLElement>('[data-pre]')!;
   const path = root.querySelector<SVGPathElement>('.pre__orbit')!;
   const dot = root.querySelector<SVGCircleElement>('.pre__dot')!;
   const word = root.querySelector<HTMLElement>('.pre__word')!;
+  if (!reduceMotion) {
+    const liquid = root.querySelector<HTMLCanvasElement>('[data-pre-liquid]')!;
+    mountLiquid(liquid, { text: `${ATOM} ${SITE.title}`, size: innerWidth < 640 ? 34 : 58, pad: 0.2 }).then((ok) => {
+      if (ok) word.classList.add('is-liquid');
+    });
+  }
   const count = root.querySelector<HTMLElement>('[data-pre-count]')!;
 
   let finished = false;
@@ -145,7 +163,7 @@ const orbit = pts.join(' ');
         },
         0.15 * speed
       )
-      .to(word, { letterSpacing: '.9em', opacity: 0, filter: 'blur(12px)', duration: 0.6 * speed, ease: 'power2.in' }, '>-0.05')
+      .to(word, { scale: 1.08, opacity: 0, filter: 'blur(12px)', duration: 0.6 * speed, ease: 'power2.in' }, '>-0.05')
       .to(root, { yPercent: -100, duration: 0.9 * speed, ease: 'expo.inOut' }, '<0.2');
   }
 </script>

@@ -57,7 +57,7 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: var(--bg);
+  background-color: transparent;
   /* kareli defter: 24px küçük kare, her 5'te bir biraz koyu çizgi yok — sade kalsın */
   background-image:
     linear-gradient(var(--grid) 1px, transparent 1px),
@@ -808,3 +808,11 @@ a.tag:hover { border-color: var(--steel); color: var(--steel); }
 }
 
 .skip-link:focus { left: 1rem; top: 1rem; }
+
+/* Nerd Font logosu (yedek metin ve sıvı tuvalin dokusu için) */
+@font-face {
+  font-family: 'BlexMono Nerd';
+  src: url('/fonts/blexmono-nerd-bold.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
