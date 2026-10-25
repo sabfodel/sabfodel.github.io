@@ -1,0 +1,60 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { STATUS, tagsWithoutLang } from '../utils';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  /** "Fig. 1" gibi numara */
+  n: number;
+}
+
+const { project, n } = Astro.props;
+const d = project.data;
+const href = `/projects/${project.id}/`;
+---
+
+<li class="work">
+  {
+    d.cover && (
+      <figure class="work__fig">
+        <a href={href} tabindex="-1" aria-hidden="true">
+          <div class:list={['plate', d.coverDark && 'plate--dark']}>
+            <img src={d.cover} alt={d.coverAlt ?? ''} loading={n === 1 ? 'eager' : 'lazy'} decoding="async" />
+          </div>
+        </a>
+        {d.caption && (
+          <figcaption class="figcap">
+            <span class="label">Fig. {n}</span>
+            <span>{d.caption}</span>
+          </figcaption>
+        )}
+      </figure>
+    )
+  }
+  <div class="work__body">
+    <span class="label">
+      {String(n).padStart(2, '0')} · {d.lang} · {STATUS[d.status]}
+    </span>
+    <h3><a href={href}>{d.title}</a></h3>
+    <p class="work__sum">{d.summary}</p>
+    {
+      d.result && (
+        <p class="result">
+          <span class="label">result</span>
+          {d.result}
+        </p>
+      )
+    }
+    <ul class="tags">
+      {tagsWithoutLang(d.tags, d.lang).map((t) => (
+        <li>
+          <a class="tag" href={`/tags/${encodeURIComponent(t)}/`}>{t}</a>
+        </li>
+      ))}
+    </ul>
+    <p class="work__links">
+      <a href={href}>read the write-up →</a>
+      {d.repo && <a href={d.repo}>source ↗</a>}
+    </p>
+  </div>
+</li>

@@ -1,0 +1,695 @@
+---
+/**
+ * Tek kübitlik etkileşimli Bloch küresi.
+ * Kapılar Bloch vektörünü kendi eksenleri etrafında döndürür (global faz hariç
+ * her tek-kübit kapısı bir SO(3) dönmesidir). Kanvas sürüklenerek çevrilebilir.
+ */
+interface Props {
+  fig?: string;
+  caption?: string;
+  /** Lab sayfasında daha geniş yerleşim */
+  wide?: boolean;
+}
+
+const {
+  fig = 'Fig. 0',
+  caption = 'A single qubit on the Bloch sphere. Apply gates, measure, drag to turn the sphere.',
+  wide = false,
+} = Astro.props;
+
+const GATES = [
+  { id: 'H', title: 'Hadamard — π about (x+z)/√2' },
+  { id: 'X', title: 'Pauli-X — π about x' },
+  { id: 'Y', title: 'Pauli-Y — π about y' },
+  { id: 'Z', title: 'Pauli-Z — π about z' },
+  { id: 'S', title: 'Phase S — π/2 about z' },
+  { id: 'T', title: 'T — π/4 about z' },
+];
+---
+
+<figure class:list={['bloch', wide && 'bloch--wide']} data-bloch>
+  <div class="bloch__stage">
+    <canvas
+      role="img"
+      aria-label="Bloch sphere showing the current qubit state as an arrow from the centre."
+    ></canvas>
+    <span class="bloch__hint label" aria-hidden="true">drag to rotate</span>
+  </div>
+
+  <div class="bloch__panel">
+    <div class="bloch__row">
+      <span class="label">gates</span>
+      <div class="bloch__gates" role="group" aria-label="Apply a gate">
+        {GATES.map((g) => (
+          <button type="button" class="gate" data-gate={g.id} title={g.title} aria-label={g.title}>
+            {g.id}
+          </button>
+        ))}
+        <button type="button" class="gate gate--measure" data-measure title="Measure in the Z basis — the state collapses to |0⟩ or |1⟩ with Born-rule probabilities">
+          measure
+        </button>
+        <button type="button" class="gate gate--reset" data-reset title="Reset to |0⟩">
+          reset
+        </button>
+      </div>
+    </div>
+
+    <div class="bloch__row">
+      <span class="label">circuit</span>
+      <div class="bloch__circuit" data-circuit aria-label="Gates applied so far"></div>
+    </div>
+
+    <div class="bloch__row" aria-live="polite">
+      <span class="label">state</span>
+      <div class="bloch__state">
+        <p class="bloch__psi" data-psi>|ψ⟩ = 1|0⟩</p>
+        <p class="bloch__angles" data-angles>θ = 0 · φ = 0</p>
+      </div>
+    </div>
+
+    <div class="bloch__row">
+      <span class="label">born rule</span>
+      <div class="bloch__probs">
+        <div class="prob"><span>P(0)</span><span class="prob__bar"><i data-p0></i></span><span data-p0-text>1.00</span></div>
+        <div class="prob"><span>P(1)</span><span class="prob__bar"><i data-p1></i></span><span data-p1-text>0.00</span></div>
+      </div>
+    </div>
+  </div>
+
+  <figcaption class="figcap"><span class="label">{fig}</span><span>{caption}</span></figcaption>
+</figure>
+
+<style>
+  .bloch {
+    margin: 0;
+    display: grid;
+    gap: 1.1rem;
+  }
+
+  .bloch--wide {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 1.6rem 2.6rem;
+    align-items: center;
+  }
+
+  .bloch--wide figcaption { grid-column: 1 / -1; }
+
+  @media (max-width: 820px) {
+    .bloch--wide { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  .bloch__stage {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    max-width: 460px;
+    margin: 0 auto;
+    background: var(--surface);
+    border: 1px solid var(--line-2);
+    box-shadow: var(--shadow);
+  }
+
+  /* köşe işaretleri — teknik çizim hissi */
+  .bloch__stage::before,
+  .bloch__stage::after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-color: var(--brass);
+    border-style: solid;
+    pointer-events: none;
+  }
+
+  .bloch__stage::before { top: 8px; left: 8px; border-width: 1px 0 0 1px; }
+  .bloch__stage::after { bottom: 8px; right: 8px; border-width: 0 1px 1px 0; }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+    touch-action: pan-y;
+  }
+
+  canvas:active { cursor: grabbing; }
+
+  .bloch__hint {
+    position: absolute;
+    right: 14px;
+    top: 10px;
+    font-size: .64rem;
+    color: var(--ink-faint);
+  }
+
+  .bloch__panel {
+    display: grid;
+    gap: .55rem;
+    font-size: .9rem;
+  }
+
+  .bloch__row {
+    display: grid;
+    grid-template-columns: 6.2rem minmax(0, 1fr);
+    gap: .8rem;
+    align-items: baseline;
+    padding-bottom: .55rem;
+    border-bottom: 1px dashed var(--line-2);
+  }
+
+  .bloch__row:last-child { border-bottom: 0; padding-bottom: 0; }
+
+  .bloch__gates { display: flex; flex-wrap: wrap; gap: .35rem; }
+
+  .gate {
+    min-width: 2.3rem;
+    height: 2.3rem;
+    padding: 0 .55rem;
+    border: 1px solid var(--ink);
+    background: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease, border-color .15s ease;
+  }
+
+  .gate:hover, .gate:focus-visible { background: var(--ink); color: var(--bg); }
+
+  .gate--measure, .gate--reset {
+    font-family: var(--font-mono);
+    font-size: .74rem;
+    font-weight: 500;
+    letter-spacing: .04em;
+  }
+
+  .gate--measure { border-color: var(--accent); color: var(--accent); }
+  .gate--measure:hover, .gate--measure:focus-visible { background: var(--accent); color: #fff; }
+  .gate--reset { border-color: var(--line-2); color: var(--ink-dim); }
+
+  /* devre çizgisi: |0⟩ ── [H] ── [S] ── */
+  .bloch__circuit {
+    display: flex;
+    align-items: center;
+    min-height: 1.7rem;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: .78rem;
+    color: var(--ink);
+    background: linear-gradient(var(--ink-faint), var(--ink-faint)) left 50% / 100% 1px no-repeat;
+  }
+
+  .bloch__circuit :global(span) {
+    flex: none;
+    margin-right: .55rem;
+    padding: .05rem .4rem;
+    border: 1px solid var(--ink);
+    background: var(--surface);
+  }
+
+  .bloch__circuit :global(.ket) {
+    border: 0;
+    padding-left: 0;
+    background: var(--bg);
+    font-family: var(--font-display);
+    font-size: .95rem;
+  }
+
+  .bloch__circuit :global(.m) { border-color: var(--accent); color: var(--accent); }
+
+  .bloch__state p { margin: 0; }
+
+  .bloch__psi {
+    font-family: var(--font-display);
+    font-size: 1.08rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bloch__angles {
+    font-family: var(--font-mono);
+    font-size: .76rem;
+    color: var(--ink-faint);
+  }
+
+  .bloch__probs { display: grid; gap: .3rem; }
+
+  .prob {
+    display: grid;
+    grid-template-columns: 2.6rem minmax(0, 1fr) 2.6rem;
+    gap: .6rem;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: .76rem;
+    color: var(--ink-dim);
+  }
+
+  .prob__bar {
+    height: 8px;
+    background: var(--surface-2);
+    overflow: hidden;
+  }
+
+  .prob__bar i {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--accent);
+    transition: width .25s ease;
+  }
+
+  .prob > span:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+</style>
+
+<script>
+  type Vec = [number, number, number];
+
+  const S2 = Math.SQRT1_2;
+  // Her kapı: Bloch vektörü için dönme ekseni ve açısı
+  const GATES: Record<string, { axis: Vec; angle: number }> = {
+    H: { axis: [S2, 0, S2], angle: Math.PI },
+    X: { axis: [1, 0, 0], angle: Math.PI },
+    Y: { axis: [0, 1, 0], angle: Math.PI },
+    Z: { axis: [0, 0, 1], angle: Math.PI },
+    S: { axis: [0, 0, 1], angle: Math.PI / 2 },
+    T: { axis: [0, 0, 1], angle: Math.PI / 4 },
+  };
+
+  const dot = (a: Vec, b: Vec) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  const cross = (a: Vec, b: Vec): Vec => [
+    a[1] * b[2] - a[2] * b[1],
+    a[2] * b[0] - a[0] * b[2],
+    a[0] * b[1] - a[1] * b[0],
+  ];
+
+  /** Rodrigues dönme formülü */
+  function rotate(v: Vec, k: Vec, a: number): Vec {
+    const c = Math.cos(a);
+    const s = Math.sin(a);
+    const kxv = cross(k, v);
+    const kd = dot(k, v) * (1 - c);
+    return [
+      v[0] * c + kxv[0] * s + k[0] * kd,
+      v[1] * c + kxv[1] * s + k[1] * kd,
+      v[2] * c + kxv[2] * s + k[2] * kd,
+    ];
+  }
+
+  const ease = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+
+  /** 0.70710 → "0.707", -0 → "0" */
+  const num = (x: number) => {
+    const r = Math.round(x * 1000) / 1000;
+    return (Object.is(r, -0) ? 0 : r).toString();
+  };
+
+  function complex(re: number, im: number): string {
+    const r = Math.abs(re) < 5e-4 ? 0 : re;
+    const i = Math.abs(im) < 5e-4 ? 0 : im;
+    if (i === 0) return num(r);
+    if (r === 0) return `${num(i)}i`;
+    return `(${num(r)} ${i < 0 ? '−' : '+'} ${num(Math.abs(i))}i)`;
+  }
+
+  /** Açıyı π cinsinden göster: 0.25π, π, 0 */
+  function inPi(a: number): string {
+    const k = Math.round((a / Math.PI) * 100) / 100;
+    if (Math.abs(k) < 0.005) return '0';
+    if (Math.abs(k - 1) < 0.005) return 'π';
+    if (Math.abs(k + 1) < 0.005) return '−π';
+    return `${num(k).replace('-', '−')}π`;
+  }
+
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function mount(root: HTMLElement) {
+    const canvas = root.querySelector('canvas')!;
+    const ctx = canvas.getContext('2d')!;
+    const $ = (sel: string) => root.querySelector<HTMLElement>(sel)!;
+    const circuitEl = $('[data-circuit]');
+    const psiEl = $('[data-psi]');
+    const anglesEl = $('[data-angles]');
+    const p0 = $('[data-p0]');
+    const p1 = $('[data-p1]');
+    const p0t = $('[data-p0-text]');
+    const p1t = $('[data-p1-text]');
+
+    let r: Vec = [0, 0, 1];
+    let yaw = (32 * Math.PI) / 180;
+    let elev = (18 * Math.PI) / 180;
+    let trail: Vec[] = [];
+    let history: string[] = [];
+    let queue: (() => void)[] = [];
+    let animating = false;
+    let userTurned = false;
+    let visible = true;
+    let colors: Record<string, string> = {};
+    let size = 0;
+    let dpr = 1;
+
+    const readColors = () => {
+      const cs = getComputedStyle(document.documentElement);
+      for (const k of ['ink', 'ink-dim', 'ink-faint', 'line', 'line-2', 'accent', 'steel', 'surface', 'brass'])
+        colors[k] = cs.getPropertyValue(`--${k}`).trim();
+    };
+
+    // --- izdüşüm ------------------------------------------------------------
+    function basis() {
+      const ca = Math.cos(yaw), sa = Math.sin(yaw), ce = Math.cos(elev), se = Math.sin(elev);
+      const toViewer: Vec = [ce * ca, ce * sa, se];
+      const right: Vec = [-sa, ca, 0];
+      const up: Vec = [-se * ca, -se * sa, ce];
+      return { toViewer, right, up };
+    }
+
+    function project(p: Vec, b = basis()) {
+      const R = size * 0.34;
+      return {
+        x: size / 2 + dot(p, b.right) * R,
+        y: size / 2 - dot(p, b.up) * R,
+        z: dot(p, b.toViewer),
+      };
+    }
+
+    function circle(u: Vec, v: Vec, b: ReturnType<typeof basis>, color: string, width: number) {
+      // u, v: dairenin düzlemini geren iki birim vektör
+      const N = 96;
+      for (let i = 0; i < N; i++) {
+        const a0 = (i / N) * Math.PI * 2;
+        const a1 = ((i + 1) / N) * Math.PI * 2;
+        const p: Vec = [0, 1, 2].map((j) => u[j] * Math.cos(a0) + v[j] * Math.sin(a0)) as Vec;
+        const q: Vec = [0, 1, 2].map((j) => u[j] * Math.cos(a1) + v[j] * Math.sin(a1)) as Vec;
+        const P = project(p, b), Q = project(q, b);
+        const front = P.z + Q.z >= 0;
+        ctx.strokeStyle = color;
+        ctx.globalAlpha = front ? 0.9 : 0.28;
+        ctx.lineWidth = width;
+        ctx.setLineDash(front ? [] : [3, 4]);
+        ctx.beginPath();
+        ctx.moveTo(P.x, P.y);
+        ctx.lineTo(Q.x, Q.y);
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
+    }
+
+    function label(text: string, p: Vec, b: ReturnType<typeof basis>, font: string, color: string) {
+      const P = project(p, b);
+      ctx.font = font;
+      ctx.fillStyle = color;
+      ctx.globalAlpha = P.z >= -0.15 ? 1 : 0.45;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, P.x, P.y);
+      ctx.globalAlpha = 1;
+    }
+
+    function draw() {
+      if (!size) return;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, size, size);
+      const b = basis();
+      const R = size * 0.34;
+      const c = size / 2;
+
+      // küre gövdesi
+      const g = ctx.createRadialGradient(c - R * 0.35, c - R * 0.4, R * 0.1, c, c, R);
+      g.addColorStop(0, colors.surface);
+      g.addColorStop(1, colors['line']);
+      ctx.fillStyle = g;
+      ctx.globalAlpha = 0.55;
+      ctx.beginPath();
+      ctx.arc(c, c, R, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = colors['ink-dim'];
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      // büyük çemberler: ekvator ve iki meridyen
+      circle([1, 0, 0], [0, 1, 0], b, colors['ink-faint'], 1);
+      circle([1, 0, 0], [0, 0, 1], b, colors['line-2'], 1);
+      circle([0, 1, 0], [0, 0, 1], b, colors['line-2'], 1);
+
+      // eksenler
+      const axes: [Vec, string][] = [
+        [[1, 0, 0], 'x'],
+        [[0, 1, 0], 'y'],
+        [[0, 0, 1], 'z'],
+      ];
+      for (const [a] of axes) {
+        const P = project([-a[0], -a[1], -a[2]], b), Q = project(a, b);
+        ctx.strokeStyle = colors['ink-faint'];
+        ctx.globalAlpha = 0.55;
+        ctx.lineWidth = 1;
+        ctx.setLineDash([2, 3]);
+        ctx.beginPath();
+        ctx.moveTo(P.x, P.y);
+        ctx.lineTo(Q.x, Q.y);
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
+
+      const serif = `italic ${Math.max(13, size * 0.038)}px "Source Serif 4", Georgia, serif`;
+      const mono = `500 ${Math.max(10, size * 0.026)}px "IBM Plex Mono", monospace`;
+      label('|0⟩', [0, 0, 1.2], b, serif, colors.ink);
+      label('|1⟩', [0, 0, -1.2], b, serif, colors.ink);
+      label('|+⟩', [1.22, 0, 0], b, serif, colors['ink-dim']);
+      label('|+i⟩', [0, 1.24, 0], b, serif, colors['ink-dim']);
+      label('x', [1.05, 0, 0.09], b, mono, colors.steel);
+      label('y', [0, 1.05, 0.09], b, mono, colors.steel);
+
+      // iz
+      if (trail.length > 1) {
+        ctx.lineWidth = 1.6;
+        for (let i = 1; i < trail.length; i++) {
+          const P = project(trail[i - 1], b), Q = project(trail[i], b);
+          ctx.strokeStyle = colors.accent;
+          ctx.globalAlpha = 0.12 + 0.5 * (i / trail.length);
+          ctx.beginPath();
+          ctx.moveTo(P.x, P.y);
+          ctx.lineTo(Q.x, Q.y);
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      // ekvator düzlemine düşen izdüşüm çizgisi
+      const tip = project(r, b);
+      const foot = project([r[0], r[1], 0], b);
+      const O = project([0, 0, 0], b);
+      ctx.strokeStyle = colors.accent;
+      ctx.globalAlpha = 0.45;
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath();
+      ctx.moveTo(tip.x, tip.y);
+      ctx.lineTo(foot.x, foot.y);
+      ctx.lineTo(O.x, O.y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
+
+      // durum vektörü
+      ctx.strokeStyle = colors.accent;
+      ctx.lineWidth = 2.6;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(O.x, O.y);
+      ctx.lineTo(tip.x, tip.y);
+      ctx.stroke();
+      ctx.fillStyle = colors.accent;
+      ctx.beginPath();
+      ctx.arc(tip.x, tip.y, Math.max(4, size * 0.012), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = colors.ink;
+      ctx.beginPath();
+      ctx.arc(O.x, O.y, 2.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // --- okuma paneli -------------------------------------------------------
+    function readout() {
+      const z = Math.max(-1, Math.min(1, r[2]));
+      const theta = Math.acos(z);
+      const rho = Math.hypot(r[0], r[1]);
+      const phi = rho < 1e-6 ? 0 : Math.atan2(r[1], r[0]);
+      const a = Math.cos(theta / 2);
+      const s = Math.sin(theta / 2);
+      const terms: string[] = [];
+      if (a > 5e-4) terms.push(`${num(a)}|0⟩`);
+      if (s > 5e-4) {
+        const b = complex(s * Math.cos(phi), s * Math.sin(phi));
+        terms.push(`${b}|1⟩`);
+      }
+      psiEl.textContent = `|ψ⟩ = ${terms.join(' + ').replace('+ -', '− ').replace('+ −', '− ')}`;
+      anglesEl.textContent = `θ = ${inPi(theta)} · φ = ${inPi(phi)}`;
+      const P0 = a * a;
+      const P1 = 1 - P0;
+      p0.style.width = `${P0 * 100}%`;
+      p1.style.width = `${P1 * 100}%`;
+      p0t.textContent = P0.toFixed(2);
+      p1t.textContent = P1.toFixed(2);
+      const chip = (text: string, cls = '') => {
+        const s = document.createElement('span');
+        s.textContent = text;
+        if (cls) s.className = cls;
+        return s;
+      };
+      circuitEl.replaceChildren(
+        chip('|0⟩', 'ket'),
+        ...history.map((h) => chip(h, h.startsWith('M') ? 'm' : ''))
+      );
+      circuitEl.scrollLeft = circuitEl.scrollWidth;
+    }
+
+    // --- işlemler -----------------------------------------------------------
+    function run(next: () => void) {
+      queue.push(next);
+      if (!animating) pump();
+    }
+
+    function pump() {
+      const job = queue.shift();
+      if (job) job();
+    }
+
+    function animateTo(step: (t: number) => Vec, ms: number) {
+      if (reduceMotion) {
+        r = step(1);
+        trail.push(r);
+        draw();
+        readout();
+        pump();
+        return;
+      }
+      animating = true;
+      const t0 = performance.now();
+      const frame = (now: number) => {
+        const t = Math.min(1, (now - t0) / ms);
+        r = step(ease(t));
+        trail.push(r);
+        if (trail.length > 240) trail.shift();
+        draw();
+        if (t < 1) requestAnimationFrame(frame);
+        else {
+          animating = false;
+          readout();
+          pump();
+        }
+      };
+      requestAnimationFrame(frame);
+    }
+
+    function applyGate(id: string) {
+      run(() => {
+        const { axis, angle } = GATES[id];
+        const start = r;
+        history.push(id);
+        animateTo((t) => rotate(start, axis, angle * t), 650);
+      });
+    }
+
+    function measure() {
+      run(() => {
+        const P0 = (1 + r[2]) / 2;
+        const outcome = Math.random() < P0 ? 0 : 1;
+        const start = r;
+        const end: Vec = [0, 0, outcome === 0 ? 1 : -1];
+        history.push(`M=${outcome}`);
+        // çöküşü yay boyunca değil, doğrudan kutba "sıçrama" gibi göster
+        animateTo((t) => {
+          const v: Vec = [
+            start[0] + (end[0] - start[0]) * t,
+            start[1] + (end[1] - start[1]) * t,
+            start[2] + (end[2] - start[2]) * t,
+          ];
+          const n = Math.hypot(...v) || 1;
+          return [v[0] / n, v[1] / n, v[2] / n];
+        }, 280);
+      });
+    }
+
+    function reset() {
+      queue = [];
+      run(() => {
+        history = [];
+        trail = [];
+        const start = r;
+        // |1⟩'den |0⟩'a düz çizgi merkezden geçer; onun yerine x etrafında döndür
+        if (start[2] < -0.999) return animateTo((t) => rotate(start, [1, 0, 0], Math.PI * t), 350);
+        animateTo((t) => {
+          const v: Vec = [start[0] * (1 - t), start[1] * (1 - t), start[2] + (1 - start[2]) * t];
+          const n = Math.hypot(...v) || 1;
+          return [v[0] / n, v[1] / n, v[2] / n];
+        }, 350);
+      });
+    }
+
+    root.querySelectorAll<HTMLButtonElement>('[data-gate]').forEach((btn) =>
+      btn.addEventListener('click', () => applyGate(btn.dataset.gate!))
+    );
+    root.querySelector('[data-measure]')!.addEventListener('click', measure);
+    root.querySelector('[data-reset]')!.addEventListener('click', reset);
+
+    // --- sürükleme ----------------------------------------------------------
+    let drag: { x: number; y: number; yaw: number; elev: number } | null = null;
+    canvas.addEventListener('pointerdown', (e) => {
+      drag = { x: e.clientX, y: e.clientY, yaw, elev };
+      userTurned = true;
+      canvas.setPointerCapture(e.pointerId);
+    });
+    canvas.addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      const k = Math.PI / Math.max(size, 1);
+      yaw = drag.yaw - (e.clientX - drag.x) * k;
+      elev = Math.max(-1.3, Math.min(1.3, drag.elev + (e.clientY - drag.y) * k));
+      draw();
+    });
+    const end = () => (drag = null);
+    canvas.addEventListener('pointerup', end);
+    canvas.addEventListener('pointercancel', end);
+
+    // --- boyut, tema, görünürlük -------------------------------------------
+    new ResizeObserver(() => {
+      const w = canvas.clientWidth;
+      if (!w) return;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      size = w;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(w * dpr);
+      draw();
+    }).observe(canvas);
+
+    const retheme = () => {
+      readColors();
+      draw();
+    };
+    document.addEventListener('themechange', retheme);
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', retheme);
+    // Web fontları yüklenince etiketleri yeniden çiz
+    document.fonts?.ready.then(draw);
+
+    new IntersectionObserver(([entry]) => (visible = entry.isIntersecting)).observe(canvas);
+
+    // Kullanıcı dokunana kadar küre yavaşça döner
+    let last = performance.now();
+    const idle = (now: number) => {
+      const dt = now - last;
+      last = now;
+      if (!userTurned && !reduceMotion && visible && !drag) {
+        yaw += dt * 0.00012;
+        if (!animating) draw();
+      }
+      if (!userTurned) requestAnimationFrame(idle);
+    };
+
+    readColors();
+    readout();
+    requestAnimationFrame(idle);
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-bloch]').forEach(mount);
+</script>

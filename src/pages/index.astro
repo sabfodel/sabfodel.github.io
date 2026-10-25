@@ -1,120 +1,68 @@
 ---
-import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import Panel from '../components/Panel.astro';
-import EntryList from '../components/EntryList.astro';
-import Shelf from '../components/Shelf.astro';
-import Gallery from '../components/Gallery.astro';
-import { byDateDesc, byOrderThenDate, STATUS, tagsWithoutLang } from '../utils';
-
-const notes = (await getCollection('notes', (n) => !n.data.draft)).sort(byDateDesc).slice(0, 5);
-const posts = (await getCollection('journal', (p) => !p.data.draft)).sort(byDateDesc).slice(0, 3);
-const practice = (await getCollection('practice', (p) => !p.data.draft))
-  .sort(byDateDesc)
-  .slice(0, 3);
-const shelf = (await getCollection('reading')).slice(0, 6);
-const frames = (await getCollection('photos', (p) => !p.data.draft))
-  .sort(byOrderThenDate)
-  .slice(0, 6);
-const projects = (await getCollection('projects')).sort(
-  (a, b) => b.data.order - a.data.order || byDateDesc(a, b)
-);
+import Preloader from '../components/cine/Preloader.astro';
+import HeroGather from '../components/cine/HeroGather.astro';
+import AboutZoom from '../components/cine/AboutZoom.astro';
+import Journey from '../components/cine/Journey.astro';
+import CurvedCarousel from '../components/cine/CurvedCarousel.astro';
+import WorksRing from '../components/cine/WorksRing.astro';
+import ChaosLab from '../components/cine/ChaosLab.astro';
+import Capabilities from '../components/cine/Capabilities.astro';
+import LetsTalk from '../components/cine/LetsTalk.astro';
+import '../styles/cine.css';
 ---
 
-<Base wide>
-  {/* Karşılama metnini buraya yazabilirsin:
-      <Panel title="welcome"><p>...</p></Panel> */}
+<Base cinematic>
+  <Preloader />
 
-  <Panel title="notes" note={`${notes.length} entries`}>
-    <EntryList
-      items={notes.map((n) => ({
-        href: `/notes/${n.id}/`,
-        title: n.data.title,
-        date: n.data.date,
-        summary: n.data.summary,
-        tags: n.data.tags,
-        extra: n.data.field,
-      }))}
-      empty="No notes written up yet."
-    />
-    <p style="margin:1rem 0 0"><a href="/notes/">all notes →</a></p>
-  </Panel>
+  <div data-hud-name="gather"><HeroGather /></div>
+  <div data-hud-name="about"><AboutZoom /></div>
+  <div data-hud-name="journey"><Journey /></div>
+  <div data-hud-name="featured"><CurvedCarousel /></div>
+  <div data-hud-name="works ’26"><WorksRing /></div>
+  <div data-hud-name="chaos"><ChaosLab /></div>
+  <div data-hud-name="toolbox"><Capabilities /></div>
+  <div data-hud-name="contact"><LetsTalk /></div>
 
-  <Panel title="projects" note={`${projects.length} entries`}>
-    {
-      projects.length === 0 ? (
-        <p class="empty">No projects yet.</p>
-      ) : (
-        <ul class="grid-cards">
-          {projects.map((p) => (
-            <li class="card">
-              <h3 class="card__title"><a href={`/projects/${p.id}/`}>{p.data.title}</a></h3>
-              <p class="card__sum">{p.data.summary}</p>
-              <ul class="tags">
-                <li class="tag">{STATUS[p.data.status]}</li>
-                {p.data.lang && <li class="tag">{p.data.lang}</li>}
-                {tagsWithoutLang(p.data.tags, p.data.lang)
-                  .slice(0, 2)
-                  .map((t) => <li class="tag">{t}</li>)}
-              </ul>
-            </li>
-          ))}
-        </ul>
-      )
-    }
-    <p style="margin:1.1rem 0 0"><a href="/projects/">all projects →</a></p>
-  </Panel>
-
-  {
-    shelf.length > 0 && (
-      <Panel title="off the shelf" note={`${shelf.length} books`}>
-        <Shelf books={shelf} />
-        <p style="margin:1.1rem 0 0"><a href="/reading/">the whole shelf →</a></p>
-      </Panel>
-    )
-  }
-
-  {
-    frames.length > 0 && (
-      <Panel title="photos" note={`${frames.length} frames`}>
-        <Gallery photos={frames} />
-        <p style="margin:1.1rem 0 0"><a href="/photos/">all photos →</a></p>
-      </Panel>
-    )
-  }
-
-  {
-    practice.length > 0 && (
-      <Panel title="practice log" note={`${practice.length} entries`}>
-        <EntryList
-          items={practice.map((p) => ({
-            href: `/practice/${p.id}/`,
-            title: p.data.title,
-            date: p.data.date,
-            summary: p.data.summary,
-            tags: p.data.tags,
-            extra: p.data.discipline,
-          }))}
-        />
-        <p style="margin:1rem 0 0"><a href="/practice/">all practice entries →</a></p>
-      </Panel>
-    )
-  }
-
-  {
-    posts.length > 0 && (
-      <Panel title="from the journal" note={`${posts.length} entries`}>
-        <EntryList
-          items={posts.map((p) => ({
-            href: `/journal/${p.id}/`,
-            title: p.data.title,
-            date: p.data.date,
-            summary: p.data.summary,
-            tags: p.data.tags,
-          }))}
-        />
-        <p style="margin:1rem 0 0"><a href="/journal/">all journal entries →</a></p>
-      </Panel>
-    )
-  }
+  <div class="scroll-hud" aria-hidden="true">
+    <span class="hud" data-hud-sec>gather</span>
+    <span class="scroll-hud__bar"><i data-hud-bar></i></span>
+    <span class="hud" data-hud-pct>000</span>
+  </div>
 </Base>
+
+<script>
+  import { initMotion, ScrollTrigger } from '../scripts/motion';
+
+  initMotion();
+
+  // Sol alttaki kaydırma göstergesi: bölüm adı + ilerleme
+  const sec = document.querySelector<HTMLElement>('[data-hud-sec]')!;
+  const bar = document.querySelector<HTMLElement>('[data-hud-bar]')!;
+  const pct = document.querySelector<HTMLElement>('[data-hud-pct]')!;
+  const hud = document.querySelector<HTMLElement>('.scroll-hud')!;
+
+  ScrollTrigger.create({
+    start: 0,
+    end: 'max',
+    onUpdate: (s) => {
+      bar.style.width = `${s.progress * 100}%`;
+      pct.textContent = String(Math.round(s.progress * 100)).padStart(3, '0');
+      // en altta alt bilgiyle çakışmasın
+      hud.style.opacity = s.progress > 0.97 ? '0' : '1';
+    },
+  });
+
+  document.querySelectorAll<HTMLElement>('[data-hud-name]').forEach((el) =>
+    ScrollTrigger.create({
+      trigger: el,
+      start: 'top 50%',
+      end: 'bottom 50%',
+      onToggle: (s) => s.isActive && (sec.textContent = el.dataset.hudName!),
+    })
+  );
+
+  // Görseller / fontlar yüklenince ölçüler değişir
+  addEventListener('load', () => ScrollTrigger.refresh());
+  document.fonts?.ready.then(() => ScrollTrigger.refresh());
+</script>

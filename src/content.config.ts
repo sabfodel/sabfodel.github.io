@@ -27,6 +27,17 @@ const projects = defineCollection({
     status: z.enum(['active', 'paused', 'done', 'idea']).default('active'),
     tags: z.array(z.string()).default([]),
     order: z.number().default(0),
+    /** Ana sayfadaki "selected work" listesinde görünsün mü */
+    featured: z.boolean().default(false),
+    /** Path under public/, e.g. /img/work/foo.png */
+    cover: z.string().optional(),
+    coverAlt: z.string().optional(),
+    /** Figür altındaki açıklama */
+    caption: z.string().optional(),
+    /** Görsel kendi koyu zeminine sahipse (ör. render) çerçevesiz göster */
+    coverDark: z.boolean().default(false),
+    /** Tek satırlık ölçülebilir sonuç — "energy drift 5×10⁻⁹ over 100 years" */
+    result: z.string().optional(),
   }),
 });
 

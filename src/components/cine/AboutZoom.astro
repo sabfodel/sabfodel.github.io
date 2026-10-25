@@ -1,0 +1,337 @@
+---
+/**
+ * ABOUT ME — arka planda nokta girdaplarının hız alanı (Yıldızlı Gece'yi andıran akım
+ * çizgileri). Ortadaki kart kaydırdıkça büyüyüp tüm ekranı kaplar; içinde ışık hüzmesi
+ * altında "hakkımda" içeriği belirir.
+ */
+---
+
+<section class="about pin" data-about id="about" aria-labelledby="about-title">
+  <div class="pin__stage">
+    <canvas class="about__field" data-about-field aria-hidden="true"></canvas>
+    <div class="about__vignette" aria-hidden="true"></div>
+
+    <p class="about__cap hud" data-about-cap>
+      Fig. — velocity field of seven point vortices · ∇·u = 0
+    </p>
+
+    <!-- büyüyen pencere -->
+    <div class="about__panel" data-about-panel>
+      <div class="about__beam" aria-hidden="true"></div>
+      <canvas class="about__dust" data-about-dust aria-hidden="true"></canvas>
+
+      <div class="about__content" data-about-content>
+        <p class="hud">§ 01 — about me</p>
+        <h2 id="about-title" class="about__h wide-type">
+          I understand things best once I've <em>built them.</em>
+        </h2>
+        <div class="about__cols">
+          <p>
+            Third-year physics undergraduate in Turkey. Most of what I learn ends up as code —
+            a ray tracer for a black hole, a solar system integrated for a century, a quantum
+            circuit simulator that never builds a matrix it doesn't need.
+          </p>
+          <p>
+            I care less about the pictures than about checking them: conservation laws,
+            analytical limits and known results are how I decide whether code is telling the
+            truth. Next: quantum computation — and where physics meets biology and medicine.
+          </p>
+        </div>
+        <p class="about__links">
+          <a class="pill" href="/about/">More about me</a>
+          <a class="pill pill--ghost" href="/lab/">Open the lab</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- kart başlığı: ikiye ayrılan "ABOUT / ME" -->
+    <p class="about__word about__word--l wide-type" data-about-l aria-hidden="true">About</p>
+    <p class="about__word about__word--r wide-type" data-about-r aria-hidden="true">Me</p>
+  </div>
+</section>
+
+<style>
+  .about { height: 320vh; background: #050608; }
+
+  .about__field {
+    position: absolute;
+    inset: -4%;
+    width: 108%;
+    height: 108%;
+    will-change: transform;
+  }
+
+  .about__vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(70% 70% at 50% 50%, transparent 30%, rgba(5, 6, 8, .85) 100%);
+    pointer-events: none;
+  }
+
+  .about__cap {
+    position: absolute;
+    left: clamp(1rem, 3vw, 2.2rem);
+    bottom: 3rem;
+    margin: 0;
+    z-index: 2;
+  }
+
+  .about__panel {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    overflow: hidden;
+    background: #07090c;
+    /* kaydırma ile güncellenir */
+    clip-path: inset(var(--it, 34%) var(--ix, 42%) var(--it, 34%) var(--ix, 42%) round var(--ir, 6px));
+    box-shadow: 0 30px 80px rgba(0, 0, 0, .6);
+  }
+
+  .about__beam {
+    position: absolute;
+    inset: -30% -10% -10% 20%;
+    background:
+      linear-gradient(115deg, transparent 38%, rgba(255, 244, 225, .2) 47%, rgba(255, 244, 225, .55) 50%, rgba(255, 244, 225, .2) 53%, transparent 62%);
+    filter: blur(28px);
+    transform-origin: 80% 0;
+    opacity: var(--beam, .9);
+    pointer-events: none;
+  }
+
+  .about__dust { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+
+  .about__content {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    align-content: center;
+    gap: 1.3rem;
+    padding: 6rem clamp(1.2rem, 7vw, 7rem) 4rem;
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  .about__h {
+    max-width: 15ch;
+    font-size: clamp(2.3rem, 6.2vw, 5.6rem);
+    color: #f3efe7;
+  }
+
+  .about__h em {
+    font-style: normal;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(243, 239, 231, .75);
+  }
+
+  .about__cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 34ch));
+    gap: 1.6rem 2.6rem;
+    color: var(--ink-dim);
+    font-size: .98rem;
+  }
+
+  .about__cols p { margin: 0; }
+
+  @media (max-width: 760px) {
+    .about__cols { grid-template-columns: minmax(0, 1fr); font-size: .92rem; }
+  }
+
+  .about__links { display: flex; gap: .7rem; flex-wrap: wrap; margin: .6rem 0 0; }
+
+  .about__word {
+    position: absolute;
+    top: 50%;
+    z-index: 4;
+    font-size: clamp(2.2rem, 6vw, 4.6rem);
+    color: #fff;
+    text-shadow: 0 0 30px rgba(0, 0, 0, .8);
+    pointer-events: none;
+    margin: 0;
+  }
+
+  .about__word--l { right: 50%; transform: translate(0, -110%); }
+  .about__word--r { left: 50%; transform: translate(0, 0%); }
+</style>
+
+<style is:global>
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .7rem 1.25rem;
+    border: 1px solid #f3efe7;
+    border-radius: 999px;
+    background: #f3efe7;
+    color: #07090c;
+    font-family: var(--font-mono);
+    font-size: .76rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    transition: background .2s ease, color .2s ease, transform .2s ease;
+  }
+
+  .pill:hover, .pill:focus-visible { background: transparent; color: #f3efe7; border-bottom-color: #f3efe7; transform: translateY(-2px); }
+
+  .pill--ghost { background: transparent; color: #f3efe7; }
+  .pill--ghost:hover, .pill--ghost:focus-visible { background: #f3efe7; color: #07090c; }
+</style>
+
+<script>
+  import { ScrollTrigger, fitCanvas, loop, reduceMotion, lerp, smooth } from '../../scripts/motion';
+
+  const root = document.querySelector<HTMLElement>('[data-about]')!;
+  const field = root.querySelector<HTMLCanvasElement>('[data-about-field]')!;
+  const dust = root.querySelector<HTMLCanvasElement>('[data-about-dust]')!;
+  const panel = root.querySelector<HTMLElement>('[data-about-panel]')!;
+  const content = root.querySelector<HTMLElement>('[data-about-content]')!;
+  const wl = root.querySelector<HTMLElement>('[data-about-l]')!;
+  const wr = root.querySelector<HTMLElement>('[data-about-r]')!;
+  const cap = root.querySelector<HTMLElement>('[data-about-cap]')!;
+
+  // --- hız alanı: nokta girdaplarının toplamı ---------------------------
+  // u(x) = Σ Γ_k / (2π) · ẑ × (x − x_k) / |x − x_k|²  (+ küçük çekirdek)
+  type V = { x: number; y: number; g: number };
+  let vortices: V[] = [];
+
+  function velocity(x: number, y: number) {
+    let u = 0, v = 0;
+    for (const k of vortices) {
+      const dx = x - k.x, dy = y - k.y;
+      const r2 = dx * dx + dy * dy + 0.004;
+      u += (-k.g * dy) / r2;
+      v += (k.g * dx) / r2;
+    }
+    // zemin akışı — soldan sağa hafif rüzgâr
+    return [u + 0.6, v + 0.08 * Math.sin(x * 3)];
+  }
+
+  const fctx = fitCanvas(field, (w, h) => paintField(w, h));
+
+  function paintField(w: number, h: number) {
+    const aspect = w / h;
+    // tohumlu rastgele: her yüklemede aynı resim
+    let seed = 7;
+    const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    vortices = Array.from({ length: 7 }, (_, i) => ({
+      x: (0.12 + 0.76 * rnd()) * aspect,
+      y: 0.15 + 0.6 * rnd(),
+      g: (i % 3 === 0 ? -1 : 1) * (0.06 + rnd() * 0.08),
+    }));
+    fctx.fillStyle = '#050608';
+    fctx.fillRect(0, 0, w, h);
+    fctx.lineCap = 'round';
+    const lines = Math.round((w * h) / 520);
+    for (let n = 0; n < lines; n++) {
+      let x = rnd() * aspect, y = rnd();
+      // ufuk altında koyu "kasaba" siluetine benzer bölge: çizgileri seyrelt
+      const ground = y > 0.78;
+      if (ground && rnd() > 0.25) continue;
+      const len = 10 + rnd() * 26;
+      const bright = ground ? 0.12 : 0.18 + rnd() * 0.5;
+      fctx.strokeStyle = `rgba(232,228,218,${bright})`;
+      fctx.lineWidth = 0.6 + rnd() * 1.4;
+      fctx.beginPath();
+      fctx.moveTo((x / aspect) * w, y * h);
+      for (let s = 0; s < len; s++) {
+        const [u, v] = velocity(x, y);
+        const m = Math.hypot(u, v) || 1;
+        x += (u / m) * 0.0032;
+        y += (v / m) * 0.0032;
+        fctx.lineTo((x / aspect) * w, y * h);
+      }
+      fctx.stroke();
+    }
+    // girdap merkezleri: parlak "yıldızlar"
+    for (const k of vortices) {
+      const gx = (k.x / aspect) * w, gy = k.y * h;
+      const grd = fctx.createRadialGradient(gx, gy, 0, gx, gy, 40);
+      grd.addColorStop(0, 'rgba(255,248,232,.85)');
+      grd.addColorStop(1, 'rgba(255,248,232,0)');
+      fctx.fillStyle = grd;
+      fctx.beginPath();
+      fctx.arc(gx, gy, 40, 0, Math.PI * 2);
+      fctx.fill();
+    }
+    // ufuk çizgisinde sivri siluet (katedral / kale) — Yıldızlı Gece'ye selam
+    fctx.fillStyle = '#050608';
+    fctx.beginPath();
+    fctx.moveTo(0, h);
+    let px = 0;
+    while (px < w) {
+      const spire = rnd() > 0.86;
+      const hh = spire ? h * (0.1 + rnd() * 0.16) : h * (0.04 + rnd() * 0.05);
+      const ww = spire ? 6 + rnd() * 10 : 20 + rnd() * 50;
+      fctx.lineTo(px, h * 0.86 - hh * 0.25);
+      fctx.lineTo(px + ww / 2, h * 0.86 - hh);
+      fctx.lineTo(px + ww, h * 0.86 - hh * 0.25);
+      px += ww;
+    }
+    fctx.lineTo(w, h);
+    fctx.closePath();
+    fctx.fill();
+  }
+
+  // --- ışık hüzmesindeki toz ---------------------------------------------
+  let DW = 0, DH = 0;
+  const dctx = fitCanvas(dust, (w, h) => { DW = w; DH = h; });
+  const motes = Array.from({ length: 90 }, () => ({
+    x: Math.random(), y: Math.random(), s: 0.4 + Math.random() * 1.4, v: 0.00005 + Math.random() * 0.00012,
+  }));
+  if (!reduceMotion) {
+    loop(dust, (t, dt) => {
+      if (!DW) return;
+      dctx.clearRect(0, 0, DW, DH);
+      for (const m of motes) {
+        m.y += m.v * dt;
+        m.x += Math.sin(t * 0.0004 + m.s * 9) * 0.00008 * dt;
+        if (m.y > 1) m.y = 0;
+        // hüzme köşegeni boyunca daha parlak
+        const along = 1 - Math.min(1, Math.abs(m.x - (0.85 - m.y * 0.55)) * 4);
+        if (along <= 0) continue;
+        dctx.fillStyle = `rgba(255,244,225,${0.6 * along})`;
+        dctx.beginPath();
+        dctx.arc(m.x * DW, m.y * DH, m.s, 0, Math.PI * 2);
+        dctx.fill();
+      }
+    });
+  }
+
+  // --- kaydırma: kart büyür, kelimeler ayrılır, içerik belirir ----------
+  function update(p: number) {
+    // 0 → 0.55: pencere açılır
+    const open = smooth(0.05, 0.55, p);
+    const small = innerWidth < 760;
+    const ix0 = small ? 26 : 42, it0 = small ? 30 : 33;
+    panel.style.setProperty('--ix', `${lerp(ix0, 0, open)}%`);
+    panel.style.setProperty('--it', `${lerp(it0, 0, open)}%`);
+    panel.style.setProperty('--ir', `${lerp(6, 0, open)}px`);
+    panel.style.setProperty('--beam', String(lerp(0.5, 1, open)));
+    // kelimeler yana kayar ve söner
+    const split = smooth(0.08, 0.5, p);
+    wl.style.transform = `translate(${-split * 40}vw, -110%)`;
+    wr.style.transform = `translate(${split * 40}vw, 0%)`;
+    wl.style.opacity = wr.style.opacity = String(1 - smooth(0.3, 0.55, p));
+    cap.style.opacity = String(1 - open);
+    // içerik
+    const c = smooth(0.5, 0.75, p);
+    content.style.opacity = String(c);
+    content.style.transform = `translateY(${(1 - c) * 40}px)`;
+    // arka plan yavaşça yakınlaşır
+    field.style.transform = `scale(${1 + p * 0.18})`;
+  }
+
+  if (reduceMotion) {
+    root.style.height = 'auto';
+    update(1);
+  } else {
+    update(0);
+    ScrollTrigger.create({
+      trigger: root,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: true,
+      onUpdate: (s) => update(s.progress),
+    });
+  }
+</script>

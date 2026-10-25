@@ -1,48 +1,54 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import Panel from '../../components/Panel.astro';
+import WorkItem from '../../components/WorkItem.astro';
 import { byDateDesc, STATUS, tagsWithoutLang } from '../../utils';
 
 const projects = (await getCollection('projects')).sort(
   (a, b) => b.data.order - a.data.order || byDateDesc(a, b)
 );
+const featured = projects.filter((p) => p.data.featured);
+const rest = projects.filter((p) => !p.data.featured);
 ---
 
-<Base title="projects" description="Things I build: simulators, tools, experiments." wide>
-  <Panel title="projects" note={`${projects.length} entries`}>
-    <p style="margin:0" class="muted">
-      Mostly Rust, some Python. Every one of them started with the same question — "what
-      would I learn if I wrote this myself?" Source is on GitHub.
+<Base title="work" description="Simulators, analyses and experiments — each with its method, results and limitations." wide>
+  <header class="entry-head">
+    <span class="kicker">work · {projects.length} projects</span>
+    <h1>Things I've built to understand</h1>
+    <p class="lede" style="margin:0">
+      Each one started with the same question: what would I learn if I wrote this myself? Every
+      write-up shows the physics, the method, what came out — and where it stops being right.
     </p>
-  </Panel>
+  </header>
 
-  <Panel title="all of them">
-    {
-      projects.length === 0 ? (
-        <p class="empty">No projects yet.</p>
-      ) : (
+  <ol class="works">
+    {featured.map((p, i) => <WorkItem project={p} n={i + 1} />)}
+  </ol>
+
+  {
+    rest.length > 0 && (
+      <section class="panel" style="margin-top:3rem">
+        <header class="section-hd">
+          <span class="label">§</span>
+          <h2>Smaller things</h2>
+          <span class="label">side projects</span>
+        </header>
         <ul class="grid-cards">
-          {projects.map((p) => (
+          {rest.map((p) => (
             <li class="card">
               <h3 class="card__title"><a href={`/projects/${p.id}/`}>{p.data.title}</a></h3>
               <p class="card__sum">{p.data.summary}</p>
               <ul class="tags">
-                <li class="tag">{STATUS[p.data.status]}</li>
+                <li class="tag tag--status">{STATUS[p.data.status]}</li>
                 {p.data.lang && <li class="tag">{p.data.lang}</li>}
                 {tagsWithoutLang(p.data.tags, p.data.lang)
-                  .slice(0, 3)
+                  .slice(0, 2)
                   .map((t) => <li class="tag">{t}</li>)}
               </ul>
-              {p.data.repo && (
-                <p style="margin:.6rem 0 0;font-size:.85rem">
-                  <a href={p.data.repo}>source →</a>
-                </p>
-              )}
             </li>
           ))}
         </ul>
-      )
-    }
-  </Panel>
+      </section>
+    )
+  }
 </Base>

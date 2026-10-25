@@ -1,25 +1,32 @@
 ---
-import { SITE } from '../site';
+import { SITE, NAV, OFF_THE_CLOCK } from '../site';
 const year = new Date().getFullYear();
 ---
 
 <footer class="foot">
-  <p class="foot__row">
-    <a href="/notes/">notes</a>
-    <a href="/projects/">projects</a>
-    <a href="/reading/">reading</a>
-    <a href="/practice/">practice</a>
-    <a href="/photos/">photos</a>
-    <a href="/journal/">journal</a>
-    <a href="/uses/">uses</a>
-    <a href="/about/">about</a>
-  </p>
-  <p class="foot__row">
-    <a href={SITE.github}>github</a>
-    <a href={SITE.instagram}>instagram</a>
-    <a href="/rss.xml">rss</a>
-  </p>
-  <p style="margin:1rem 0 0">
-    © {year} {SITE.title} — take what's useful, just say where it came from
-  </p>
+  <div>
+    <span class="label">sabfodel / physics</span>
+    <p>
+      Built with Astro. Equations typeset with KaTeX. No cookies, no tracking.
+    </p>
+    <p>© {year} {SITE.title} — take what's useful, just say where it came from.</p>
+  </div>
+  <nav aria-label="Site">
+    <span class="label">site</span>
+    <ul>
+      {NAV.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+    </ul>
+  </nav>
+  <nav aria-label="Elsewhere">
+    <span class="label">elsewhere</span>
+    <ul>
+      <li><a href={SITE.github}>github</a></li>
+      {SITE.linkedin && <li><a href={SITE.linkedin}>linkedin</a></li>}
+      <li><a href="/rss.xml">rss</a></li>
+    </ul>
+    <span class="label" style="display:block;margin-top:1.1rem">off the clock</span>
+    <ul>
+      {OFF_THE_CLOCK.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+    </ul>
+  </nav>
 </footer>

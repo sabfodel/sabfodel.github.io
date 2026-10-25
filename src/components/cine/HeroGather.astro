@@ -1,0 +1,335 @@
+---
+/**
+ * GATHER — gargantua-rs render'ı binlerce "foton"a ayrılır. Fare iter, tıklama /
+ * boşluk tuşu dağıtıp toplar, aşağı kaydırma bulutu patlatır. Arkada dev başlık.
+ */
+---
+
+<section class="gx pin" data-gx aria-labelledby="gx-title">
+  <div class="pin__stage gx__stage">
+    <h1 id="gx-title" class="gx__title wide-type" data-gx-title>
+      <span class="gx__line"><span class="blur-word">Built</span> <span class="blur-word">from</span></span>
+      <span class="gx__line"><span class="blur-word">first</span> <span class="blur-word">principles</span></span>
+    </h1>
+
+    <canvas class="gx__canvas" data-gx-canvas aria-hidden="true"></canvas>
+
+    <div class="gx__hud gx__hud--tl hud">
+      <span class="spaced gx__tag">Gather</span><br />
+      gargantua-rs · Schwarzschild, r<sub>s</sub> = 1
+    </div>
+    <div class="gx__hud gx__hud--tr hud" aria-hidden="true">
+      <span data-gx-n>0</span> photons<br />
+      <span data-gx-state>gathered</span>
+    </div>
+    <div class="gx__hud gx__hud--bl hud">
+      Physics undergraduate. I write simulators from scratch<br />
+      to see where the equations hold — and where they break.
+    </div>
+    <div class="gx__hud gx__hud--br hud" aria-hidden="true">
+      <span class="gx__key">space</span> / click — scatter · gather
+    </div>
+    <div class="gx__scroll hud" aria-hidden="true"><span></span>scroll</div>
+    <span class="crosshair" style="left:24px;top:84px"></span>
+    <span class="crosshair" style="right:24px;top:84px"></span>
+  </div>
+</section>
+
+<style>
+  .gx { height: 190vh; }
+
+  .gx__stage {
+    display: grid;
+    place-items: center;
+    background:
+      radial-gradient(60% 50% at 50% 55%, rgba(255, 154, 77, .08), transparent 70%),
+      #050608;
+  }
+
+  .gx__title {
+    position: absolute;
+    z-index: 1;
+    text-align: center;
+    font-size: clamp(2.4rem, 8.4vw, 9.4rem);
+    color: #ece8df;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .gx__line { display: block; white-space: nowrap; }
+  .gx__line + .gx__line { color: transparent; -webkit-text-stroke: 1px rgba(236, 232, 223, .55); }
+
+  .gx__canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+  }
+
+  .gx__hud {
+    position: absolute;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .gx__hud--tl { left: clamp(1rem, 3vw, 2.2rem); top: 5.2rem; }
+  .gx__hud--tr { right: clamp(1rem, 3vw, 2.2rem); top: 5.2rem; text-align: right; }
+  .gx__hud--bl { left: clamp(1rem, 3vw, 2.2rem); bottom: 3.4rem; max-width: 34ch; text-transform: none; letter-spacing: .04em; font-size: .78rem; color: var(--ink-dim); }
+  .gx__hud--br { right: clamp(1rem, 3vw, 2.2rem); bottom: 3.4rem; }
+
+  .gx__tag { color: var(--ink); font-size: .74rem; letter-spacing: .5em; }
+
+  .gx__key {
+    display: inline-block;
+    padding: .05rem .4rem;
+    border: 1px solid var(--ink-faint);
+    border-radius: 3px;
+    color: var(--ink);
+  }
+
+  .gx__scroll {
+    position: absolute;
+    z-index: 3;
+    bottom: 1rem;
+    left: 50%;
+    display: grid;
+    justify-items: center;
+    gap: .4rem;
+    transform: translateX(-50%);
+  }
+
+  .gx__scroll span {
+    width: 1px;
+    height: 34px;
+    background: linear-gradient(transparent, var(--ink));
+    animation: drip 2.2s ease-in-out infinite;
+    transform-origin: top;
+  }
+
+  @keyframes drip {
+    0% { transform: scaleY(0); opacity: 1; }
+    60% { transform: scaleY(1); opacity: 1; }
+    100% { transform: scaleY(1); opacity: 0; }
+  }
+
+  @media (max-width: 640px) {
+    .gx__title { font-size: 11.5vw; }
+    .gx__line { white-space: normal; }
+    .gx__hud--tl, .gx__hud--tr { top: 6.8rem; }
+    .gx__hud--br { display: none; }
+    .gx__hud--bl { bottom: 4.4rem; }
+  }
+</style>
+
+<script>
+  import { gsap, ScrollTrigger, fitCanvas, loop, reduceMotion, isSmall, clamp } from '../../scripts/motion';
+
+  const root = document.querySelector<HTMLElement>('[data-gx]')!;
+  const canvas = root.querySelector<HTMLCanvasElement>('[data-gx-canvas]')!;
+  const nEl = root.querySelector<HTMLElement>('[data-gx-n]')!;
+  const stateEl = root.querySelector<HTMLElement>('[data-gx-state]')!;
+  const words = root.querySelectorAll<HTMLElement>('.blur-word');
+
+  // --- başlık: bulanıktan netliğe --------------------------------------
+  const reveal = () =>
+    gsap.to(words, { opacity: 1, filter: 'blur(0px)', y: 0, duration: 1.3, stagger: 0.09, ease: 'power3.out' });
+  if (reduceMotion || 'ready' in document.documentElement.dataset) reveal();
+  else addEventListener('preloader:done', reveal, { once: true });
+
+  // --- parçacıklar ------------------------------------------------------
+  type P = {
+    x: number; y: number; z: number;      // toplanmış konum (normalleştirilmiş)
+    sx: number; sy: number; sz: number;   // dağılmış konum
+    r: number; g: number; b: number; a: number;
+    delay: number;
+    ox: number; oy: number;               // fare itmesi ofseti
+  };
+
+  let pts: P[] = [];
+  let W = 0, H = 0;
+  let scatterTarget = 0;   // tıklama / boşluk
+  let scatter = 0;         // yumuşatılmış
+  let scrollScatter = 0;   // kaydırmadan
+  const mouse = { x: -9999, y: -9999, on: false };
+  const labels: number[] = [];
+
+  const ctx = fitCanvas(canvas, (w, h) => { W = w; H = h; });
+
+  const img = new Image();
+  img.src = '/img/work/gargantua-render.png';
+  img.onload = () => {
+    const sw = 320, sh = 180;
+    const off = document.createElement('canvas');
+    off.width = sw; off.height = sh;
+    const o = off.getContext('2d', { willReadFrequently: true })!;
+    o.drawImage(img, 0, 0, sw, sh);
+    const data = o.getImageData(0, 0, sw, sh).data;
+    const target = isSmall() ? 5200 : 11000;
+    const cand: P[] = [];
+    for (let y = 0; y < sh; y++) {
+      for (let x = 0; x < sw; x++) {
+        const i = (y * sw + x) * 4;
+        const r = data[i], g = data[i + 1], b = data[i + 2];
+        const lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+        // zemin laciverti dışarıda kalsın; yıldızlar seyrek gelsin
+        if (lum < 0.2) continue;
+        if (Math.random() > lum * 1.15) continue;
+        const u = x / sw - 0.5, v = y / sh - 0.5;
+        // küresel dağılım hedefi
+        const th = Math.random() * Math.PI * 2;
+        const ph = Math.acos(2 * Math.random() - 1);
+        const R = 0.9 + Math.random() * 0.9;
+        cand.push({
+          x: u * 1.78, y: v, z: (lum - 0.55) * 0.35 + (Math.random() - 0.5) * 0.06,
+          sx: R * Math.sin(ph) * Math.cos(th) * 1.4,
+          sy: R * Math.cos(ph) * 0.9,
+          sz: R * Math.sin(ph) * Math.sin(th),
+          r, g, b, a: 0.35 + lum * 0.65,
+          delay: Math.random() * 0.35,
+          ox: 0, oy: 0,
+        });
+      }
+    }
+    // hedef sayıya indir
+    for (let i = cand.length - 1; i > 0; i--) {
+      const j = (Math.random() * (i + 1)) | 0;
+      [cand[i], cand[j]] = [cand[j], cand[i]];
+    }
+    pts = cand.slice(0, target);
+    nEl.textContent = pts.length.toLocaleString('en-US');
+    // HUD etiketleri: diskin parlak bölgesinden birkaç nokta
+    // ekran boyunca yayılsın: her yatay dilimden bir parlak nokta
+    const nl = isSmall() ? 5 : 8;
+    for (let b = 0; b < nl; b++) {
+      const x0 = -0.75 + (1.5 * b) / nl, x1 = x0 + 1.5 / nl;
+      const k = pts.findIndex((p, i) => p.a > 0.75 && p.x >= x0 && p.x < x1 && !labels.includes(i) && Math.abs(p.y) > 0.08 * (b % 2));
+      if (k >= 0) labels.push(k);
+    }
+    if (reduceMotion) draw(0);
+  };
+
+  // --- etkileşim --------------------------------------------------------
+  const toggle = () => {
+    scatterTarget = scatterTarget > 0.5 ? 0 : 1;
+    stateEl.textContent = scatterTarget ? 'scattered' : 'gathered';
+  };
+  canvas.addEventListener('click', toggle);
+  addEventListener('keydown', (e) => {
+    if (e.code !== 'Space' || (e.target as HTMLElement)?.closest('input, textarea, button, a')) return;
+    const r = root.getBoundingClientRect();
+    if (r.bottom < 0 || r.top > innerHeight) return;
+    e.preventDefault();
+    toggle();
+  });
+  canvas.addEventListener('pointermove', (e) => {
+    const r = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - r.left;
+    mouse.y = e.clientY - r.top;
+    mouse.on = true;
+  });
+  canvas.addEventListener('pointerleave', () => (mouse.on = false));
+
+  if (!reduceMotion) {
+    ScrollTrigger.create({
+      trigger: root,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: true,
+      onUpdate: (s) => (scrollScatter = s.progress),
+    });
+    gsap.to(root.querySelector('[data-gx-title]'), {
+      scale: 0.82,
+      opacity: 0.15,
+      filter: 'blur(6px)',
+      ease: 'none',
+      scrollTrigger: { trigger: root, start: 'top top', end: 'bottom bottom', scrub: true },
+    });
+  }
+
+  // --- çizim ------------------------------------------------------------
+  function draw(t: number) {
+    if (!W || !pts.length) return;
+    ctx.clearRect(0, 0, W, H);
+    ctx.globalCompositeOperation = 'lighter';
+
+    const scale = Math.min(W / 1.95, H / 1.25) * (isSmall() ? 1.05 : 0.92);
+    const cx = W / 2, cy = H / 2 + H * 0.02;
+    const yaw = Math.sin(t * 0.00018) * 0.38;
+    const pitch = 0.08 + Math.sin(t * 0.00011) * 0.05;
+    const cyw = Math.cos(yaw), syw = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
+    const S = clamp(Math.max(scatter, scrollScatter * 1.25));
+    const size = isSmall() ? 1.3 : 1.55;
+    const proj: [number, number][] = [];
+
+    for (let i = 0; i < pts.length; i++) {
+      const p = pts[i];
+      const k = clamp((S - p.delay * (1 - S)) / (1 - p.delay * 0.5));
+      const e = k * k * (3 - 2 * k);
+      let x = p.x + (p.sx - p.x) * e;
+      let y = p.y + (p.sy - p.y) * e;
+      let z = p.z + (p.sz - p.z) * e;
+      // hafif "nefes" titreşimi
+      x += Math.sin(t * 0.0011 + i) * 0.0022;
+      y += Math.cos(t * 0.0013 + i * 1.7) * 0.0022;
+      // dönme
+      const x1 = x * cyw + z * syw;
+      const z1 = -x * syw + z * cyw;
+      const y1 = y * cp - z1 * sp;
+      const z2 = y * sp + z1 * cp;
+      const persp = 2.6 / (2.6 + z2);
+      let px = cx + x1 * scale * persp;
+      let py = cy + y1 * scale * persp;
+      // fare itmesi (yay gibi geri döner)
+      if (mouse.on) {
+        const dx = px - mouse.x, dy = py - mouse.y;
+        const d2 = dx * dx + dy * dy;
+        const R = 110;
+        if (d2 < R * R) {
+          const f = (1 - Math.sqrt(d2) / R) * 22;
+          const d = Math.sqrt(d2) || 1;
+          p.ox += (dx / d) * f * 0.35;
+          p.oy += (dy / d) * f * 0.35;
+        }
+      }
+      p.ox *= 0.9;
+      p.oy *= 0.9;
+      px += p.ox;
+      py += p.oy;
+      proj.push([px, py]);
+      ctx.fillStyle = `rgba(${p.r},${p.g},${p.b},${p.a * (0.55 + 0.45 * persp) * (1 - S * 0.35)})`;
+      ctx.fillRect(px, py, size * persp, size * persp);
+    }
+
+    // HUD: etiketli noktalar ve aralarındaki ince çizgiler
+    ctx.globalCompositeOperation = 'source-over';
+    const fade = 1 - clamp(S * 2.2);
+    if (fade > 0.02 && labels.length) {
+      ctx.strokeStyle = `rgba(236,232,223,${0.22 * fade})`;
+      ctx.lineWidth = 0.6;
+      ctx.beginPath();
+      labels.forEach((li, j) => {
+        const [x, y] = proj[li];
+        if (j === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+      ctx.font = '500 9px "IBM Plex Mono", monospace';
+      ctx.fillStyle = `rgba(236,232,223,${0.75 * fade})`;
+      labels.forEach((li) => {
+        const [x, y] = proj[li];
+        const p = pts[li];
+        ctx.fillRect(x - 1.5, y - 1.5, 3, 3);
+        ctx.fillText(`${(p.x * 2.4).toFixed(2)} ${(p.y * 2.4).toFixed(2)} · ${(p.z * 9).toFixed(2)}`, x + 6, y - 5);
+      });
+    }
+  }
+
+  if (!reduceMotion) {
+    loop(root, (t) => {
+      scatter += (scatterTarget - scatter) * 0.045;
+      draw(t);
+    });
+  }
+</script>

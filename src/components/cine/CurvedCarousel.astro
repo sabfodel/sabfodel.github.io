@@ -1,0 +1,197 @@
+---
+/**
+ * FEATURED WORK — kâğıt zemin üzerinde, silindir yüzeyine sarılmış gibi kıvrılan
+ * proje şeridi. Dikey kaydırma şeridi yatay akıtır; her kart merkeze uzaklığına göre
+ * Y ekseninde döner ve derinleşir.
+ */
+import { getCollection } from 'astro:content';
+import { byDateDesc } from '../../utils';
+
+const projects = (await getCollection('projects', (p) => p.data.featured && !!p.data.cover)).sort(
+  (a, b) => b.data.order - a.data.order || byDateDesc(a, b)
+);
+
+const cards = [
+  ...projects.map((p) => ({
+    href: `/projects/${p.id}/`,
+    img: p.data.cover!,
+    alt: p.data.coverAlt ?? '',
+    dark: p.data.coverDark,
+    title: p.data.title,
+    meta: `${p.data.lang} · ${p.data.tags[0]?.replace(/-/g, ' ')}`,
+  })),
+  {
+    href: '/lab/',
+    img: '',
+    alt: '',
+    dark: true,
+    title: 'Bloch sphere',
+    meta: 'Lab · exp. 001 · interactive',
+  },
+];
+---
+
+<section class="cc pin section--paper" data-cc style={`height:${cards.length * 70 + 100}vh`} aria-labelledby="cc-title">
+  <div class="pin__stage cc__stage">
+    <header class="cc__head">
+      <p class="hud">§ 03 — featured work</p>
+      <h2 id="cc-title" class="cc__h wide-type">Selected<br />simulations</h2>
+    </header>
+
+    <div class="cc__viewport">
+      <ul class="cc__track" data-cc-track>
+        {
+          cards.map((c, i) => (
+            <li class="cc__card" data-cc-card>
+              <a href={c.href} class="cc__link">
+                <div class:list={['cc__img', c.dark && 'cc__img--dark']}>
+                  {c.img ? (
+                    <img src={c.img} alt={c.alt} loading="lazy" decoding="async" />
+                  ) : (
+                    <svg viewBox="0 0 200 200" aria-hidden="true" class="cc__bloch">
+                      <circle cx="100" cy="100" r="70" />
+                      <ellipse cx="100" cy="100" rx="70" ry="20" />
+                      <ellipse cx="100" cy="100" rx="22" ry="70" />
+                      <line x1="100" y1="100" x2="146" y2="54" class="v" />
+                      <circle cx="146" cy="54" r="5" class="d" />
+                    </svg>
+                  )}
+                  <span class="cc__over wide-type">{c.title}</span>
+                </div>
+                <p class="cc__meta hud">
+                  <b>{String(i + 1).padStart(2, '0')}</b> {c.meta}
+                </p>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <p class="cc__foot hud">Drag the page — each one is a write-up with method, results and limits</p>
+  </div>
+</section>
+
+<style>
+  .cc__stage {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding: 5.5rem 0 1.6rem;
+  }
+
+  .cc__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1rem;
+    padding: 0 clamp(1.2rem, 4vw, 3rem);
+  }
+
+  .cc__h { font-size: clamp(2rem, 5vw, 4.4rem); color: var(--paper-ink); text-align: right; }
+
+  .cc__viewport {
+    position: relative;
+    display: flex;
+    align-items: center;
+    perspective: 1400px;
+    perspective-origin: 50% 50%;
+    overflow: hidden;
+  }
+
+  .cc__track {
+    display: flex;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+
+  .cc__card {
+    flex: none;
+    width: clamp(240px, 34vw, 520px);
+    margin: 0;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+
+  .cc__link { display: block; border: 0; color: inherit; }
+
+  .cc__img {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: #fbfaf7;
+    border: 1px solid rgba(13, 17, 22, .12);
+    box-shadow: 0 30px 60px -30px rgba(13, 17, 22, .45);
+  }
+
+  .cc__img--dark { background: #07090c; border-color: #07090c; }
+
+  .cc__img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s ease; }
+  .cc__link:hover .cc__img img { transform: scale(1.05); }
+
+  .cc__over {
+    position: absolute;
+    left: .9rem;
+    bottom: .7rem;
+    font-size: clamp(1.4rem, 2.6vw, 2.4rem);
+    color: #fff;
+    mix-blend-mode: difference;
+  }
+
+  .cc__bloch { position: absolute; inset: 8% 25%; width: 50%; height: 84%; fill: none; stroke: rgba(236, 232, 223, .55); stroke-width: 1; }
+  .cc__bloch .v { stroke: var(--glow-a); stroke-width: 2.4; }
+  .cc__bloch .d { fill: var(--glow-a); stroke: none; }
+
+  .cc__meta { margin: .7rem 0 0; }
+
+  .cc__foot { padding: 0 clamp(1.2rem, 4vw, 3rem); margin: 0; }
+</style>
+
+<script>
+  import { ScrollTrigger, reduceMotion } from '../../scripts/motion';
+
+  const root = document.querySelector<HTMLElement>('[data-cc]')!;
+  const track = root.querySelector<HTMLElement>('[data-cc-track]')!;
+  const cards = [...root.querySelectorAll<HTMLElement>('[data-cc-card]')];
+
+  function layout(p: number) {
+    const vw = innerWidth;
+    const cw = cards[0].offsetWidth;
+    const gap = cw * 0.08;
+    const total = cards.length * (cw + gap);
+    // ilk kart merkezde başlar, son kart merkezde biter
+    const start = vw / 2 - cw / 2;
+    const end = vw / 2 - (total - gap) + cw / 2;
+    const x = start + (end - start) * p;
+    track.style.transform = `translateX(${x}px)`;
+    cards.forEach((c, i) => {
+      const center = x + i * (cw + gap) + cw / 2;
+      const d = (center - vw / 2) / (vw / 2); // -1 … 1 ekran kenarında
+      const rot = Math.max(-62, Math.min(62, d * 38));
+      const z = -Math.abs(d) * cw * 0.55;
+      c.style.marginRight = `${gap}px`;
+      c.style.transform = `translateZ(${z}px) rotateY(${-rot}deg)`;
+      c.style.opacity = String(Math.max(0.25, 1 - Math.abs(d) * 0.35));
+    });
+  }
+
+  if (reduceMotion) {
+    root.style.height = 'auto';
+    track.style.flexWrap = 'wrap';
+    track.style.gap = '1.4rem';
+    track.style.padding = '0 1.2rem';
+  } else {
+    layout(0);
+    ScrollTrigger.create({
+      trigger: root,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: true,
+      onUpdate: (s) => layout(s.progress),
+      onRefresh: (s) => layout(s.progress),
+    });
+  }
+</script>

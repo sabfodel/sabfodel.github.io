@@ -1,0 +1,559 @@
+---
+/**
+ * CHAOS — be.of.dao tarzı tuhaf çekici laboratuvarı. Birbirinden 10⁻⁶ uzakta başlayan
+ * iki nokta (turuncu, camgöbeği) aynı denklemi RK4 ile izler ve kısa sürede ayrışır.
+ * HUD: denklemler, canlı x·y·z, ayrışma |Δ|, parametre sürgüleri, isteğe bağlı ses.
+ */
+const words =
+  'Two points start almost in the same place — a millionth apart — and end up on completely different paths. That is what we call the butterfly effect.'.split(
+    ' '
+  );
+---
+
+<section class="ch" id="chaos" data-chaos aria-labelledby="ch-title">
+  <p class="ch__caption wide-type" data-ch-caption>
+    {words.map((w) => <span class="ch__w">{w} </span>)}
+  </p>
+
+  <div class="ch__frame">
+    <header class="ch__top">
+      <div>
+        <p id="ch-title" class="spaced ch__brand">Chaos</p>
+        <p class="hud">by sabfodel · rk4 · live</p>
+      </div>
+      <p class="ch__glyph" aria-hidden="true">χάος</p>
+    </header>
+
+    <div class="ch__canvas-wrap">
+      <canvas class="ch__canvas" data-ch-canvas aria-label="Strange attractor with two diverging trajectories" role="img"></canvas>
+      <span class="crosshair" style="left:12px;top:12px"></span>
+      <span class="crosshair" style="right:12px;bottom:12px"></span>
+      <p class="ch__drag hud" aria-hidden="true">drag to rotate</p>
+    </div>
+
+    <div class="ch__hud">
+      <div class="ch__sys">
+        <p class="spaced ch__name" data-ch-name>Lorenz</p>
+        <p class="hud" data-ch-year>Edward Lorenz · 1963</p>
+        <pre class="ch__eq" data-ch-eq></pre>
+        <p class="hud ch__params" data-ch-params></p>
+      </div>
+
+      <div class="ch__live hud" aria-live="off">
+        <div><i class="sw sw--a"></i><b>A</b> <span data-ch-a></span></div>
+        <div><i class="sw sw--b"></i><b>B</b> <span data-ch-b></span></div>
+        <div class="ch__delta">|Δ| <b data-ch-d>1.0e-6</b> <span class="ch__meter"><i data-ch-meter></i></span></div>
+        <div>t <b data-ch-t>0.00</b></div>
+      </div>
+
+      <div class="ch__ctl">
+        <div class="ch__btns" role="group" aria-label="System">
+          <button type="button" class="chip is-on" data-sys="lorenz">Lorenz</button>
+          <button type="button" class="chip" data-sys="yuwang">Yu-Wang</button>
+          <button type="button" class="chip" data-sys="thomas">Thomas</button>
+        </div>
+        <div class="ch__sliders" data-ch-sliders></div>
+        <div class="ch__btns">
+          <button type="button" class="chip chip--accent" data-ch-perturb>Re-seed 10⁻⁶</button>
+          <button type="button" class="chip" data-ch-sound aria-pressed="false">Sound off</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ch {
+    position: relative;
+    padding: 18vh clamp(1rem, 3vw, 2.2rem) 6rem;
+    background: #050608;
+  }
+
+  .ch__caption {
+    max-width: 18ch;
+    margin: 0 auto 14vh;
+    font-size: clamp(2rem, 5.6vw, 5rem);
+    text-align: center;
+    color: #f3efe7;
+  }
+
+  .ch__w { opacity: .12; transition: opacity .2s linear; }
+
+  .ch__frame {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 0 2rem;
+    max-width: 1280px;
+    min-height: 88vh;
+    margin: 0 auto;
+    padding: 1.4rem;
+    border: 1px solid var(--line);
+    background: radial-gradient(60% 60% at 35% 55%, rgba(57, 224, 196, .035), transparent 70%), #07090c;
+  }
+
+  .ch__top {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .ch__top p { margin: 0; }
+  .ch__brand { font-size: .82rem; color: var(--ink); margin-bottom: .2rem !important; }
+  .ch__glyph { font-family: var(--font-display); font-size: 1.1rem; color: var(--ink-dim); writing-mode: vertical-rl; }
+
+  .ch__canvas-wrap { position: relative; min-height: 420px; }
+  .ch__canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; touch-action: pan-y; }
+  .ch__canvas:active { cursor: grabbing; }
+  .ch__drag { position: absolute; right: 12px; top: 8px; margin: 0; }
+
+  .ch__hud {
+    display: grid;
+    align-content: end;
+    gap: 1.4rem;
+    padding-bottom: .4rem;
+  }
+
+  .ch__name { font-size: 1.05rem; color: var(--ink); margin: 0 0 .2rem; }
+  .ch__sys .hud { margin: 0; }
+
+  .ch__eq {
+    margin: .9rem 0 .6rem;
+    padding: 0;
+    border: 0;
+    background: none !important;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1rem;
+    line-height: 1.7;
+    white-space: pre;
+  }
+
+  .ch__params { color: var(--ink-dim); }
+
+  .ch__live { display: grid; gap: .3rem; font-variant-numeric: tabular-nums; }
+  .ch__live b { color: var(--ink); }
+
+  .sw { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: .4rem; }
+  .sw--a { background: var(--glow-a); box-shadow: 0 0 8px var(--glow-a); }
+  .sw--b { background: var(--glow-b); box-shadow: 0 0 8px var(--glow-b); }
+
+  .ch__delta { display: flex; align-items: center; gap: .5rem; }
+  .ch__meter { flex: 1; max-width: 140px; height: 2px; background: var(--line-2); }
+  .ch__meter i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--glow-b), var(--glow-a)); }
+
+  .ch__ctl { display: grid; gap: .8rem; }
+  .ch__btns { display: flex; flex-wrap: wrap; gap: .4rem; }
+
+  .chip {
+    padding: .38rem .7rem;
+    border: 1px solid var(--line-2);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ink-dim);
+    font-family: var(--font-mono);
+    font-size: .68rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color .2s, color .2s, background .2s;
+  }
+
+  .chip:hover, .chip:focus-visible { color: var(--ink); border-color: var(--ink-dim); }
+  .chip.is-on, .chip[aria-pressed='true'] { color: #07090c; background: var(--ink); border-color: var(--ink); }
+  .chip--accent { color: var(--glow-a); border-color: rgba(255, 154, 77, .5); }
+
+  .ch__sliders { display: grid; gap: .35rem; }
+
+  .ch__sliders :global(label) {
+    display: grid;
+    grid-template-columns: 1.4rem minmax(0, 1fr) 3.4rem;
+    gap: .6rem;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: .7rem;
+    color: var(--ink-dim);
+  }
+
+  .ch__sliders :global(output) { text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  .ch__sliders :global(input[type='range']) {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 2px;
+    background: var(--line-2);
+    outline-offset: 6px;
+  }
+
+  .ch__sliders :global(input[type='range']::-webkit-slider-thumb) {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--ink);
+    border: 0;
+    cursor: pointer;
+  }
+
+  .ch__sliders :global(input[type='range']::-moz-range-thumb) {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--ink);
+    border: 0;
+    cursor: pointer;
+  }
+
+  @media (max-width: 860px) {
+    .ch__frame { grid-template-columns: minmax(0, 1fr); padding: 1rem; }
+    .ch__canvas-wrap { min-height: 360px; height: 62vh; }
+  }
+</style>
+
+<script>
+  import { ScrollTrigger, fitCanvas, loop, reduceMotion, isSmall, clamp } from '../../scripts/motion';
+
+  type Vec3 = [number, number, number];
+  type Sys = {
+    name: string;
+    year: string;
+    eq: string;
+    params: { k: string; v: number; min: number; max: number; step: number }[];
+    f: (s: Vec3, p: number[]) => Vec3;
+    dt: number;
+    steps: number; // kare başına alt adım
+    x0: Vec3;
+  };
+
+  const SYSTEMS: Record<string, Sys> = {
+    lorenz: {
+      name: 'Lorenz',
+      year: 'Edward Lorenz · 1963 · convection',
+      eq: 'ẋ = σ(y − x)\nẏ = x(ρ − z) − y\nż = xy − βz',
+      params: [
+        { k: 'σ', v: 10, min: 4, max: 20, step: 0.1 },
+        { k: 'ρ', v: 28, min: 14, max: 50, step: 0.1 },
+        { k: 'β', v: 8 / 3, min: 1, max: 4, step: 0.01 },
+      ],
+      f: ([x, y, z], [s, r, b]) => [s * (y - x), x * (r - z) - y, x * y - b * z],
+      dt: 0.005,
+      steps: 4,
+      x0: [1, 1, 1],
+    },
+    yuwang: {
+      name: 'Yu-Wang',
+      year: 'Fei Yu & Chunhua Wang · 2012',
+      eq: 'ẋ = a(y − x)\nẏ = bx − cxz\nż = eˣʸ − dz',
+      params: [
+        { k: 'a', v: 10, min: 6, max: 14, step: 0.1 },
+        { k: 'b', v: 40, min: 30, max: 50, step: 0.1 },
+        { k: 'c', v: 2, min: 1.2, max: 3, step: 0.01 },
+        { k: 'd', v: 2.5, min: 1.8, max: 3.2, step: 0.01 },
+      ],
+      f: ([x, y, z], [a, b, c, d]) => [a * (y - x), b * x - c * x * z, Math.exp(x * y) - d * z],
+      dt: 0.001,
+      steps: 12,
+      x0: [0.1, 0.1, 0.1],
+    },
+    thomas: {
+      name: 'Thomas',
+      year: 'René Thomas · 1999 · cyclically symmetric',
+      eq: 'ẋ = sin y − bx\nẏ = sin z − by\nż = sin x − bz',
+      params: [{ k: 'b', v: 0.208186, min: 0.16, max: 0.24, step: 0.0005 }],
+      f: ([x, y, z], [b]) => [Math.sin(y) - b * x, Math.sin(z) - b * y, Math.sin(x) - b * z],
+      dt: 0.04,
+      steps: 3,
+      x0: [0.1, 0, 0],
+    },
+  };
+
+  function rk4(f: Sys['f'], s: Vec3, p: number[], h: number): Vec3 {
+    const k1 = f(s, p);
+    const k2 = f([s[0] + (h / 2) * k1[0], s[1] + (h / 2) * k1[1], s[2] + (h / 2) * k1[2]], p);
+    const k3 = f([s[0] + (h / 2) * k2[0], s[1] + (h / 2) * k2[1], s[2] + (h / 2) * k2[2]], p);
+    const k4 = f([s[0] + h * k3[0], s[1] + h * k3[1], s[2] + h * k3[2]], p);
+    return [
+      s[0] + (h / 6) * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]),
+      s[1] + (h / 6) * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1]),
+      s[2] + (h / 6) * (k1[2] + 2 * k2[2] + 2 * k3[2] + k4[2]),
+    ];
+  }
+
+  const root = document.querySelector<HTMLElement>('[data-chaos]')!;
+  const canvas = root.querySelector<HTMLCanvasElement>('[data-ch-canvas]')!;
+  const $ = (s: string) => root.querySelector<HTMLElement>(s)!;
+  const nameEl = $('[data-ch-name]'), yearEl = $('[data-ch-year]'), eqEl = $('[data-ch-eq]');
+  const paramsEl = $('[data-ch-params]'), aEl = $('[data-ch-a]'), bEl = $('[data-ch-b]');
+  const dEl = $('[data-ch-d]'), tEl = $('[data-ch-t]'), meter = $('[data-ch-meter]');
+  const sliders = $('[data-ch-sliders]');
+  const soundBtn = root.querySelector<HTMLButtonElement>('[data-ch-sound]')!;
+
+  let sys = SYSTEMS.lorenz;
+  let params: number[] = [];
+  let A: Vec3, B: Vec3, t = 0;
+  let trailA: Vec3[] = [], trailB: Vec3[] = [];
+  let ghost: Vec3[] = [];
+  let lo: Vec3 = [0, 0, 0], hi: Vec3 = [1, 1, 1];
+  let W = 0, H = 0;
+  let yaw = 0.5, pitch = 0.2, userTurned = false;
+  const TRAIL = isSmall() ? 150 : 260;
+
+  const ctx = fitCanvas(canvas, (w, h) => { W = w; H = h; });
+
+  // --- sistem kurulumu -------------------------------------------------------
+  function computeGhost() {
+    let s: Vec3 = [...sys.x0];
+    const pts: Vec3[] = [];
+    const l: Vec3 = [Infinity, Infinity, Infinity], h: Vec3 = [-Infinity, -Infinity, -Infinity];
+    const total = 26000;
+    for (let i = 0; i < total; i++) {
+      s = rk4(sys.f, s, params, sys.dt);
+      if (!s.every(Number.isFinite)) break;
+      if (i > 1500) {
+        for (let k = 0; k < 3; k++) { l[k] = Math.min(l[k], s[k]); h[k] = Math.max(h[k], s[k]); }
+        if (i % 4 === 0) pts.push(s);
+      }
+    }
+    if (pts.length > 100) { ghost = pts; lo = l; hi = h; A = pts[pts.length - 1]; }
+    else { ghost = []; A = [...sys.x0]; }
+    seed();
+  }
+
+  function seed() {
+    B = [A[0] + 1e-6, A[1], A[2]];
+    trailA = []; trailB = []; t = 0;
+  }
+
+  function renderSliders() {
+    sliders.replaceChildren(
+      ...sys.params.map((p, i) => {
+        const label = document.createElement('label');
+        const span = document.createElement('span');
+        span.textContent = p.k;
+        const input = document.createElement('input');
+        input.type = 'range';
+        input.min = String(p.min); input.max = String(p.max); input.step = String(p.step);
+        input.value = String(params[i]);
+        input.setAttribute('aria-label', `Parameter ${p.k}`);
+        const out = document.createElement('output');
+        out.textContent = params[i].toFixed(p.step < 0.01 ? 4 : 2);
+        let timer = 0;
+        input.addEventListener('input', () => {
+          params[i] = Number(input.value);
+          out.textContent = params[i].toFixed(p.step < 0.01 ? 4 : 2);
+          writeParams();
+          clearTimeout(timer);
+          timer = window.setTimeout(computeGhost, 120);
+        });
+        label.append(span, input, out);
+        return label;
+      })
+    );
+  }
+
+  function writeParams() {
+    paramsEl.textContent = sys.params.map((p, i) => `${p.k} = ${params[i].toFixed(p.step < 0.01 ? 4 : 2)}`).join('   ');
+  }
+
+  function useSystem(key: string) {
+    sys = SYSTEMS[key];
+    params = sys.params.map((p) => p.v);
+    nameEl.textContent = sys.name;
+    yearEl.textContent = sys.year;
+    eqEl.textContent = sys.eq;
+    writeParams();
+    renderSliders();
+    computeGhost();
+    root.querySelectorAll<HTMLButtonElement>('[data-sys]').forEach((b) => b.classList.toggle('is-on', b.dataset.sys === key));
+    nameEl.animate([{ filter: 'blur(8px)', opacity: 0 }, { filter: 'blur(0)', opacity: 1 }], { duration: 500 });
+  }
+
+  root.querySelectorAll<HTMLButtonElement>('[data-sys]').forEach((b) => b.addEventListener('click', () => useSystem(b.dataset.sys!)));
+  root.querySelector('[data-ch-perturb]')!.addEventListener('click', seed);
+
+  // --- izdüşüm ----------------------------------------------------------------
+  function project(p: Vec3) {
+    // her ekseni [-1, 1] aralığına getir; z dikey eksen
+    const nx = ((p[0] - lo[0]) / (hi[0] - lo[0] || 1)) * 2 - 1;
+    const ny = ((p[1] - lo[1]) / (hi[1] - lo[1] || 1)) * 2 - 1;
+    const nz = ((p[2] - lo[2]) / (hi[2] - lo[2] || 1)) * 2 - 1;
+    const cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
+    const x1 = nx * cy - ny * sy;
+    const y1 = nx * sy + ny * cy;
+    const v = nz * cp - y1 * sp;
+    const depth = nz * sp + y1 * cp;
+    const s = Math.min(W, H) * 0.4;
+    return { x: W / 2 + x1 * s, y: H / 2 - v * s, d: depth };
+  }
+
+  function drawTrail(trail: Vec3[], color: string) {
+    for (let i = 1; i < trail.length; i++) {
+      const a = project(trail[i - 1]), b = project(trail[i]);
+      ctx.strokeStyle = color;
+      ctx.globalAlpha = (i / trail.length) * 0.9;
+      ctx.lineWidth = 0.6 + (i / trail.length) * 1.6;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function head(p: Vec3, color: string) {
+    const q = project(p);
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 18;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(q.x, q.y, 3.6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(q.x, q.y, 1.4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  const fmt = (v: number) => (v >= 0 ? ' ' : '−') + Math.abs(v).toFixed(3).padStart(6, ' ');
+
+  function frame() {
+    if (!W || !A) return;
+    for (let i = 0; i < sys.steps; i++) {
+      A = rk4(sys.f, A, params, sys.dt);
+      B = rk4(sys.f, B, params, sys.dt);
+      t += sys.dt;
+    }
+    if (!A.every(Number.isFinite) || !B.every(Number.isFinite)) { computeGhost(); return; }
+    trailA.push(A); trailB.push(B);
+    if (trailA.length > TRAIL) { trailA.shift(); trailB.shift(); }
+    if (!userTurned) yaw += 0.0016;
+
+    ctx.clearRect(0, 0, W, H);
+    // eksen artısı
+    const o = project([(lo[0] + hi[0]) / 2, (lo[1] + hi[1]) / 2, (lo[2] + hi[2]) / 2]);
+    ctx.strokeStyle = 'rgba(236,232,223,.08)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(o.x - W * 0.45, o.y); ctx.lineTo(o.x + W * 0.45, o.y);
+    ctx.moveTo(o.x, o.y - H * 0.45); ctx.lineTo(o.x, o.y + H * 0.45);
+    ctx.stroke();
+
+    // hayalet yörünge: ince örümcek ağı
+    ctx.strokeStyle = 'rgba(236,232,223,.11)';
+    ctx.lineWidth = 0.6;
+    ctx.beginPath();
+    const stride = isSmall() ? 2 : 1;
+    for (let i = 0; i < ghost.length; i += stride) {
+      const q = project(ghost[i]);
+      if (i === 0) ctx.moveTo(q.x, q.y);
+      else ctx.lineTo(q.x, q.y);
+    }
+    ctx.stroke();
+
+    drawTrail(trailB, '#39e0c4');
+    drawTrail(trailA, '#ff9a4d');
+    head(B, '#39e0c4');
+    head(A, '#ff9a4d');
+
+    // HUD
+    const d = Math.hypot(A[0] - B[0], A[1] - B[1], A[2] - B[2]);
+    const span = Math.hypot(hi[0] - lo[0], hi[1] - lo[1], hi[2] - lo[2]);
+    aEl.textContent = `x${fmt(A[0])}  y${fmt(A[1])}  z${fmt(A[2])}`;
+    bEl.textContent = `x${fmt(B[0])}  y${fmt(B[1])}  z${fmt(B[2])}`;
+    dEl.textContent = d.toExponential(1);
+    tEl.textContent = t.toFixed(2);
+    meter.style.width = `${clamp((Math.log10(d / span) + 7) / 7) * 100}%`;
+    sound(A, B);
+  }
+
+  // --- sürükleme ------------------------------------------------------------
+  let drag: { x: number; y: number; yaw: number; pitch: number } | null = null;
+  canvas.addEventListener('pointerdown', (e) => {
+    drag = { x: e.clientX, y: e.clientY, yaw, pitch };
+    userTurned = true;
+    canvas.setPointerCapture(e.pointerId);
+  });
+  canvas.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    yaw = drag.yaw - (e.clientX - drag.x) * 0.006;
+    pitch = clamp(drag.pitch + (e.clientY - drag.y) * 0.006, -1.4, 1.4);
+  });
+  const end = () => (drag = null);
+  canvas.addEventListener('pointerup', end);
+  canvas.addEventListener('pointercancel', end);
+
+  // --- ses: z → perde, x → stereo konum --------------------------------------
+  let audio: { ctx: AudioContext; oa: OscillatorNode; ob: OscillatorNode; pa: StereoPannerNode; pb: StereoPannerNode; g: GainNode } | null = null;
+  let soundOn = false;
+
+  function sound(a: Vec3, b: Vec3) {
+    if (!audio || !soundOn) return;
+    const now = audio.ctx.currentTime;
+    const n = (v: number, k: number) => clamp((v - lo[k]) / (hi[k] - lo[k] || 1));
+    // 146 Hz çevresinde, pentatoniğe kaymadan sürekli
+    audio.oa.frequency.setTargetAtTime(110 + n(a[2], 2) * 330, now, 0.05);
+    audio.ob.frequency.setTargetAtTime(110 + n(b[2], 2) * 330, now, 0.05);
+    audio.pa.pan.setTargetAtTime(n(a[0], 0) * 2 - 1, now, 0.08);
+    audio.pb.pan.setTargetAtTime(n(b[0], 0) * 2 - 1, now, 0.08);
+  }
+
+  soundBtn.addEventListener('click', () => {
+    if (!audio) {
+      const ac = new AudioContext();
+      const g = ac.createGain();
+      g.gain.value = 0;
+      const lp = ac.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.value = 1200;
+      g.connect(lp).connect(ac.destination);
+      const mk = (type: OscillatorType) => {
+        const o = ac.createOscillator();
+        o.type = type;
+        const p = ac.createStereoPanner();
+        o.connect(p).connect(g);
+        o.start();
+        return [o, p] as const;
+      };
+      const [oa, pa] = mk('triangle');
+      const [ob, pb] = mk('sine');
+      audio = { ctx: ac, oa, ob, pa, pb, g };
+    }
+    soundOn = !soundOn;
+    audio.ctx.resume();
+    audio.g.gain.setTargetAtTime(soundOn ? 0.06 : 0, audio.ctx.currentTime, 0.1);
+    soundBtn.setAttribute('aria-pressed', String(soundOn));
+    soundBtn.textContent = soundOn ? 'Sound on' : 'Sound off';
+  });
+
+  // --- başlangıç ------------------------------------------------------------
+  useSystem('lorenz');
+
+  if (reduceMotion) {
+    // tek kare çiz, harekete geçme
+    requestAnimationFrame(() => {
+      for (let i = 0; i < TRAIL; i++) frame();
+    });
+    root.querySelectorAll<HTMLElement>('.ch__w').forEach((w) => (w.style.opacity = '1'));
+  } else {
+    loop(canvas, frame);
+    // ekrandan çıkınca sesi kıs
+    new IntersectionObserver(([e]) => {
+      if (audio && soundOn) audio.g.gain.setTargetAtTime(e.isIntersecting ? 0.06 : 0, audio.ctx.currentTime, 0.2);
+    }).observe(canvas);
+
+    // altyazı: kelimeler kaydırdıkça yanar
+    const ws = [...root.querySelectorAll<HTMLElement>('.ch__w')];
+    ScrollTrigger.create({
+      trigger: root.querySelector('[data-ch-caption]')!,
+      start: 'top 85%',
+      end: 'bottom 35%',
+      scrub: true,
+      onUpdate: (s) => ws.forEach((w, i) => (w.style.opacity = String(0.12 + 0.88 * clamp(s.progress * ws.length * 1.1 - i)))),
+    });
+  }
+</script>

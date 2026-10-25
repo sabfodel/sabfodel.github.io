@@ -1,0 +1,126 @@
+---
+/**
+ * WHAT I BRING — kâğıt zeminde, kaydırdıkça bulanıktan netleşen dev satırlar ve
+ * altında koyu bir "araç kutusu" kartı.
+ */
+const LINES = [
+  { t: 'Simulation from first principles', d: 'Equations of motion, integrated by hand — no physics library between me and the result.' },
+  { t: 'Numerics that are tested', d: 'Conservation laws, analytical limits and known results as unit tests.' },
+  { t: 'Quantum circuits, by hand', d: 'State vectors, gates as index tricks, the Born rule in code.' },
+  { t: 'Data, honestly measured', d: 'The right metric for the question — and the limits written down.' },
+];
+const TOOLS = ['Rust', 'Python', 'Qiskit', 'NumPy', 'pandas', 'scikit-learn', 'Matplotlib', 'RK4', 'Rayon', 'LaTeX', 'Astro'];
+---
+
+<section class="cap section--paper" data-cap aria-labelledby="cap-title">
+  <p class="hud cap__kicker">§ 05 — what I bring</p>
+  <h2 id="cap-title" class="visually-hidden">What I bring</h2>
+  <ol class="cap__list">
+    {
+      LINES.map((l, i) => (
+        <li class="cap__item" data-cap-item>
+          <span class="hud">0{i + 1}</span>
+          <p class="cap__t wide-type">{l.t}</p>
+          <p class="cap__d">{l.d}</p>
+        </li>
+      ))
+    }
+  </ol>
+
+  <div class="cap__card" data-cap-card>
+    <p class="hud">toolbox</p>
+    <ul class="cap__tools">{TOOLS.map((t) => <li>{t}</li>)}</ul>
+    <a class="pill" href="/projects/">See everything →</a>
+  </div>
+</section>
+
+<style>
+  .cap { padding: 16vh clamp(1.2rem, 5vw, 5rem) 18vh; }
+
+  .cap__kicker { margin: 0 0 3rem; }
+
+  .cap__list { list-style: none; margin: 0; padding: 0; }
+
+  .cap__item {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr) minmax(0, 22rem);
+    gap: 1.5rem;
+    align-items: baseline;
+    margin: 0;
+    padding: 2.2rem 0;
+    border-top: 1px solid rgba(13, 17, 22, .15);
+    opacity: .1;
+    filter: blur(12px);
+    will-change: filter, opacity;
+  }
+
+  .cap__t { font-size: clamp(1.8rem, 5vw, 4.6rem); color: var(--paper-ink); }
+  .cap__d { margin: 0; color: #4a4a46; font-size: .95rem; }
+
+  @media (max-width: 860px) {
+    .cap__item { grid-template-columns: minmax(0, 1fr); gap: .5rem; }
+  }
+
+  .cap__card {
+    display: grid;
+    gap: 1.2rem;
+    justify-items: start;
+    max-width: 640px;
+    margin: 6rem auto 0;
+    padding: 1.6rem 1.8rem;
+    border-radius: 14px;
+    background: #07090c;
+    color: var(--ink);
+    box-shadow: 0 40px 80px -40px rgba(13, 17, 22, .7);
+  }
+
+  .cap__card .hud { margin: 0; }
+
+  .cap__tools { display: flex; flex-wrap: wrap; gap: .4rem; margin: 0; padding: 0; list-style: none; }
+
+  .cap__tools li {
+    margin: 0;
+    padding: .3rem .7rem;
+    border: 1px solid var(--line-2);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: .74rem;
+    color: var(--ink-dim);
+  }
+
+  .visually-hidden {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+</style>
+
+<script>
+  import { gsap, reduceMotion } from '../../scripts/motion';
+
+  const root = document.querySelector<HTMLElement>('[data-cap]')!;
+  const items = root.querySelectorAll<HTMLElement>('[data-cap-item]');
+
+  if (reduceMotion) {
+    items.forEach((el) => { el.style.opacity = '1'; el.style.filter = 'none'; });
+  } else {
+    items.forEach((el) =>
+      gsap.to(el, {
+        opacity: 1,
+        filter: 'blur(0px)',
+        ease: 'none',
+        scrollTrigger: { trigger: el, start: 'top 90%', end: 'top 55%', scrub: true },
+      })
+    );
+    gsap.from(root.querySelector('[data-cap-card]'), {
+      y: 80,
+      scale: 0.92,
+      opacity: 0,
+      ease: 'none',
+      scrollTrigger: { trigger: root.querySelector('[data-cap-card]'), start: 'top 95%', end: 'top 60%', scrub: true },
+    });
+  }
+</script>

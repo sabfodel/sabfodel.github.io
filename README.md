@@ -104,9 +104,31 @@ yapman gerekmez.
 ## Ayarlar
 
 `src/site.ts` — site başlığı, slogan, gezinme menüsü, üstteki kayan yazı.
-`src/styles/global.css` — bütün renkler en üstteki `:root` bloğunda (kırmızı/siyah tema).
+`src/styles/global.css` — bütün renkler en üstteki `:root` bloğunda ("field notes" teması:
+kâğıt zemin, kareli ızgara, pas/çelik mavisi/pirinç vurgular). Fontlar: Source Serif 4 (başlık),
+IBM Plex Sans (gövde), IBM Plex Mono (etiketler) — Google Fonts'tan `Base.astro` içinde.
 
-### Görseller
+### Proje sayfaları
+
+Ana sayfadaki "Selected work" listesine girmesi için projeye `featured: true` ver. İsteğe bağlı
+alanlar:
+
+```yaml
+cover: /img/work/foo.png      # public/ altında
+coverAlt: Ekran okuyucu açıklaması
+caption: Figür altı yazısı
+coverDark: true               # görselin kendi koyu zemini varsa
+result: Tek satırlık ölçülebilir sonuç
+```
+
+Yazı sırası önerisi: problem → fizik → yöntem → sonuç → sınırlamalar → sonraki adım.
+
+### Lab
+
+`/lab/` etkileşimli deneyler. Bloch küresi `src/components/BlochSphere.astro` içinde; ana
+sayfada da kullanılıyor.
+
+## Görseller
 
 - `public/img/bg-taht-salonu.jpg` — sabit sayfa arka planı. `body::before` içinde,
   üstüne karartma + kan sisi gradyanı biniyor. Metin fazla soluk/fazla karanlık gelirse

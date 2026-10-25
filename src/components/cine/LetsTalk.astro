@@ -1,0 +1,119 @@
+---
+/**
+ * LET'S TALK — dev başlık fareyi izleyen bir "ışık" ile aydınlanır; altta hap
+ * bağlantılar ve en sonda açılıştaki yörüngeye dönen imza.
+ */
+import { SITE, OFF_THE_CLOCK } from '../../site';
+const year = new Date().getFullYear();
+---
+
+<section class="lt" data-lt aria-labelledby="lt-title">
+  <div class="lt__spot" data-lt-spot aria-hidden="true"></div>
+  <p class="hud lt__kicker">§ 06 — contact</p>
+  <h2 id="lt-title" class="lt__h wide-type" data-lt-h>Let’s talk</h2>
+  <p class="lt__sub">
+    Research groups, summer schools, collaborations — or just a good question about physics.
+  </p>
+  <nav class="lt__pills" aria-label="Contact and site">
+    <a class="pill" href={SITE.github}>GitHub ↗</a>
+    {SITE.linkedin && <a class="pill pill--ghost" href={SITE.linkedin}>LinkedIn ↗</a>}
+    {SITE.cv && <a class="pill pill--ghost" href={SITE.cv}>CV</a>}
+    <a class="pill pill--ghost" href="/projects/">Work</a>
+    <a class="pill pill--ghost" href="/lab/">Lab</a>
+    <a class="pill pill--ghost" href="/notes/">Notes</a>
+    <a class="pill pill--ghost" href="/about/">About</a>
+  </nav>
+
+  <footer class="lt__foot hud">
+    <span>© {year} {SITE.title}</span>
+    <span class="lt__off">
+      off the clock:
+      {OFF_THE_CLOCK.map((l) => <a href={l.href}>{l.label}</a>)}
+    </span>
+    <a href="#main">back to top ↑</a>
+  </footer>
+</section>
+
+<style>
+  .lt {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: 1.6rem;
+    min-height: 100vh;
+    padding: 8rem clamp(1rem, 4vw, 3rem) 6rem;
+    overflow: hidden;
+    background: #050608;
+    text-align: center;
+  }
+
+  .lt__spot {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 244, 225, .12), transparent 70%);
+    pointer-events: none;
+  }
+
+  .lt__kicker { margin: 0; }
+
+  .lt__h {
+    position: relative;
+    font-size: clamp(3.4rem, 15vw, 15rem);
+    color: transparent;
+    background: radial-gradient(360px circle at var(--hx, 50%) var(--hy, 50%), #ffffff 0%, #f3efe7 35%, rgba(243, 239, 231, .28) 70%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    white-space: nowrap;
+  }
+
+  .lt__sub { max-width: 46ch; margin: 0; color: var(--ink-dim); }
+
+  .lt__pills { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem; }
+
+  .lt__foot {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 1.2rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: .6rem 1.4rem;
+    padding: 0 clamp(1rem, 3vw, 2.2rem);
+  }
+
+  .lt__foot a { color: var(--ink-dim); border: 0; }
+  .lt__foot a:hover { color: var(--ink); }
+  .lt__off { display: inline-flex; flex-wrap: wrap; gap: .8rem; }
+
+  @media (max-width: 640px) {
+    .lt__foot { position: static; justify-content: center; margin-top: 3rem; }
+  }
+</style>
+
+<script>
+  import { gsap, reduceMotion } from '../../scripts/motion';
+
+  const root = document.querySelector<HTMLElement>('[data-lt]')!;
+  const h = root.querySelector<HTMLElement>('[data-lt-h]')!;
+
+  root.addEventListener('pointermove', (e) => {
+    const r = root.getBoundingClientRect();
+    root.style.setProperty('--mx', `${e.clientX - r.left}px`);
+    root.style.setProperty('--my', `${e.clientY - r.top}px`);
+    const hr = h.getBoundingClientRect();
+    h.style.setProperty('--hx', `${e.clientX - hr.left}px`);
+    h.style.setProperty('--hy', `${e.clientY - hr.top}px`);
+  });
+
+  if (!reduceMotion) {
+    gsap.from(h, {
+      letterSpacing: '.3em',
+      opacity: 0,
+      filter: 'blur(18px)',
+      ease: 'none',
+      scrollTrigger: { trigger: root, start: 'top 80%', end: 'top 20%', scrub: true },
+    });
+  }
+</script>

@@ -1,0 +1,178 @@
+/* =========================================================
+   Sinematik ana sayfa — kaydırmaya bağlı, her zaman koyu.
+   Koyu bölümler gece mürekkebi; açık bölümler defter kâğıdı.
+   ========================================================= */
+
+html[data-cine] {
+  --bg:        #050608;
+  --surface:   #0c1015;
+  --surface-2: #131920;
+  --grid:      rgba(141, 179, 199, .04);
+  --ink:       #ece8df;
+  --ink-dim:   #a9b0b8;
+  --ink-faint: #6f7882;
+  --line:      #1b232c;
+  --line-2:    #2a3542;
+  --accent:      #e08a66;
+  --accent-soft: #3a2620;
+  --steel:       #8db3c7;
+  --steel-soft:  #1d2c36;
+  --brass:       #cdb78f;
+
+  --paper: #efece5;
+  --paper-ink: #0d1116;
+  --glow-a: #ff9a4d;   /* turuncu parçacık */
+  --glow-b: #39e0c4;   /* camgöbeği parçacık */
+
+  --font-wide: 'Archivo', 'Arial Black', Impact, sans-serif;
+
+  color-scheme: dark;
+}
+
+html[data-cine] body {
+  background-color: var(--bg);
+  overflow-x: clip;
+}
+
+/* Lenis */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+main.cine { max-width: none; margin: 0; }
+
+/* Sabit, şeffaf üst bant — "difference" ile açık/koyu her bölümde okunur */
+.topbar--float {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 60;
+  margin: 0;
+  padding: 1.1rem clamp(1rem, 3vw, 2.2rem);
+  border: 0;
+  color: #fff;
+  mix-blend-mode: difference;
+  pointer-events: none;
+}
+
+.topbar--float > * { pointer-events: auto; }
+.topbar--float .mark,
+.topbar--float .mark__sub,
+.topbar--float .nav a,
+.topbar--float .nav a .idx { color: #fff; }
+.topbar--float .nav a[aria-current='page'] { border-bottom-color: #fff; }
+.topbar--float .nav a:hover { opacity: .7; }
+
+/* --- ortak parçalar --------------------------------------------------- */
+.hud {
+  font-family: var(--font-mono);
+  font-size: .64rem;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  line-height: 1.5;
+}
+
+.hud b { color: var(--ink); font-weight: 500; }
+
+.wide-type {
+  font-family: var(--font-wide);
+  font-weight: 900;
+  font-stretch: 112%;
+  letter-spacing: -.035em;
+  line-height: .86;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.spaced {
+  font-family: var(--font-wide);
+  font-weight: 800;
+  letter-spacing: .42em;
+  text-transform: uppercase;
+}
+
+.pin { position: relative; }
+.pin__stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+}
+
+.section--paper {
+  background: var(--paper);
+  color: var(--paper-ink);
+}
+
+.section--paper .hud { color: #6c6a64; }
+.section--paper .hud b { color: var(--paper-ink); }
+
+/* Köşe artı işaretleri (HUD çerçevesi) */
+.crosshair {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  pointer-events: none;
+  opacity: .5;
+}
+
+.crosshair::before,
+.crosshair::after {
+  content: '';
+  position: absolute;
+  background: currentColor;
+}
+
+.crosshair::before { left: 5px; top: 0; width: 1px; height: 11px; }
+.crosshair::after  { top: 5px; left: 0; height: 1px; width: 11px; }
+
+/* Bulanıklıktan netleşen kelimeler */
+.blur-word {
+  display: inline-block;
+  filter: blur(14px);
+  opacity: 0;
+  transform: translateY(.18em);
+  will-change: filter, opacity, transform;
+}
+
+/* --- kaydırma göstergesi ---------------------------------------------- */
+.scroll-hud {
+  position: fixed;
+  left: clamp(1rem, 3vw, 2.2rem);
+  bottom: 1rem;
+  z-index: 55;
+  display: flex;
+  gap: 1.2rem;
+  align-items: center;
+  color: #fff;
+  mix-blend-mode: difference;
+  pointer-events: none;
+  transition: opacity .3s ease;
+}
+
+.scroll-hud .hud { color: #fff; opacity: .75; }
+
+.scroll-hud__bar {
+  position: relative;
+  width: 90px;
+  height: 1px;
+  background: rgba(255, 255, 255, .3);
+}
+
+.scroll-hud__bar i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  background: #fff;
+}
+
+@media (max-width: 640px) {
+  .scroll-hud { display: none; }
+}
+
+/* Hareket azaltma: sabitlenmiş bölümler normal akışa döner */
+@media (prefers-reduced-motion: reduce) {
+  .blur-word { filter: none; opacity: 1; transform: none; }
+}

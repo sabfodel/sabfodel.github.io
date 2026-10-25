@@ -20,8 +20,31 @@ const d = project.data;
   summary={d.summary}
   tags={d.tags}
   backHref="/projects/"
-  backLabel="all projects"
+  backLabel="all work"
 >
-  {d.repo && <p><a href={d.repo}>▸ source: {d.repo.replace('https://', '')}</a></p>}
+  {
+    d.cover && (
+      <figure style="margin:0 0 2rem">
+        <div class:list={['plate', d.coverDark && 'plate--dark']}>
+          <img src={d.cover} alt={d.coverAlt ?? ''} decoding="async" />
+        </div>
+        {d.caption && (
+          <figcaption class="figcap">
+            <span class="label">Fig. 1</span>
+            <span>{d.caption}</span>
+          </figcaption>
+        )}
+      </figure>
+    )
+  }
+  {
+    d.result && (
+      <p class="result">
+        <span class="label">result</span>
+        {d.result}
+      </p>
+    )
+  }
+  {d.repo && <p class="work__links"><a href={d.repo}>source ↗ {d.repo.replace('https://github.com/', '')}</a></p>}
   <Content />
 </Entry>

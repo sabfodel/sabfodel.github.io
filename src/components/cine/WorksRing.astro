@@ -1,0 +1,230 @@
+---
+/**
+ * WORKS '26 — altı kart 3B altıgen halkada döner; kaydırma devam edince halka
+ * dağılır, kartlar havada süzülen dikey bir yığına dizilir. Soldaki ad, ortadaki
+ * kartla birlikte değişir.
+ */
+const ITEMS = [
+  { href: '/projects/gargantua-rs/', img: '/img/work/gargantua-render.png', name: 'gargantua-rs', note: 'Null geodesics around a Schwarzschild black hole' },
+  { href: '/projects/qsim-rs/', img: '/img/work/qsim-bell.svg', name: 'qsim-rs', note: 'State-vector quantum circuits, no SDK' },
+  { href: '/projects/nbody-sim/', img: '/img/work/nbody-orbits.svg', name: 'nbody-sim', note: 'A century of solar system, energy drift 5×10⁻⁹' },
+  { href: '/projects/pulsar-htru2/', img: '/img/work/pulsar-feature-importance.png', name: 'Pulsar hunt', note: 'Recall 0.92 on 9%-positive radio data' },
+  { href: '/lab/', img: '', name: 'Bloch lab', note: 'Every single-qubit gate is a rotation' },
+  { href: '#chaos', img: '', name: 'Chaos', note: 'Two points, one equation, two fates' },
+];
+---
+
+<section class="wr pin section--paper" data-wr aria-labelledby="wr-title">
+  <div class="pin__stage wr__stage">
+    <p class="wr__kicker hud">§ 04 — index of works</p>
+
+    <div class="wr__label" aria-live="polite">
+      <p class="hud" data-wr-idx>01 / 06</p>
+      <p class="wr__name wide-type" data-wr-name>{ITEMS[0].name}</p>
+      <p class="wr__note" data-wr-note>{ITEMS[0].note}</p>
+    </div>
+
+    <div class="wr__scene">
+      <p class="wr__center wide-type" data-wr-center id="wr-title">Works&nbsp;’26</p>
+      <ul class="wr__ring" data-wr-ring>
+        {
+          ITEMS.map((it, i) => (
+            <li class="wr__card" data-wr-card>
+              <a href={it.href} class="wr__link" aria-label={`${it.name} — ${it.note}`}>
+                {it.img ? (
+                  <img src={it.img} alt="" loading="lazy" decoding="async" />
+                ) : (
+                  <span class="wr__gen" data-kind={i === 4 ? 'bloch' : 'chaos'} aria-hidden="true">
+                    <svg viewBox="0 0 160 100">
+                      {i === 4 ? (
+                        <g>
+                          <circle cx="80" cy="50" r="34" />
+                          <ellipse cx="80" cy="50" rx="34" ry="10" />
+                          <line x1="80" y1="50" x2="102" y2="26" class="v" />
+                        </g>
+                      ) : (
+                        <path d="M30 70 C 10 30, 70 20, 80 50 S 150 80, 130 30 S 60 10, 80 50 S 20 90, 30 70" />
+                      )}
+                    </svg>
+                  </span>
+                )}
+                <span class="wr__tag hud">{String(i + 1).padStart(2, '0')}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .wr { height: 420vh; }
+
+  .wr__stage { display: grid; place-items: center; }
+
+  .wr__kicker { position: absolute; top: 5.5rem; left: clamp(1.2rem, 4vw, 3rem); margin: 0; }
+
+  .wr__label {
+    position: absolute;
+    left: clamp(1.2rem, 4vw, 3rem);
+    top: 50%;
+    z-index: 2;
+    max-width: 30ch;
+    transform: translateY(-50%);
+    opacity: 0;
+  }
+
+  .wr__label .hud { margin: 0 0 .4rem; }
+  .wr__name { font-size: clamp(1.7rem, 3.6vw, 3.2rem); color: var(--paper-ink); }
+  .wr__note { margin: .6rem 0 0; color: #4a4a46; font-size: .92rem; }
+
+  .wr__scene {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    perspective: 1300px;
+  }
+
+  .wr__center {
+    position: absolute;
+    z-index: 0;
+    font-size: clamp(1.4rem, 3vw, 2.4rem);
+    color: var(--paper-ink);
+    letter-spacing: -.02em;
+    margin: 0;
+  }
+
+  .wr__ring {
+    position: relative;
+    width: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    transform-style: preserve-3d;
+  }
+
+  .wr__card {
+    position: absolute;
+    left: calc(var(--cw) / -2);
+    top: calc(var(--ch) / -2);
+    width: var(--cw);
+    height: var(--ch);
+    margin: 0;
+    --cw: clamp(150px, 19vw, 260px);
+    --ch: calc(var(--cw) * .66);
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    will-change: transform, opacity;
+  }
+
+  .wr__link {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border: 1px solid rgba(13, 17, 22, .14);
+    background: #fbfaf7;
+    box-shadow: 0 24px 50px -24px rgba(13, 17, 22, .5);
+  }
+
+  .wr__link img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .wr__gen { position: absolute; inset: 0; display: grid; place-items: center; background: #07090c; }
+  .wr__gen svg { width: 80%; height: 80%; fill: none; stroke: rgba(236, 232, 223, .6); stroke-width: 1; }
+  .wr__gen .v { stroke: var(--glow-a); stroke-width: 2; }
+  .wr__gen[data-kind='chaos'] svg { stroke: var(--glow-b); }
+
+  .wr__tag {
+    position: absolute;
+    top: .4rem;
+    right: .5rem;
+    padding: .05rem .35rem;
+    background: rgba(255, 255, 255, .85);
+    color: var(--paper-ink);
+  }
+
+  @media (max-width: 760px) {
+    .wr__label { top: auto; bottom: 2.6rem; transform: none; max-width: none; right: 1.2rem; }
+  }
+</style>
+
+<script>
+  import { ScrollTrigger, reduceMotion, lerp, smooth, clamp } from '../../scripts/motion';
+
+  const root = document.querySelector<HTMLElement>('[data-wr]')!;
+  const ring = root.querySelector<HTMLElement>('[data-wr-ring]')!;
+  const cards = [...root.querySelectorAll<HTMLElement>('[data-wr-card]')];
+  const center = root.querySelector<HTMLElement>('[data-wr-center]')!;
+  const label = root.querySelector<HTMLElement>('.wr__label')!;
+  const nameEl = root.querySelector<HTMLElement>('[data-wr-name]')!;
+  const noteEl = root.querySelector<HTMLElement>('[data-wr-note]')!;
+  const idxEl = root.querySelector<HTMLElement>('[data-wr-idx]')!;
+  const items = cards.map((c) => (c.querySelector('a')!.getAttribute('aria-label') ?? '').split(' — '));
+  const n = cards.length;
+  let shown = 0;
+
+  function update(p: number) {
+    const cw = cards[0].offsetWidth;
+    const small = innerWidth < 760;
+    const R = cw * (small ? 1.05 : 1.25);
+    const spin = p * 300;
+    const m = smooth(0.26, 0.42, p);
+    const f = clamp((p - 0.42) / 0.55) * (n - 1);
+    const tilt = lerp(-14, 0, m);
+    ring.style.transform = `rotateX(${tilt}deg)`;
+    center.style.opacity = String(1 - m);
+    label.style.opacity = String(smooth(0.36, 0.46, p));
+
+    cards.forEach((c, i) => {
+      const a = ((i / n) * 360 + spin) * (Math.PI / 180);
+      const rx = Math.sin(a) * R, rz = Math.cos(a) * R, rRot = (i / n) * 360 + spin;
+      // yığın: aktif kart ortada önde, diğerleri yukarı/aşağı süzülür
+      const d = i - f;
+      const sx = (small ? 0 : cw * 0.55) + Math.sin(i * 2.3) * cw * 0.35 * Math.min(1, Math.abs(d));
+      const sy = d * cw * (small ? 0.55 : 0.62);
+      const sz = -Math.abs(d) * 220;
+      const x = lerp(rx, sx, m), y = lerp(0, sy, m), z = lerp(rz, sz, m);
+      const rot = lerp(rRot, Math.sin(i) * 8, m);
+      const scale = lerp(1, 1.25 - Math.min(0.4, Math.abs(d) * 0.2), m);
+      c.style.transform = `translate3d(${x}px, ${y}px, ${z}px) rotateY(${rot}deg) scale(${scale})`;
+      c.style.opacity = String(lerp(1, Math.max(0, 1 - Math.abs(d) * 0.45), m));
+      c.style.zIndex = String(100 - Math.round(Math.abs(d) * 10));
+    });
+
+    const k = Math.round(f);
+    if (m > 0.5 && k !== shown) {
+      shown = k;
+      const [name, note] = items[k];
+      label.animate(
+        [
+          { filter: 'blur(10px)', opacity: 0.2 },
+          { filter: 'blur(0)', opacity: 1 },
+        ],
+        { duration: 420, easing: 'cubic-bezier(.2,.7,.3,1)' }
+      );
+      nameEl.textContent = name;
+      noteEl.textContent = note;
+      idxEl.textContent = `${String(k + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;
+    }
+  }
+
+  if (reduceMotion) {
+    root.style.height = 'auto';
+    update(0.3);
+  } else {
+    update(0);
+    ScrollTrigger.create({
+      trigger: root,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: true,
+      onUpdate: (s) => update(s.progress),
+      onRefresh: (s) => update(s.progress),
+    });
+  }
+</script>

@@ -1,0 +1,89 @@
+---
+import katex from 'katex';
+import Base from '../../layouts/Base.astro';
+import BlochSphere from '../../components/BlochSphere.astro';
+
+const tex = (s: string, display = false) =>
+  katex.renderToString(s, { displayMode: display, throwOnError: false });
+---
+
+<Base title="lab" description="Interactive physics: small experiments you can run in the browser." wide>
+  <header class="entry-head">
+    <span class="kicker">lab · interactive</span>
+    <h1>Things you can poke</h1>
+    <p class="lede" style="margin:0">
+      Small experiments that run in your browser. Each one is a single idea, with the equations
+      that drive it written underneath.
+    </p>
+  </header>
+
+  <section class="panel" aria-labelledby="exp1">
+    <header class="section-hd">
+      <span class="label">Exp. 001</span>
+      <h2 id="exp1">The Bloch sphere</h2>
+      <span class="label">one qubit</span>
+    </header>
+
+    <BlochSphere
+      wide
+      fig="Exp. 001"
+      caption="Apply gates to |0⟩ and watch the state rotate. Measurement samples an outcome with the Born-rule probabilities and collapses the state to a pole."
+    />
+
+    <div class="prose" style="margin-top:2.4rem">
+      <p>
+        Any pure state of one qubit can be written, up to an unobservable global phase, with two
+        angles:
+      </p>
+      <Fragment set:html={tex(String.raw`\lvert\psi\rangle = \cos\tfrac{\theta}{2}\,\lvert 0\rangle + e^{i\varphi}\sin\tfrac{\theta}{2}\,\lvert 1\rangle`, true)} />
+      <p>
+        Read <Fragment set:html={tex(String.raw`(\theta, \varphi)`)} /> as polar and azimuthal
+        angles and every state becomes a point on a unit sphere: <Fragment set:html={tex(String.raw`\lvert 0\rangle`)} />
+        at the north pole, <Fragment set:html={tex(String.raw`\lvert 1\rangle`)} /> at the south, and
+        equal superpositions around the equator.
+      </p>
+      <p>
+        The useful fact is that every single-qubit gate is a <em>rotation</em> of that sphere.
+        Up to global phase,
+      </p>
+      <Fragment set:html={tex(String.raw`U = e^{-i\alpha\,\hat{n}\cdot\vec{\sigma}/2}`, true)} />
+      <p>
+        rotates the Bloch vector by angle <Fragment set:html={tex(String.raw`\alpha`)} /> about the axis
+        <Fragment set:html={tex(String.raw`\hat n`)} />. That is all the simulator above does — it never
+        stores amplitudes, only the arrow, and turns it with Rodrigues' formula:
+      </p>
+      <table>
+        <thead><tr><th>Gate</th><th>Axis</th><th>Angle</th></tr></thead>
+        <tbody>
+          <tr><td>X, Y, Z</td><td>x, y, z</td><td>π</td></tr>
+          <tr><td>H</td><td>(x + z)/√2</td><td>π</td></tr>
+          <tr><td>S</td><td>z</td><td>π/2</td></tr>
+          <tr><td>T</td><td>z</td><td>π/4</td></tr>
+        </tbody>
+      </table>
+      <p>
+        The probability of measuring 0 is the height of the arrow:
+        <Fragment set:html={tex(String.raw`P(0) = \cos^2\tfrac{\theta}{2} = \tfrac{1 + z}{2}`)} />.
+        Try <strong>H</strong> then <strong>T</strong> repeatedly: the state walks around the
+        equator and the probabilities never change — the information is all in the phase.
+      </p>
+      <p class="muted">
+        Limits: one qubit, pure states only. Entanglement has no picture here — two entangled
+        qubits don't each have their own arrow. For that, see
+        <a href="/projects/qsim-rs/">qsim-rs</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="next">
+    <header class="section-hd">
+      <span class="label">Next</span>
+      <h2 id="next">On the drawing board</h2>
+      <span class="label">planned</span>
+    </header>
+    <ul class="log">
+      <li><span class="label">exp. 002</span><span>Decoherence on the Bloch sphere — T₁ and T₂ shrinking the arrow into the ball.</span></li>
+      <li><span class="label">exp. 003</span><span>Grover's search, one amplitude bar at a time.</span></li>
+    </ul>
+  </section>
+</Base>

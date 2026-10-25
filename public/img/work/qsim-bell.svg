@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace">
+  <rect width="900" height="600" fill="#fbfaf7"/>
+  <!-- ince kareli zemin -->
+  <defs>
+    <pattern id="g" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M24 0H0V24" fill="none" stroke="#547c91" stroke-opacity=".12" stroke-width="1"/>
+    </pattern>
+    <marker id="dot" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="10" markerHeight="10">
+      <circle cx="5" cy="5" r="5" fill="#111820"/>
+    </marker>
+  </defs>
+  <rect width="900" height="600" fill="url(#g)"/>
+
+  <text x="48" y="64" font-size="15" letter-spacing="2" fill="#436779">FIG. — BELL STATE, qsim-rs</text>
+
+  <!-- devre -->
+  <g stroke="#111820" stroke-width="2" fill="none">
+    <line x1="120" y1="190" x2="500" y2="190"/>
+    <line x1="120" y1="320" x2="500" y2="320"/>
+  </g>
+  <g font-size="22" fill="#111820">
+    <text x="48" y="198">q₀ |0⟩</text>
+    <text x="48" y="328">q₁ |0⟩</text>
+  </g>
+  <!-- H kapısı -->
+  <rect x="190" y="160" width="60" height="60" fill="#fbfaf7" stroke="#111820" stroke-width="2"/>
+  <text x="220" y="200" text-anchor="middle" font-size="26" fill="#111820" font-family="Source Serif 4, Georgia, serif">H</text>
+  <!-- CNOT -->
+  <line x1="360" y1="190" x2="360" y2="338" stroke="#111820" stroke-width="2"/>
+  <circle cx="360" cy="190" r="8" fill="#111820"/>
+  <circle cx="360" cy="320" r="18" fill="#fbfaf7" stroke="#111820" stroke-width="2"/>
+  <line x1="342" y1="320" x2="378" y2="320" stroke="#111820" stroke-width="2"/>
+  <line x1="360" y1="302" x2="360" y2="338" stroke="#111820" stroke-width="2"/>
+  <!-- ölçüm -->
+  <g stroke="#111820" stroke-width="2" fill="#fbfaf7">
+    <rect x="440" y="164" width="52" height="52"/>
+    <rect x="440" y="294" width="52" height="52"/>
+  </g>
+  <g stroke="#111820" stroke-width="2" fill="none">
+    <path d="M450 204 A16 16 0 0 1 482 204"/>
+    <line x1="466" y1="204" x2="480" y2="178"/>
+    <path d="M450 334 A16 16 0 0 1 482 334"/>
+    <line x1="466" y1="334" x2="480" y2="308"/>
+  </g>
+
+  <text x="120" y="430" font-size="22" fill="#111820" font-family="Source Serif 4, Georgia, serif" font-style="italic">|Φ⁺⟩ = (|00⟩ + |11⟩) / √2</text>
+
+  <!-- histogram: 1024 atış — 00: 500, 01: 0, 10: 0, 11: 524 -->
+  <g transform="translate(580 120)">
+    <text x="0" y="0" font-size="14" letter-spacing="1.5" fill="#436779">1024 SHOTS</text>
+    <line x1="0" y1="360" x2="260" y2="360" stroke="#111820" stroke-width="2"/>
+    <rect x="16"  y="117" width="44" height="243" fill="#c96947"/>
+    <rect x="80"  y="358" width="44" height="2" fill="#c96947"/>
+    <rect x="144" y="358" width="44" height="2" fill="#c96947"/>
+    <rect x="208" y="105" width="44" height="255" fill="#c96947"/>
+    <g font-size="16" fill="#111820" text-anchor="middle">
+      <text x="38" y="386">00</text>
+      <text x="102" y="386">01</text>
+      <text x="166" y="386">10</text>
+      <text x="230" y="386">11</text>
+    </g>
+    <g font-size="14" fill="#4a525c" text-anchor="middle">
+      <text x="38" y="108">500</text>
+      <text x="102" y="350">0</text>
+      <text x="166" y="350">0</text>
+      <text x="230" y="96">524</text>
+    </g>
+  </g>
+</svg>

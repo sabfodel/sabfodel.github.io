@@ -1,0 +1,146 @@
+---
+/**
+ * Açılış: kelime işaretinin etrafında kendini çizen, presesyon yapan bir yörünge
+ * (genel görelilikteki günberi kayması gibi). Oturum başına bir kez tam oynar.
+ */
+import { SITE } from '../../site';
+
+// r(θ) = p / (1 + e·cos(kθ)) — k < 1 olunca elips her turda biraz döner
+const pts: string[] = [];
+const turns = 2.15;
+const k = 0.88;
+const e = 0.22;
+for (let i = 0; i <= 720; i++) {
+  const th = (i / 720) * turns * Math.PI * 2;
+  const r = 1 / (1 + e * Math.cos(k * th));
+  const x = 300 + Math.cos(th - 0.6) * r * 230;
+  const y = 120 + Math.sin(th - 0.6) * r * 92;
+  pts.push(`${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`);
+}
+const orbit = pts.join(' ');
+---
+
+<div class="pre" data-pre aria-hidden="true">
+  <div class="pre__inner">
+    <svg class="pre__svg" viewBox="0 0 600 240" fill="none">
+      <path class="pre__orbit" d={orbit} pathLength="1" />
+      <circle class="pre__dot" r="3.2" cx="0" cy="0" />
+    </svg>
+    <p class="pre__word spaced">{SITE.title}<span>.</span></p>
+  </div>
+  <p class="pre__meta hud">
+    <span>r(θ) = p / (1 + e cos kθ)</span>
+    <span data-pre-count>000</span>
+  </p>
+</div>
+
+<style>
+  .pre {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    background: #050608;
+    color: #ece8df;
+  }
+
+  .pre__inner {
+    position: relative;
+    width: min(600px, 92vw);
+    aspect-ratio: 600 / 240;
+    display: grid;
+    place-items: center;
+  }
+
+  .pre__svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+
+  .pre__orbit {
+    stroke: rgba(236, 232, 223, .75);
+    stroke-width: 1;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+
+  .pre__dot { fill: #fff; filter: drop-shadow(0 0 6px #fff); }
+
+  .pre__word {
+    position: relative;
+    margin: 0;
+    font-size: clamp(1.5rem, 4.4vw, 2.6rem);
+    letter-spacing: .5em;
+    padding-left: .5em;
+    text-shadow: 0 0 22px rgba(255, 255, 255, .45);
+    filter: blur(10px);
+    opacity: 0;
+  }
+
+  .pre__word span { color: var(--glow-a); }
+
+  .pre__meta {
+    text-transform: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 1.4rem;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 clamp(1rem, 3vw, 2.2rem);
+    margin: 0;
+  }
+</style>
+
+<script>
+  import { gsap, getLenis, initMotion, reduceMotion } from '../../scripts/motion';
+
+  const root = document.querySelector<HTMLElement>('[data-pre]')!;
+  const path = root.querySelector<SVGPathElement>('.pre__orbit')!;
+  const dot = root.querySelector<SVGCircleElement>('.pre__dot')!;
+  const word = root.querySelector<HTMLElement>('.pre__word')!;
+  const count = root.querySelector<HTMLElement>('[data-pre-count]')!;
+
+  const done = () => {
+    root.remove();
+    document.documentElement.dataset.ready = '';
+    getLenis()?.start();
+    window.dispatchEvent(new Event('preloader:done'));
+  };
+
+  let seen = false;
+  try {
+    seen = sessionStorage.getItem('pre') === '1';
+    sessionStorage.setItem('pre', '1');
+  } catch {
+    /* depolama kapalıysa her seferinde oynat */
+  }
+
+  if (reduceMotion) {
+    done();
+  } else {
+    // Lenis'i burada başlatıp hemen durdur; done() yeniden başlatır
+    initMotion()?.stop();
+    const total = path.getTotalLength();
+    const progress = { p: 0 };
+    const speed = seen ? 0.45 : 1;
+    const tl = gsap.timeline({ onComplete: done });
+    tl.to(word, { opacity: 1, filter: 'blur(0px)', duration: 0.9 * speed, ease: 'power2.out' }, 0)
+      .to(
+        progress,
+        {
+          p: 1,
+          duration: 1.9 * speed,
+          ease: 'power2.inOut',
+          onUpdate: () => {
+            path.style.strokeDashoffset = String(1 - progress.p);
+            const pt = path.getPointAtLength(progress.p * total);
+            dot.setAttribute('cx', String(pt.x));
+            dot.setAttribute('cy', String(pt.y));
+            count.textContent = String(Math.round(progress.p * 100)).padStart(3, '0');
+          },
+        },
+        0.15 * speed
+      )
+      .to(word, { letterSpacing: '.9em', opacity: 0, filter: 'blur(12px)', duration: 0.6 * speed, ease: 'power2.in' }, '>-0.05')
+      .to(root, { yPercent: -100, duration: 0.9 * speed, ease: 'expo.inOut' }, '<0.2');
+  }
+</script>
