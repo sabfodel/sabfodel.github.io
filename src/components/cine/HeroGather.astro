@@ -42,8 +42,8 @@
   .gx__stage {
     display: grid;
     place-items: center;
-    /* olay ufku: merkez koyu, renkler etrafında döner */
-    background: radial-gradient(42% 46% at 50% 52%, rgba(5, 6, 8, .92), rgba(5, 6, 8, .55) 55%, rgba(5, 6, 8, .12) 100%);
+    /* kara deliğin arkası hafif koyu, gradyan net görünsün */
+    background: radial-gradient(45% 45% at 50% 52%, rgba(5, 6, 8, .55), rgba(5, 6, 8, 0) 100%);
   }
 
   .gx__title {
@@ -326,29 +326,10 @@
     }
   }
 
-  // Arka plan gradyanı kara deliğin etrafında yavaşça döner ve kaydırdıkça
-  // içeri çekilir: renkler deliğe akıyormuş gibi görünür. Yalnızca giriş
-  // bölümündeyken; çıkınca sıfırlanır.
-  const sg = document.querySelector<HTMLElement>('.sg');
-  if (sg) sg.style.transformOrigin = '50% 52%';
-
   if (!reduceMotion) {
     loop(root, (t) => {
       scatter += (scatterTarget - scatter) * 0.045;
       draw(t);
-      if (sg) {
-        const pull = scrollScatter;
-        const deg = t * 0.0015 + pull * 90;
-        const th = (deg * Math.PI) / 180;
-        const a = innerWidth / innerHeight;
-        const c = Math.abs(Math.cos(th)), sn = Math.abs(Math.sin(th));
-        // döndürülmüş katman ekranın köşelerini her açıda örtsün
-        const cover = Math.max(c + a * sn, c + sn / a) * 1.02;
-        sg.style.transform = `rotate(${deg.toFixed(2)}deg) scale(${(cover * (1 + pull * 0.3)).toFixed(3)})`;
-      }
     });
-    new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting && sg) sg.style.transform = '';
-    }).observe(root);
   }
 </script>
