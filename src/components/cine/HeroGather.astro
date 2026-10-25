@@ -7,9 +7,11 @@
 
 <section class="gx pin" data-gx data-sg aria-labelledby="gx-title">
   <div class="pin__stage gx__stage">
+    <div class="gx__glow" data-gx-glow aria-hidden="true"></div>
+
     <h1 id="gx-title" class="gx__title wide-type" data-gx-title>
-      <span class="gx__line"><span class="blur-word">Built</span> <span class="blur-word">from</span></span>
-      <span class="gx__line"><span class="blur-word">first</span> <span class="blur-word">principles</span></span>
+      <span class="gx__line gx__line--top"><span class="blur-word">Built</span> <span class="blur-word">from</span></span>
+      <span class="gx__line gx__line--bot"><span class="blur-word">first</span> <span class="blur-word">principles</span></span>
     </h1>
 
     <canvas class="gx__canvas" data-gx-canvas aria-hidden="true"></canvas>
@@ -45,18 +47,37 @@
     background: radial-gradient(55% 50% at 50% 55%, rgba(5, 6, 8, .7), rgba(5, 6, 8, .15) 100%);
   }
 
+  /* Render'ın kendisinden yumuşak bir parıltı: kara delik parçacıkların arkasında belirgin dursun */
+  .gx__glow {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 0;
+    background: url('/img/work/gargantua-render.png') center / cover no-repeat;
+    filter: blur(16px) saturate(1.15);
+    mix-blend-mode: screen;
+    opacity: 0;
+    pointer-events: none;
+    -webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent 100%);
+    mask-image: radial-gradient(closest-side, #000 55%, transparent 100%);
+  }
+
+  /* Başlık kara deliği çerçeveler: üstte ve altta, merkez boş kalır */
   .gx__title {
     position: absolute;
+    inset: 0;
     z-index: 1;
+    margin: 0;
     text-align: center;
-    font-size: clamp(2.4rem, 8.4vw, 9.4rem);
+    font-size: clamp(2.4rem, 7.4vw, 8.6rem);
     color: #ece8df;
     pointer-events: none;
     user-select: none;
   }
 
-  .gx__line { display: block; white-space: nowrap; }
-  .gx__line + .gx__line { color: transparent; -webkit-text-stroke: 1px rgba(236, 232, 223, .55); }
+  .gx__line { position: absolute; left: 0; right: 0; display: block; white-space: nowrap; }
+  .gx__line--top { top: clamp(6.5rem, 12%, 10rem); }
+  .gx__line--bot { bottom: clamp(5rem, 12%, 9rem); color: transparent; -webkit-text-stroke: 1px rgba(236, 232, 223, .6); }
 
   .gx__canvas {
     position: absolute;
@@ -116,6 +137,8 @@
   @media (max-width: 640px) {
     .gx__title { font-size: 11.5vw; }
     .gx__line { white-space: normal; }
+    .gx__line--top { top: 22%; }
+    .gx__line--bot { bottom: 18%; }
     .gx__hud--tl, .gx__hud--tr { top: 6.8rem; }
     .gx__hud--br { display: none; }
     .gx__hud--bl { bottom: 4.4rem; }
@@ -130,6 +153,7 @@
   const nEl = root.querySelector<HTMLElement>('[data-gx-n]')!;
   const stateEl = root.querySelector<HTMLElement>('[data-gx-state]')!;
   const words = root.querySelectorAll<HTMLElement>('.blur-word');
+  const glow = root.querySelector<HTMLElement>('[data-gx-glow]')!;
 
   // --- başlık: bulanıktan netliğe --------------------------------------
   const reveal = () =>
@@ -154,18 +178,30 @@
   const mouse = { x: -9999, y: -9999, on: false };
   const labels: number[] = [];
 
-  const ctx = fitCanvas(canvas, (w, h) => { W = w; H = h; });
+  // Bulutun ölçeği ve merkezi (parıltı katmanı da buna oturur)
+  const cloud = () => ({
+    scale: Math.min(W / 1.95, H / 1.25) * (isSmall() ? 1.1 : 1.12),
+    cx: W / 2,
+    cy: H / 2,
+  });
+
+  const ctx = fitCanvas(canvas, (w, h) => {
+    W = w; H = h;
+    const { scale, cx, cy } = cloud();
+    const gw = scale * 1.78 * 1.1, gh = scale * 1.1;
+    Object.assign(glow.style, { width: `${gw}px`, height: `${gh}px`, transform: `translate(${cx - gw / 2}px, ${cy - gh / 2}px)` });
+  });
 
   const img = new Image();
   img.src = '/img/work/gargantua-render.png';
   img.onload = () => {
-    const sw = 320, sh = 180;
+    const sw = 480, sh = 270;
     const off = document.createElement('canvas');
     off.width = sw; off.height = sh;
     const o = off.getContext('2d', { willReadFrequently: true })!;
     o.drawImage(img, 0, 0, sw, sh);
     const data = o.getImageData(0, 0, sw, sh).data;
-    const target = isSmall() ? 5200 : 11000;
+    const target = isSmall() ? 7000 : 16000;
     const cand: P[] = [];
     for (let y = 0; y < sh; y++) {
       for (let x = 0; x < sw; x++) {
@@ -185,7 +221,7 @@
           sx: R * Math.sin(ph) * Math.cos(th) * 1.4,
           sy: R * Math.cos(ph) * 0.9,
           sz: R * Math.sin(ph) * Math.sin(th),
-          r, g, b, a: 0.35 + lum * 0.65,
+          r, g, b, a: 0.5 + lum * 0.5,
           delay: Math.random() * 0.35,
           ox: 0, oy: 0,
         });
@@ -253,13 +289,13 @@
     ctx.clearRect(0, 0, W, H);
     ctx.globalCompositeOperation = 'lighter';
 
-    const scale = Math.min(W / 1.95, H / 1.25) * (isSmall() ? 1.05 : 0.92);
-    const cx = W / 2, cy = H / 2 + H * 0.02;
+    const { scale, cx, cy } = cloud();
     const yaw = Math.sin(t * 0.00018) * 0.38;
     const pitch = 0.08 + Math.sin(t * 0.00011) * 0.05;
     const cyw = Math.cos(yaw), syw = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
     const S = clamp(Math.max(scatter, scrollScatter * 1.25));
-    const size = isSmall() ? 1.3 : 1.55;
+    const size = isSmall() ? 1.5 : 1.9;
+    glow.style.opacity = String(0.6 * (1 - clamp(S * 1.6)));
     const proj: [number, number][] = [];
 
     for (let i = 0; i < pts.length; i++) {

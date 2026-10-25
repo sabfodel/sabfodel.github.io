@@ -1,8 +1,9 @@
 ---
 /**
- * FEATURED WORK — kâğıt zemin üzerinde, silindir yüzeyine sarılmış gibi kıvrılan
+ * SELECTED SIMULATIONS — kâğıt zemin üzerinde, silindir yüzeyine sarılmış gibi kıvrılan
  * proje şeridi. Dikey kaydırma şeridi yatay akıtır; her kart merkeze uzaklığına göre
- * Y ekseninde döner ve derinleşir.
+ * Y ekseninde döner ve derinleşir. Arkada akan dev kontur yazı, altta ortadaki projenin
+ * bilgileri ve ilerleme çubuğu.
  */
 import { getCollection } from 'astro:content';
 import { byDateDesc } from '../../utils';
@@ -19,6 +20,8 @@ const cards = [
     dark: p.data.coverDark,
     title: p.data.title,
     meta: `${p.data.lang} · ${p.data.tags[0]?.replace(/-/g, ' ')}`,
+    summary: p.data.summary ?? '',
+    result: p.data.result ?? '',
   })),
   {
     href: '/lab/',
@@ -27,14 +30,22 @@ const cards = [
     dark: true,
     title: 'Bloch sphere',
     meta: 'Lab · interactive',
+    summary: 'One qubit you can rotate with gates and measure, in the browser.',
+    result: 'Every single-qubit gate is a rotation of the Bloch vector.',
   },
 ];
+const pad = (n: number) => String(n).padStart(2, '0');
 ---
 
 <section class="cc pin section--paper" data-cc style={`height:${cards.length * 70 + 100}vh`} aria-labelledby="cc-title">
   <div class="pin__stage cc__stage">
+    <p class="cc__bg wide-type" data-cc-bg aria-hidden="true">Simulations · Simulations · Simulations ·</p>
+
     <header class="cc__head">
-      <p class="hud">§ 03 — projects</p>
+      <div>
+        <p class="hud">§ 03 — projects</p>
+        <p class="cc__count wide-type" aria-hidden="true"><span data-cc-n>01</span><small> / {pad(cards.length)}</small></p>
+      </div>
       <h2 id="cc-title" class="cc__h wide-type">Selected<br />simulations</h2>
     </header>
 
@@ -42,15 +53,23 @@ const cards = [
       <ul class="cc__track" data-cc-track>
         {
           cards.map((c, i) => (
-            <li class="cc__card" data-cc-card>
+            <li
+              class="cc__card"
+              data-cc-card
+              data-title={c.title}
+              data-summary={c.summary}
+              data-result={c.result}
+              data-meta={c.meta}
+              data-href={c.href}
+            >
               <a href={c.href} class="cc__link">
                 <div class:list={['cc__img', c.dark && 'cc__img--dark']}>
-                  <img src={c.img} alt={c.alt} loading="lazy" decoding="async" />
+                  <img src={c.img} alt={c.alt} loading="eager" decoding="async" />
                   <span class="cc__over wide-type">{c.title}</span>
                   <span class="cc__open" aria-hidden="true">Open →</span>
                 </div>
                 <p class="cc__meta hud">
-                  <b>{String(i + 1).padStart(2, '0')}</b> {c.meta}
+                  <b>{pad(i + 1)}</b> {c.meta}
                 </p>
               </a>
             </li>
@@ -59,23 +78,68 @@ const cards = [
       </ul>
     </div>
 
-    <p class="cc__foot hud">Click a project to open it</p>
+    <div class="cc__info" aria-live="polite">
+      <div class="cc__info-main" data-cc-info>
+        <p class="hud" data-cc-meta>{cards[0].meta}</p>
+        <p class="cc__title wide-type" data-cc-title>{cards[0].title}</p>
+        <p class="cc__sum" data-cc-sum>{cards[0].summary}</p>
+      </div>
+      <p class="cc__result" data-cc-res-wrap>
+        <span class="hud">result</span>
+        <span data-cc-res>{cards[0].result}</span>
+      </p>
+      <div class="cc__go">
+        <a class="pill" href={cards[0].href} data-cc-go>Open project →</a>
+        <span class="cc__bar" aria-hidden="true"><i data-cc-bar></i></span>
+      </div>
+    </div>
   </div>
 </section>
 
 <style>
   .cc__stage {
     display: grid;
-    grid-template-rows: auto 1fr auto;
-    padding: 5.5rem 0 1.6rem;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    padding: 5.2rem 0 3.6rem;
+  }
+
+  /* Arkada yavaşça kayan dev kontur yazı */
+  .cc__bg {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    margin: 0;
+    white-space: nowrap;
+    font-size: clamp(6rem, 19vw, 20rem);
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(13, 17, 22, .08);
+    transform: translateY(-58%);
+    pointer-events: none;
+    will-change: transform;
   }
 
   .cc__head {
+    position: relative;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
     gap: 1rem;
     padding: 0 clamp(1.2rem, 4vw, 3rem);
+  }
+
+  .cc__head .hud { margin: 0; white-space: nowrap; }
+
+  .cc__count {
+    white-space: nowrap;
+    margin: .4rem 0 0;
+    font-size: clamp(2.6rem, 6vw, 5.6rem);
+    color: var(--paper-ink);
+  }
+
+  .cc__count small {
+    font-size: .38em;
+    color: #8a877f;
+    letter-spacing: 0;
   }
 
   .cc__h { font-size: clamp(2rem, 5vw, 4.4rem); color: var(--paper-ink); text-align: right; }
@@ -100,7 +164,7 @@ const cards = [
 
   .cc__card {
     flex: none;
-    width: clamp(240px, 34vw, 520px);
+    width: clamp(280px, min(46vw, 84vh), 900px);
     margin: 0;
     pointer-events: auto;
     will-change: transform;
@@ -110,14 +174,14 @@ const cards = [
 
   .cc__open {
     position: absolute;
-    top: .7rem;
-    right: .7rem;
-    padding: .35rem .7rem;
+    top: .8rem;
+    right: .8rem;
+    padding: .4rem .8rem;
     border-radius: 999px;
     background: #f3efe7;
     color: #07090c;
     font-family: var(--font-mono);
-    font-size: .68rem;
+    font-size: .7rem;
     letter-spacing: .08em;
     text-transform: uppercase;
     opacity: 0;
@@ -136,34 +200,109 @@ const cards = [
     overflow: hidden;
     background: #fbfaf7;
     border: 1px solid rgba(13, 17, 22, .12);
-    box-shadow: 0 30px 60px -30px rgba(13, 17, 22, .45);
+    box-shadow: 0 40px 80px -36px rgba(13, 17, 22, .5);
   }
 
   .cc__img--dark { background: #07090c; border-color: #07090c; }
 
   .cc__img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s ease; }
-  .cc__link:hover .cc__img img { transform: scale(1.05); }
+  .cc__link:hover .cc__img img { transform: scale(1.04); }
 
   .cc__over {
     position: absolute;
-    left: .9rem;
-    bottom: .7rem;
-    font-size: clamp(1.4rem, 2.6vw, 2.4rem);
+    left: 1rem;
+    bottom: .8rem;
+    font-size: clamp(1.5rem, 3vw, 2.8rem);
     color: #fff;
     mix-blend-mode: difference;
   }
 
-  .cc__meta { margin: .7rem 0 0; }
+  .cc__meta { margin: .8rem 0 0; }
 
-  .cc__foot { padding: 0 clamp(1.2rem, 4vw, 3rem); margin: 0; }
+  /* Alt bilgi satırı */
+  .cc__info {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto;
+    gap: 1.4rem clamp(1.4rem, 4vw, 3.6rem);
+    align-items: end;
+    padding: 1.4rem clamp(1.2rem, 4vw, 3rem) 0;
+    border-top: 1px solid rgba(13, 17, 22, .14);
+    margin: 0 clamp(1.2rem, 4vw, 3rem);
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .cc__info .hud { margin: 0 0 .3rem; }
+
+  .cc__title {
+    margin: 0 0 .4rem;
+    font-size: clamp(1.4rem, 2.6vw, 2.4rem);
+    color: var(--paper-ink);
+  }
+
+  .cc__sum { margin: 0; color: #4a4a46; font-size: .95rem; max-width: 52ch; }
+
+  .cc__result {
+    margin: 0;
+    padding-left: 1rem;
+    border-left: 2px solid var(--accent);
+    color: var(--paper-ink);
+    font-size: .9rem;
+    line-height: 1.5;
+  }
+
+  .cc__result .hud { display: block; color: var(--accent); }
+
+  .cc__go { display: grid; justify-items: end; gap: .8rem; }
+
+  .cc__go .pill { background: var(--paper-ink); color: var(--paper); border-color: var(--paper-ink); }
+  .cc__go .pill:hover, .cc__go .pill:focus-visible { background: transparent; color: var(--paper-ink); }
+
+  .cc__bar { width: 180px; height: 2px; background: rgba(13, 17, 22, .12); }
+  .cc__bar i { display: block; height: 100%; width: 0; background: var(--paper-ink); }
+
+  @media (max-width: 900px) {
+    .cc__info { grid-template-columns: minmax(0, 1fr) auto; }
+    .cc__result { display: none; }
+  }
+
+  @media (max-width: 640px) {
+    .cc__stage { padding-top: 7.4rem; }
+    .cc__card { width: 80vw; }
+    .cc__info { grid-template-columns: minmax(0, 1fr); }
+    .cc__go { justify-items: start; }
+    .cc__sum { font-size: .88rem; }
+  }
 </style>
 
 <script>
-  import { ScrollTrigger, reduceMotion } from '../../scripts/motion';
+  import { gsap, ScrollTrigger, reduceMotion } from '../../scripts/motion';
 
   const root = document.querySelector<HTMLElement>('[data-cc]')!;
   const track = root.querySelector<HTMLElement>('[data-cc-track]')!;
   const cards = [...root.querySelectorAll<HTMLElement>('[data-cc-card]')];
+  const bg = root.querySelector<HTMLElement>('[data-cc-bg]')!;
+  const $ = (s: string) => root.querySelector<HTMLElement>(s)!;
+  const info = $('[data-cc-info]');
+  const nEl = $('[data-cc-n]'), metaEl = $('[data-cc-meta]'), titleEl = $('[data-cc-title]');
+  const sumEl = $('[data-cc-sum]'), resEl = $('[data-cc-res]'), resWrap = $('[data-cc-res-wrap]');
+  const go = root.querySelector<HTMLAnchorElement>('[data-cc-go]')!;
+  const bar = $('[data-cc-bar]');
+
+  let active = 0;
+  function setActive(i: number) {
+    if (i === active) return;
+    active = i;
+    const d = cards[i].dataset;
+    nEl.textContent = String(i + 1).padStart(2, '0');
+    metaEl.textContent = d.meta ?? '';
+    titleEl.textContent = d.title ?? '';
+    sumEl.textContent = d.summary ?? '';
+    resEl.textContent = d.result ?? '';
+    go.href = d.href ?? '#';
+    gsap.fromTo([info, resWrap], { opacity: 0, filter: 'blur(8px)', y: 10 }, { opacity: 1, filter: 'blur(0px)', y: 0, duration: 0.45, ease: 'power2.out', overwrite: true });
+  }
 
   function layout(p: number) {
     const vw = innerWidth;
@@ -175,15 +314,20 @@ const cards = [
     const end = vw / 2 - (total - gap) + cw / 2;
     const x = start + (end - start) * p;
     track.style.transform = `translateX(${x}px)`;
+    let best = 0, bestD = Infinity;
     cards.forEach((c, i) => {
       const center = x + i * (cw + gap) + cw / 2;
       const d = (center - vw / 2) / (vw / 2); // -1 … 1 ekran kenarında
       const rot = Math.max(-62, Math.min(62, d * 38));
       const z = -Math.abs(d) * cw * 0.55;
       c.style.marginRight = `${gap}px`;
-      c.style.transform = `perspective(1400px) translateZ(${z}px) rotateY(${-rot}deg)`;
+      c.style.transform = `perspective(1600px) translateZ(${z}px) rotateY(${-rot}deg)`;
       c.style.opacity = String(Math.max(0.25, 1 - Math.abs(d) * 0.35));
+      if (Math.abs(d) < bestD) { bestD = Math.abs(d); best = i; }
     });
+    setActive(best);
+    bar.style.width = `${p * 100}%`;
+    bg.style.transform = `translate(${-p * 30}%, -58%)`;
   }
 
   if (reduceMotion) {
