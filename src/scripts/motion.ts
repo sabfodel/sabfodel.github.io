@@ -8,6 +8,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
 
 gsap.registerPlugin(ScrollTrigger);
+// iOS/Android adres çubuğu açılıp kapanınca yükseklik değişir; bunun için
+// tüm tetikleyicileri yeniden hesaplamak kaydırmada sıçramaya yol açıyor.
+ScrollTrigger.config({ ignoreMobileResize: true });
 
 export const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 export const isSmall = () => innerWidth < 760;
@@ -75,10 +78,16 @@ export function fitCanvas(
   onResize: (w: number, h: number, dpr: number) => void
 ) {
   const ctx = canvas.getContext('2d')!;
+  let lastW = 0, lastH = 0;
   const apply = () => {
     const w = canvas.clientWidth;
     const h = canvas.clientHeight;
     if (!w || !h) return;
+    // Mobil adres çubuğunun yarattığı küçük yükseklik değişimlerini yok say:
+    // kanvası her seferinde silip yeniden çizmek iOS'ta takılmaya yol açıyor.
+    if (w === lastW && lastH && Math.abs(h - lastH) / lastH < 0.2) return;
+    lastW = w;
+    lastH = h;
     const dpr = Math.min(devicePixelRatio || 1, 2);
     canvas.width = Math.round(w * dpr);
     canvas.height = Math.round(h * dpr);

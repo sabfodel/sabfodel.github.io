@@ -103,6 +103,7 @@ const ITEMS = [
     --cw: clamp(150px, 19vw, 260px);
     --ch: calc(var(--cw) * .66);
     transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     will-change: transform, opacity;
   }
