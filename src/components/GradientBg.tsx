@@ -9,6 +9,8 @@ import { ShaderGradientCanvas, ShaderGradient } from '@shadergradient/react';
 export default function GradientBg() {
   const [animate, setAnimate] = useState<'on' | 'off'>('off');
   const [small, setSmall] = useState(false);
+  // Kâğıt zeminli bölümlerdeyken (html.sg-light) açık palet
+  const [light, setLight] = useState(false);
 
   useEffect(() => {
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -20,9 +22,13 @@ export default function GradientBg() {
       sync();
     });
     document.querySelectorAll('[data-sg]').forEach((el) => io.observe(el));
+    const root = document.documentElement;
+    const mo = new MutationObserver(() => setLight(root.classList.contains('sg-light')));
+    mo.observe(root, { attributes: true, attributeFilter: ['class'] });
     document.addEventListener('visibilitychange', sync);
     return () => {
       io.disconnect();
+      mo.disconnect();
       document.removeEventListener('visibilitychange', sync);
     };
   }, []);
@@ -54,16 +60,16 @@ export default function GradientBg() {
         rotationX={0}
         rotationY={0}
         rotationZ={235}
-        color1="#1d5a63"
-        color2="#e08a66"
-        color3="#000000"
+        color1={light ? '#bfe0da' : '#1d5a63'}
+        color2={light ? '#f2b896' : '#e08a66'}
+        color3={light ? '#efece5' : '#000000'}
         reflection={0.1}
         cAzimuthAngle={180}
         cPolarAngle={115}
         cDistance={3.9}
         cameraZoom={1}
         lightType="3d"
-        brightness={1}
+        brightness={light ? 1.25 : 1}
         grain={small ? 'off' : 'on'}
         wireframe={false}
       />

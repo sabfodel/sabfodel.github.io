@@ -45,10 +45,25 @@ html[data-cine] body {
   background: #050608;
 }
 
+.sg::before,
 .sg::after {
   content: '';
   position: absolute;
   inset: 0;
+  z-index: 1;
+  transition: opacity .7s ease;
+}
+
+/* açık palet üstünde kâğıt rengi bir örtü: metin okunsun */
+.sg::before {
+  background: rgba(239, 236, 229, .55);
+  opacity: 0;
+}
+
+html.sg-light .sg::before { opacity: 1; }
+html.sg-light .sg::after { opacity: 0; }
+
+.sg::after {
   background: radial-gradient(80% 70% at 50% 40%, rgba(5, 6, 8, .05), rgba(5, 6, 8, .35) 100%);
 }
 
@@ -131,7 +146,7 @@ html.on-paper .topbar--float .nav a { text-shadow: none; }
 }
 
 .section--paper {
-  background: var(--paper);
+  background: transparent;
   color: var(--paper-ink);
 }
 

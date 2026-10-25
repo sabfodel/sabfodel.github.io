@@ -65,7 +65,7 @@ import { SITE } from '../site';
 <style>
   .ab {
     display: grid;
-    grid-template-columns: 200px minmax(0, 1fr);
+    grid-template-columns: 320px minmax(0, 1fr);
     gap: clamp(1.6rem, 4vw, 3.6rem);
     align-items: start;
   }
@@ -74,8 +74,8 @@ import { SITE } from '../site';
 
   .ab__photo img {
     display: block;
-    width: 200px;
-    height: 200px;
+    width: 320px;
+    height: 320px;
     object-fit: cover;
     border: 1px solid var(--line-2);
   }
@@ -84,6 +84,6 @@ import { SITE } from '../site';
 
   @media (max-width: 720px) {
     .ab { grid-template-columns: minmax(0, 1fr); }
-    .ab__photo img { width: 140px; height: 140px; }
+    .ab__photo img { width: 220px; height: 220px; }
   }
 </style>

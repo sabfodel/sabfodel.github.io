@@ -21,10 +21,8 @@
       <canvas class="about__dust" data-about-dust aria-hidden="true"></canvas>
 
       <div class="about__content" data-about-content>
-        <div class="about__who">
-          <img class="about__me" src="/img/me/me-square.jpg" alt="sabfodel" width="480" height="480" loading="lazy" />
-          <p class="hud">§ 01 — about me</p>
-        </div>
+        <img class="about__me" src="/img/me/me-square.jpg" alt="sabfodel" width="480" height="480" loading="lazy" />
+        <p class="hud">§ 01 — about me</p>
         <h2 id="about-title" class="about__h wide-type">
           Physics student. <em>I learn by building.</em>
         </h2>
@@ -105,6 +103,8 @@
     position: absolute;
     inset: 0;
     display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: clamp(2rem, 5vw, 5rem);
     align-content: center;
     gap: 1.3rem;
     padding: 6rem clamp(1.2rem, 7vw, 7rem) 4rem;
@@ -112,14 +112,23 @@
     transform: translateY(40px);
   }
 
-  .about__who { display: flex; align-items: center; gap: 1rem; }
-  .about__who .hud { margin: 0; }
+  .about__content > :not(.about__me) { grid-column: 1; }
 
   .about__me {
-    width: 72px;
-    height: 72px;
+    grid-column: 2;
+    grid-row: 1 / span 4;
+    align-self: center;
+    width: clamp(180px, 24vw, 360px);
+    height: auto;
+    aspect-ratio: 1;
     object-fit: cover;
     border: 1px solid rgba(243, 239, 231, .25);
+    box-shadow: 0 40px 80px -30px rgba(0, 0, 0, .8);
+  }
+
+  @media (max-width: 760px) {
+    .about__content { grid-template-columns: minmax(0, 1fr); }
+    .about__me { grid-column: 1; grid-row: auto; order: -1; width: 150px; }
   }
 
   .about__h {

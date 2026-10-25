@@ -808,11 +808,3 @@ a.tag:hover { border-color: var(--steel); color: var(--steel); }
 }
 
 .skip-link:focus { left: 1rem; top: 1rem; }
-
-/* Nerd Font logosu (yedek metin ve sıvı tuvalin dokusu için) */
-@font-face {
-  font-family: 'BlexMono Nerd';
-  src: url('/fonts/blexmono-nerd-bold.woff2') format('woff2');
-  font-weight: 700;
-  font-display: swap;
-}

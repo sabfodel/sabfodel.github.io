@@ -92,7 +92,7 @@ Projelerde ve notlarda kullandığın her etiket otomatik olarak `/tags/<ad>/` s
 `src/styles/global.css` — renkler en üstteki `:root` bloğunda (tek, koyu tema).
 `src/styles/cine.css` — ana sayfanın sinematik parçaları, üst bant, gradyan katmanı.
 Fontlar: Archivo (başlıklar), IBM Plex Sans (gövde), IBM Plex Mono (etiketler), Source Serif 4
-(denklem/italik) — Google Fonts'tan `Base.astro` içinde; logo için BlexMono Nerd Font.
+(denklem/italik) — Google Fonts'tan `Base.astro` içinde.
 
 ### Proje sayfaları
 
@@ -122,18 +122,12 @@ kendi dosyasında: açılış (`Preloader`), kara delik parçacıkları (`HeroGa
 (`WorksRing`), kaos (`ChaosLab`), yetenekler (`Capabilities`) ve iletişim (`LetsTalk`).
 Kaydırma: Lenis + GSAP ScrollTrigger, `src/scripts/motion.ts`.
 
-### Arka plan, logo ve font
+### Arka plan
 
 - `src/components/GradientBg.tsx` — [ruucm/shadergradient](https://github.com/ruucm/shadergradient)
   ile tüm sayfaların arkasındaki 3B gradyan (React adası, `client:only`). Renkler ve hareket
   bu dosyadaki `ShaderGradient` özelliklerinde. Yalnızca `data-sg` işaretli bir bölüm
   ekrandayken canlanır.
-- `src/scripts/liquid-logo.ts` — [collidingScopes/liquid-logo](https://github.com/collidingScopes/liquid-logo)
-  gölgelendiricisinden uyarlanmış sıvı metal "sabfodel" logosu (MIT, lisans metni dosyada).
-  Ön ayar `PRESET` içinde ("Galaxy").
-- `public/fonts/blexmono-nerd-bold.woff2` — BlexMono Nerd Font Bold (IBM Plex Mono'nun Nerd
-  Fonts sürümü), yalnızca Latin harfleri ve birkaç ikonla küçültülmüş. Lisans: SIL OFL 1.1,
-  `public/fonts/BlexMono-Nerd-Font-OFL.txt`.
 
 ### Kaldırılan bölümler
 
