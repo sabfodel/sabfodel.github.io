@@ -99,7 +99,10 @@ const orbit = pts.join(' ');
   const word = root.querySelector<HTMLElement>('.pre__word')!;
   const count = root.querySelector<HTMLElement>('[data-pre-count]')!;
 
+  let finished = false;
   const done = () => {
+    if (finished) return;
+    finished = true;
     root.remove();
     document.documentElement.dataset.ready = '';
     getLenis()?.start();
@@ -123,6 +126,8 @@ const orbit = pts.join(' ');
     const progress = { p: 0 };
     const speed = seen ? 0.45 : 1;
     const tl = gsap.timeline({ onComplete: done });
+    // sekme arka plandayken kareler durursa açılış asılı kalmasın
+    setTimeout(() => { tl.kill(); done(); }, seen ? 2500 : 5000);
     tl.to(word, { opacity: 1, filter: 'blur(0px)', duration: 0.9 * speed, ease: 'power2.out' }, 0)
       .to(
         progress,

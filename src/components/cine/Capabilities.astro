@@ -4,17 +4,17 @@
  * altında koyu bir "araç kutusu" kartı.
  */
 const LINES = [
-  { t: 'Simulation from first principles', d: 'Equations of motion, integrated by hand — no physics library between me and the result.' },
-  { t: 'Numerics that are tested', d: 'Conservation laws, analytical limits and known results as unit tests.' },
-  { t: 'Quantum circuits, by hand', d: 'State vectors, gates as index tricks, the Born rule in code.' },
-  { t: 'Data, honestly measured', d: 'The right metric for the question — and the limits written down.' },
+  { t: 'Simulations from scratch', d: 'Rust, no physics libraries.' },
+  { t: 'Numerical methods', d: 'RK4, Monte Carlo, error analysis.' },
+  { t: 'Quantum circuits', d: 'Qiskit and my own simulator.' },
+  { t: 'Data analysis', d: 'Python, scikit-learn.' },
 ];
 const TOOLS = ['Rust', 'Python', 'Qiskit', 'NumPy', 'pandas', 'scikit-learn', 'Matplotlib', 'RK4', 'Rayon', 'LaTeX', 'Astro'];
 ---
 
 <section class="cap section--paper" data-cap aria-labelledby="cap-title">
-  <p class="hud cap__kicker">§ 05 — what I bring</p>
-  <h2 id="cap-title" class="visually-hidden">What I bring</h2>
+  <p class="hud cap__kicker">§ 05 — skills</p>
+  <h2 id="cap-title" class="visually-hidden">Skills</h2>
   <ol class="cap__list">
     {
       LINES.map((l, i) => (
@@ -30,7 +30,7 @@ const TOOLS = ['Rust', 'Python', 'Qiskit', 'NumPy', 'pandas', 'scikit-learn', 'M
   <div class="cap__card" data-cap-card>
     <p class="hud">toolbox</p>
     <ul class="cap__tools">{TOOLS.map((t) => <li>{t}</li>)}</ul>
-    <a class="pill" href="/projects/">See everything →</a>
+    <a class="pill" href="/projects/">All projects →</a>
   </div>
 </section>
 

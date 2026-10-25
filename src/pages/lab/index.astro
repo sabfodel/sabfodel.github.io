@@ -7,13 +7,12 @@ const tex = (s: string, display = false) =>
   katex.renderToString(s, { displayMode: display, throwOnError: false });
 ---
 
-<Base title="lab" description="Interactive physics: small experiments you can run in the browser." wide>
+<Base title="lab" description="Small physics experiments that run in the browser." wide>
   <header class="entry-head">
     <span class="kicker">lab · interactive</span>
-    <h1>Things you can poke</h1>
+    <h1>Lab</h1>
     <p class="lede" style="margin:0">
-      Small experiments that run in your browser. Each one is a single idea, with the equations
-      that drive it written underneath.
+      Small experiments that run in the browser, with the equations behind them.
     </p>
   </header>
 
@@ -27,7 +26,7 @@ const tex = (s: string, display = false) =>
     <BlochSphere
       wide
       fig="Exp. 001"
-      caption="Apply gates to |0⟩ and watch the state rotate. Measurement samples an outcome with the Born-rule probabilities and collapses the state to a pole."
+      caption="Apply gates to |0⟩. Measuring picks 0 or 1 with the Born-rule probabilities."
     />
 
     <div class="prose" style="margin-top:2.4rem">
@@ -77,13 +76,14 @@ const tex = (s: string, display = false) =>
 
   <section class="panel" aria-labelledby="next">
     <header class="section-hd">
-      <span class="label">Next</span>
-      <h2 id="next">On the drawing board</h2>
+      <span class="label">§</span>
+      <h2 id="next">Next</h2>
       <span class="label">planned</span>
     </header>
     <ul class="log">
-      <li><span class="label">exp. 002</span><span>Decoherence on the Bloch sphere — T₁ and T₂ shrinking the arrow into the ball.</span></li>
-      <li><span class="label">exp. 003</span><span>Grover's search, one amplitude bar at a time.</span></li>
+      <li><span class="label">exp. 002</span><span>Decoherence: T₁ and T₂ on the Bloch sphere.</span></li>
+      <li><span class="label">exp. 003</span><span>Grover's search, step by step.</span></li>
+      <li><span class="label">on the home page</span><span><a href="/#chaos">Chaos: Lorenz, Yu-Wang and Thomas attractors.</a></span></li>
     </ul>
   </section>
 </Base>

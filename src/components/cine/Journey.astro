@@ -4,41 +4,18 @@
  * durakları bulanık / RGB kaymalı geçişle birbirinin yerini alır.
  */
 const STOPS = [
-  {
-    when: 'now',
-    title: 'Physics undergraduate',
-    body: 'Third year of a physics degree. The coursework comes first — everything below grows out of it.',
-  },
-  {
-    when: 'qiskit · qworld',
-    title: 'Quantum apprentice',
-    body: 'Completed the Qiskit Global Summer School. Working through QWorld’s QBronze track, rewriting every notebook in my own words.',
-  },
-  {
-    when: '05 → 07 · 2026',
-    title: 'Simulation builder',
-    body: 'qsim-rs, nbody-sim, gargantua-rs — a quantum circuit simulator, a solar system and a black hole, all from first principles in Rust.',
-  },
-  {
-    when: '07 · 2026',
-    title: 'Signal hunter',
-    body: 'Finding pulsars in radio-telescope noise on HTRU2: recall 0.92 on data that is 91% interference.',
-  },
-  {
-    when: 'next',
-    title: 'Physics × medicine',
-    body: 'Reading into molecular simulation, medical physics and imaging — where quantum and computational physics meet the life sciences.',
-  },
+  { when: 'now', title: 'Physics student', body: 'Third year. Classes come first.' },
+  { when: 'qiskit · qworld', title: 'Quantum computing', body: 'Finished the Qiskit Global Summer School. Now working through QWorld QBronze.' },
+  { when: '05–07 · 2026', title: 'Simulations', body: 'qsim-rs, nbody-sim and gargantua-rs. Written in Rust, without physics libraries.' },
+  { when: '07 · 2026', title: 'Pulsar search', body: 'Classified pulsar candidates from the HTRU2 survey. Recall 0.92.' },
+  { when: 'next', title: 'Physics in medicine', body: 'Reading about medical physics and molecular simulation.' },
 ];
 ---
 
 <section class="jr pin" data-journey style={`height:${STOPS.length * 80 + 60}vh`} aria-labelledby="jr-title">
   <div class="pin__stage jr__stage">
-    <div class="jr__marquee" aria-hidden="true">
-      <p class="jr__row wide-type" data-row="1">Computational physics · Quantum computing · First principles · Computational physics · Quantum computing ·</p>
-      <p class="jr__row jr__row--b wide-type" data-row="-1">2026 · Rust · Python · Qiskit · Numerics · 2026 · Rust · Python · Qiskit · Numerics ·</p>
-      <p class="jr__row wide-type" data-row="1">Simulation · Chaos · Black holes · Pulsars · Qubits · Simulation · Chaos · Black holes ·</p>
-    </div>
+    <p class="jr__row jr__row--top wide-type" data-row="1" aria-hidden="true">Physics · Quantum · Simulation · Physics · Quantum · Simulation · Physics ·</p>
+    <p class="jr__row jr__row--bot wide-type" data-row="-1" aria-hidden="true">Rust · Python · Qiskit · Rust · Python · Qiskit · Rust · Python · Qiskit ·</p>
 
     <div class="jr__grid">
       <h2 id="jr-title" class="jr__h wide-type">Where<br />I've been</h2>
@@ -69,33 +46,30 @@ const STOPS = [
 
   .jr__stage { display: grid; align-items: center; }
 
-  .jr__marquee {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    align-content: center;
-    gap: 1.2vh;
-    pointer-events: none;
-  }
-
+  /* Kontur yazılar içeriğin arkasından değil, üst ve alt bantlardan akar */
   .jr__row {
+    position: absolute;
+    left: 0;
+    margin: 0;
     white-space: nowrap;
-    font-size: clamp(4rem, 12vw, 11rem);
+    font-size: clamp(3rem, 9vw, 8rem);
     color: transparent;
-    -webkit-text-stroke: 1px rgba(236, 232, 223, .09);
+    -webkit-text-stroke: 1px rgba(236, 232, 223, .1);
+    pointer-events: none;
     will-change: transform;
   }
 
-  .jr__row--b { -webkit-text-stroke-color: rgba(224, 138, 102, .12); }
+  .jr__row--top { top: 4.6rem; }
+  .jr__row--bot { bottom: .6rem; -webkit-text-stroke-color: rgba(224, 138, 102, .14); }
 
   .jr__grid {
     position: relative;
     z-index: 1;
     display: grid;
-    grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 3rem;
     align-items: center;
-    padding: 0 clamp(1.2rem, 6vw, 6rem);
+    padding: 0 clamp(3rem, 7vw, 7rem) 0 clamp(1.2rem, 6vw, 6rem);
   }
 
   .jr__h {
@@ -104,7 +78,7 @@ const STOPS = [
     text-shadow: 0 0 40px rgba(255, 255, 255, .18);
   }
 
-  .jr__stops { position: relative; min-height: 18rem; }
+  .jr__stops { position: relative; min-height: 15rem; }
 
   .jr__stop {
     position: absolute;
@@ -176,9 +150,11 @@ const STOPS = [
 
   .jr__dots li.is-on { background: var(--glow-a); border-color: var(--glow-a); transform: scale(1.4); }
 
-  @media (max-width: 760px) {
-    .jr__grid { grid-template-columns: minmax(0, 1fr); gap: 1.4rem; align-content: center; }
-    .jr__stops { min-height: 16rem; }
+  @media (max-width: 1100px) {
+    .jr__grid { grid-template-columns: minmax(0, 1fr); gap: 2rem; align-content: center; }
+    .jr__h br { display: none; }
+    .jr__h { font-size: clamp(2.4rem, 8vw, 5rem); }
+    .jr__stops { min-height: 13rem; }
   }
 </style>
 
@@ -195,17 +171,36 @@ const STOPS = [
     if (i === current) return;
     const prev = stops[current];
     current = i;
-    stops.forEach((s, k) => s.setAttribute('aria-hidden', k === i ? 'false' : 'true'));
     dots.forEach((d, k) => d.classList.toggle('is-on', k === i));
+    // Hızlı kaydırmada yarım kalmış geçişler üst üste binmesin
+    gsap.killTweensOf(stops);
+    stops.forEach((s, k) => {
+      s.setAttribute('aria-hidden', k === i ? 'false' : 'true');
+      if (k !== i && s !== prev) {
+        s.classList.remove('is-on');
+        gsap.set(s, { opacity: 0, filter: 'blur(16px)', y: 0 });
+      }
+    });
     if (prev) {
-      gsap.to(prev, { opacity: 0, filter: 'blur(16px)', y: -24, duration: 0.45, ease: 'power2.in', onComplete: () => prev.classList.remove('is-on') });
+      gsap.to(prev, {
+        opacity: 0,
+        filter: 'blur(16px)',
+        y: -24,
+        duration: 0.3,
+        ease: 'power2.in',
+        onComplete: () => prev.classList.remove('is-on'),
+      });
     }
     const next = stops[i];
     next.classList.add('is-on');
     next.classList.remove('is-glitch');
     void next.offsetWidth;
     next.classList.add('is-glitch');
-    gsap.fromTo(next, { opacity: 0, filter: 'blur(16px)', y: 30 }, { opacity: 1, filter: 'blur(0px)', y: 0, duration: 0.7, ease: 'power3.out', delay: prev ? 0.15 : 0 });
+    gsap.fromTo(
+      next,
+      { opacity: 0, filter: 'blur(16px)', y: 30 },
+      { opacity: 1, filter: 'blur(0px)', y: 0, duration: 0.6, ease: 'power3.out', delay: prev ? 0.22 : 0 }
+    );
   }
 
   if (reduceMotion) {
@@ -224,9 +219,9 @@ const STOPS = [
       scrub: true,
       onUpdate: (s) => {
         show(Math.min(stops.length - 1, Math.floor(s.progress * stops.length * 0.999)));
-        rows.forEach((r, k) => {
+        rows.forEach((r) => {
           const dir = Number(r.dataset.row);
-          r.style.transform = `translateX(${(dir > 0 ? -1 : 1) * (s.progress * 45 + k * 6)}%)`;
+          r.style.transform = `translateX(${dir > 0 ? -s.progress * 40 : -40 + s.progress * 40}%)`;
         });
       },
     });

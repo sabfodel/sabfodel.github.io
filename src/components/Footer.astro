@@ -3,30 +3,65 @@ import { SITE, NAV, OFF_THE_CLOCK } from '../site';
 const year = new Date().getFullYear();
 ---
 
-<footer class="foot">
-  <div>
-    <span class="label">sabfodel / physics</span>
-    <p>
-      Built with Astro. Equations typeset with KaTeX. No cookies, no tracking.
-    </p>
-    <p>© {year} {SITE.title} — take what's useful, just say where it came from.</p>
+<footer class="ft">
+  <p class="hud">contact</p>
+  <a class="ft__big wide-type" href={SITE.github}>Let’s talk</a>
+  <nav class="ft__pills" aria-label="Site">
+    <a class="pill" href={SITE.github}>GitHub ↗</a>
+    {SITE.linkedin && <a class="pill pill--ghost" href={SITE.linkedin}>LinkedIn ↗</a>}
+    {NAV.map((item) => <a class="pill pill--ghost" href={item.href}>{item.label}</a>)}
+  </nav>
+  <div class="ft__row hud">
+    <span>© {year} {SITE.title}</span>
+    <span class="ft__off">
+      off the clock:
+      {OFF_THE_CLOCK.map((l) => <a href={l.href}>{l.label}</a>)}
+      <a href="/rss.xml">rss</a>
+    </span>
+    <a href="#main">back to top ↑</a>
   </div>
-  <nav aria-label="Site">
-    <span class="label">site</span>
-    <ul>
-      {NAV.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
-    </ul>
-  </nav>
-  <nav aria-label="Elsewhere">
-    <span class="label">elsewhere</span>
-    <ul>
-      <li><a href={SITE.github}>github</a></li>
-      {SITE.linkedin && <li><a href={SITE.linkedin}>linkedin</a></li>}
-      <li><a href="/rss.xml">rss</a></li>
-    </ul>
-    <span class="label" style="display:block;margin-top:1.1rem">off the clock</span>
-    <ul>
-      {OFF_THE_CLOCK.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
-    </ul>
-  </nav>
 </footer>
+
+<style>
+  .ft {
+    display: grid;
+    justify-items: center;
+    gap: 1.4rem;
+    margin: 8rem calc(50% - 50vw) 0;
+    padding: 5rem clamp(1rem, 4vw, 3rem) 1.4rem;
+    border-top: 1px solid var(--line);
+    background: radial-gradient(50% 60% at 50% 40%, rgba(255, 244, 225, .05), transparent 70%), #050608;
+    text-align: center;
+  }
+
+  .ft > .hud { margin: 0; }
+
+  .ft__big {
+    font-size: clamp(3rem, 12vw, 11rem);
+    color: var(--ink);
+    border: 0;
+    white-space: nowrap;
+    transition: color .3s ease, letter-spacing .4s ease;
+  }
+
+  .ft__big:hover, .ft__big:focus-visible { color: var(--glow-a); letter-spacing: -.005em; }
+
+  .ft__pills { display: flex; flex-wrap: wrap; justify-content: center; gap: .55rem; }
+
+  .ft__row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: .6rem 1.4rem;
+    width: 100%;
+    margin-top: 3rem;
+  }
+
+  .ft__row a { color: var(--ink-dim); border: 0; }
+  .ft__row a:hover { color: var(--ink); }
+  .ft__off { display: inline-flex; flex-wrap: wrap; gap: .8rem; }
+
+  @media (max-width: 640px) {
+    .ft__row { justify-content: center; }
+  }
+</style>

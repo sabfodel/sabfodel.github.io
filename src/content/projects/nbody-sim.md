@@ -5,7 +5,7 @@ order: 80
 status: done
 lang: Rust
 repo: https://github.com/sabfodel/N-Body-Gravity-Simulation-Computational-Astrophysics
-summary: N-body gravity simulation — RK4 integrator with Rayon-parallel force evaluation, validated against Kepler.
+summary: N-body gravity simulation with RK4 and parallel force calculation, checked against Kepler's laws.
 tags: [classical-mechanics, numerical-methods, rust, simulation]
 featured: true
 cover: /img/work/nbody-energy-drift.svg

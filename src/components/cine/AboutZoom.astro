@@ -12,7 +12,7 @@
     <div class="about__vignette" aria-hidden="true"></div>
 
     <p class="about__cap hud" data-about-cap>
-      Fig. — velocity field of seven point vortices · ∇·u = 0
+      velocity field of 7 point vortices
     </p>
 
     <!-- büyüyen pencere -->
@@ -23,23 +23,21 @@
       <div class="about__content" data-about-content>
         <p class="hud">§ 01 — about me</p>
         <h2 id="about-title" class="about__h wide-type">
-          I understand things best once I've <em>built them.</em>
+          Physics student. <em>I learn by building.</em>
         </h2>
         <div class="about__cols">
           <p>
-            Third-year physics undergraduate in Turkey. Most of what I learn ends up as code —
-            a ray tracer for a black hole, a solar system integrated for a century, a quantum
-            circuit simulator that never builds a matrix it doesn't need.
+            Third year, in Turkey. So far: a black hole ray tracer, a solar system simulation and a
+            quantum circuit simulator, all written in Rust from scratch.
           </p>
           <p>
-            I care less about the pictures than about checking them: conservation laws,
-            analytical limits and known results are how I decide whether code is telling the
-            truth. Next: quantum computation — and where physics meets biology and medicine.
+            Next I want to go deeper into quantum computing. I'm also reading about physics in
+            medicine and biology.
           </p>
         </div>
         <p class="about__links">
-          <a class="pill" href="/about/">More about me</a>
-          <a class="pill pill--ghost" href="/lab/">Open the lab</a>
+          <a class="pill" href="/about/">About me</a>
+          <a class="pill pill--ghost" href="/lab/">Lab</a>
         </p>
       </div>
     </div>
@@ -154,28 +152,6 @@
   .about__word--r { left: 50%; transform: translate(0, 0%); }
 </style>
 
-<style is:global>
-  .pill {
-    display: inline-flex;
-    align-items: center;
-    gap: .5rem;
-    padding: .7rem 1.25rem;
-    border: 1px solid #f3efe7;
-    border-radius: 999px;
-    background: #f3efe7;
-    color: #07090c;
-    font-family: var(--font-mono);
-    font-size: .76rem;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    transition: background .2s ease, color .2s ease, transform .2s ease;
-  }
-
-  .pill:hover, .pill:focus-visible { background: transparent; color: #f3efe7; border-bottom-color: #f3efe7; transform: translateY(-2px); }
-
-  .pill--ghost { background: transparent; color: #f3efe7; }
-  .pill--ghost:hover, .pill--ghost:focus-visible { background: #f3efe7; color: #07090c; }
-</style>
 
 <script>
   import { ScrollTrigger, fitCanvas, loop, reduceMotion, lerp, smooth } from '../../scripts/motion';

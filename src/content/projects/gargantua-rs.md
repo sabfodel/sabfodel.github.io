@@ -5,7 +5,7 @@ order: 100
 status: active
 lang: Rust
 repo: https://github.com/sabfodel/gargantua-rs
-summary: A general-relativistic ray tracer that follows light around a Schwarzschild black hole — no physics libraries.
+summary: Ray tracer for light around a Schwarzschild black hole. No physics libraries.
 tags: [general-relativity, numerical-methods, rust, simulation]
 featured: true
 cover: /img/work/gargantua-render.png

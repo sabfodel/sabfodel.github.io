@@ -4,7 +4,7 @@ date: 2026-07-27
 order: 70
 status: done
 lang: Python
-summary: Classifying radio-telescope candidates from the HTRU2 survey as real pulsars or interference — and why accuracy is the wrong metric when only 9% of the data is signal.
+summary: Classifying HTRU2 radio candidates as pulsars or noise, where only 9% of the data are real pulsars.
 tags: [astrophysics, machine-learning, python, data-analysis]
 featured: true
 cover: /img/work/pulsar-roc-pr.png

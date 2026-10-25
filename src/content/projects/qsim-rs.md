@@ -5,7 +5,7 @@ order: 90
 status: active
 lang: Rust
 repo: https://github.com/sabfodel/qsim-rs
-summary: A state-vector quantum circuit simulator written from first principles — no quantum SDK, no linear-algebra crate doing the physics.
+summary: State-vector quantum circuit simulator written from scratch, without a quantum SDK.
 tags: [quantum-computing, rust, simulation]
 featured: true
 cover: /img/work/qsim-bell.svg

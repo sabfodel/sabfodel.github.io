@@ -2,8 +2,7 @@ export const SITE = {
   title: 'sabfodel',
   // Sekme başlığında ve paylaşım kartlarında görünen satır.
   tagline: 'Physics, built from first principles.',
-  description:
-    'Physics undergraduate building simulators from first principles — general relativity, N-body dynamics, quantum circuits — and heading toward quantum computation.',
+  description: 'Physics student. Simulations written from scratch: black holes, orbits, qubits.',
   author: 'sabfodel',
   lang: 'en',
   github: 'https://github.com/sabfodel',

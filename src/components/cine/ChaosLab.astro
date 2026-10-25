@@ -1,158 +1,143 @@
 ---
 /**
- * CHAOS — be.of.dao tarzı tuhaf çekici laboratuvarı. Birbirinden 10⁻⁶ uzakta başlayan
- * iki nokta (turuncu, camgöbeği) aynı denklemi RK4 ile izler ve kısa sürede ayrışır.
- * HUD: denklemler, canlı x·y·z, ayrışma |Δ|, parametre sürgüleri, isteğe bağlı ses.
+ * CHAOS — tam ekran tuhaf çekici. Birbirinden 10⁻⁶ uzakta başlayan iki nokta
+ * (turuncu, camgöbeği) aynı denklemi RK4 ile izler. Kaydırdıkça ortada tek tek
+ * kelimeler belirir; köşelerde denklemler, canlı değerler, ln|Δ| grafiği ve
+ * ondan ölçülen Lyapunov üsteli, kontroller.
  */
-const words =
-  'Two points start almost in the same place — a millionth apart — and end up on completely different paths. That is what we call the butterfly effect.'.split(
-    ' '
-  );
+const WORDS = ['Two', 'points.', 'Almost', 'the same', 'start.', 'Completely', 'different', 'paths.', 'Butterfly', 'effect.'];
 ---
 
-<section class="ch" id="chaos" data-chaos aria-labelledby="ch-title">
-  <p class="ch__caption wide-type" data-ch-caption>
-    {words.map((w) => <span class="ch__w">{w} </span>)}
-  </p>
+<section class="ch pin" id="chaos" data-chaos aria-labelledby="ch-title">
+  <div class="pin__stage ch__stage">
+    <canvas class="ch__canvas" data-ch-canvas role="img" aria-label="Strange attractor with two diverging trajectories"></canvas>
 
-  <div class="ch__frame">
     <header class="ch__top">
       <div>
         <p id="ch-title" class="spaced ch__brand">Chaos</p>
-        <p class="hud">by sabfodel · rk4 · live</p>
+        <p class="hud">live · rk4 · drag to rotate</p>
       </div>
       <p class="ch__glyph" aria-hidden="true">χάος</p>
     </header>
 
-    <div class="ch__canvas-wrap">
-      <canvas class="ch__canvas" data-ch-canvas aria-label="Strange attractor with two diverging trajectories" role="img"></canvas>
-      <span class="crosshair" style="left:12px;top:12px"></span>
-      <span class="crosshair" style="right:12px;bottom:12px"></span>
-      <p class="ch__drag hud" aria-hidden="true">drag to rotate</p>
-    </div>
+    <p class="ch__word wide-type" data-ch-word aria-live="polite"></p>
 
-    <div class="ch__hud">
-      <div class="ch__sys">
-        <p class="spaced ch__name" data-ch-name>Lorenz</p>
-        <p class="hud" data-ch-year>Edward Lorenz · 1963</p>
-        <pre class="ch__eq" data-ch-eq></pre>
-        <p class="hud ch__params" data-ch-params></p>
-      </div>
-
-      <div class="ch__live hud" aria-live="off">
+    <div class="ch__sys">
+      <p class="spaced ch__name" data-ch-name>Lorenz</p>
+      <p class="hud" data-ch-year>1963</p>
+      <pre class="ch__eq" data-ch-eq></pre>
+      <p class="hud ch__params" data-ch-params></p>
+      <div class="ch__live hud">
         <div><i class="sw sw--a"></i><b>A</b> <span data-ch-a></span></div>
         <div><i class="sw sw--b"></i><b>B</b> <span data-ch-b></span></div>
-        <div class="ch__delta">|Δ| <b data-ch-d>1.0e-6</b> <span class="ch__meter"><i data-ch-meter></i></span></div>
-        <div>t <b data-ch-t>0.00</b></div>
-      </div>
-
-      <div class="ch__ctl">
-        <div class="ch__btns" role="group" aria-label="System">
-          <button type="button" class="chip is-on" data-sys="lorenz">Lorenz</button>
-          <button type="button" class="chip" data-sys="yuwang">Yu-Wang</button>
-          <button type="button" class="chip" data-sys="thomas">Thomas</button>
-        </div>
-        <div class="ch__sliders" data-ch-sliders></div>
-        <div class="ch__btns">
-          <button type="button" class="chip chip--accent" data-ch-perturb>Re-seed 10⁻⁶</button>
-          <button type="button" class="chip" data-ch-sound aria-pressed="false">Sound off</button>
-        </div>
       </div>
     </div>
+
+    <div class="ch__plot">
+      <p class="hud">ln |Δ| vs t</p>
+      <canvas data-ch-plot aria-hidden="true"></canvas>
+      <p class="hud ch__lyap">|Δ| <b data-ch-d>1.0e-6</b> · λ ≈ <b data-ch-l>—</b></p>
+    </div>
+
+    <div class="ch__ctl">
+      <div class="ch__btns" role="group" aria-label="System">
+        <button type="button" class="chip is-on" data-sys="lorenz">Lorenz</button>
+        <button type="button" class="chip" data-sys="yuwang">Yu-Wang</button>
+        <button type="button" class="chip" data-sys="thomas">Thomas</button>
+      </div>
+      <div class="ch__sliders" data-ch-sliders></div>
+      <div class="ch__btns">
+        <button type="button" class="chip chip--accent" data-ch-perturb>Restart 10⁻⁶</button>
+        <button type="button" class="chip" data-ch-sound aria-pressed="false">Sound off</button>
+      </div>
+    </div>
+
+    <ol class="ch__words" hidden>{WORDS.map((w) => <li>{w}</li>)}</ol>
   </div>
 </section>
 
 <style>
-  .ch {
-    position: relative;
-    padding: 18vh clamp(1rem, 3vw, 2.2rem) 6rem;
-    background: #050608;
+  .ch { height: 360vh; background: #050608; }
+
+  .ch__stage {
+    background: radial-gradient(60% 60% at 50% 45%, rgba(57, 224, 196, .04), transparent 70%), #050608;
   }
 
-  .ch__caption {
-    max-width: 18ch;
-    margin: 0 auto 14vh;
-    font-size: clamp(2rem, 5.6vw, 5rem);
-    text-align: center;
-    color: #f3efe7;
-  }
-
-  .ch__w { opacity: .12; transition: opacity .2s linear; }
-
-  .ch__frame {
-    position: relative;
-    display: grid;
-    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
-    grid-template-rows: auto minmax(0, 1fr);
-    gap: 0 2rem;
-    max-width: 1280px;
-    min-height: 88vh;
-    margin: 0 auto;
-    padding: 1.4rem;
-    border: 1px solid var(--line);
-    background: radial-gradient(60% 60% at 35% 55%, rgba(57, 224, 196, .035), transparent 70%), #07090c;
-  }
+  .ch__canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; touch-action: pan-y; }
+  .ch__canvas:active { cursor: grabbing; }
 
   .ch__top {
-    grid-column: 1 / -1;
+    position: absolute;
+    top: 5.2rem;
+    left: clamp(1rem, 3vw, 2.2rem);
+    right: clamp(1rem, 3vw, 2.2rem);
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    pointer-events: none;
   }
 
   .ch__top p { margin: 0; }
-  .ch__brand { font-size: .82rem; color: var(--ink); margin-bottom: .2rem !important; }
+  .ch__brand { font-size: .8rem; color: var(--ink); margin-bottom: .2rem !important; }
   .ch__glyph { font-family: var(--font-display); font-size: 1.1rem; color: var(--ink-dim); writing-mode: vertical-rl; }
 
-  .ch__canvas-wrap { position: relative; min-height: 420px; }
-  .ch__canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; touch-action: pan-y; }
-  .ch__canvas:active { cursor: grabbing; }
-  .ch__drag { position: absolute; right: 12px; top: 8px; margin: 0; }
-
-  .ch__hud {
-    display: grid;
-    align-content: end;
-    gap: 1.4rem;
-    padding-bottom: .4rem;
+  .ch__word {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 58%;
+    margin: 0;
+    text-align: center;
+    font-size: clamp(2.4rem, 7vw, 6.4rem);
+    color: #fff;
+    text-shadow: 0 0 30px rgba(0, 0, 0, .9), 0 0 60px rgba(0, 0, 0, .6);
+    pointer-events: none;
   }
 
-  .ch__name { font-size: 1.05rem; color: var(--ink); margin: 0 0 .2rem; }
+  .ch__sys, .ch__plot, .ch__ctl {
+    position: absolute;
+    bottom: 1.6rem;
+    margin: 0;
+  }
+
+  .ch__sys { left: clamp(1rem, 3vw, 2.2rem); bottom: 3.6rem; max-width: 23rem; }
+  .ch__plot { left: 50%; transform: translateX(-50%); width: 240px; }
+  .ch__ctl { right: clamp(1rem, 3vw, 2.2rem); width: 18rem; display: grid; gap: .7rem; }
+
+  .ch__name { font-size: 1rem; color: var(--ink); margin: 0 0 .2rem; }
   .ch__sys .hud { margin: 0; }
 
   .ch__eq {
-    margin: .9rem 0 .6rem;
+    margin: .7rem 0 .4rem;
     padding: 0;
     border: 0;
     background: none !important;
     color: var(--ink);
     font-family: var(--font-display);
     font-style: italic;
-    font-size: 1rem;
-    line-height: 1.7;
+    font-size: .98rem;
+    line-height: 1.6;
     white-space: pre;
   }
 
   .ch__params { color: var(--ink-dim); }
-
-  .ch__live { display: grid; gap: .3rem; font-variant-numeric: tabular-nums; }
+  .ch__live { display: grid; gap: .2rem; margin-top: .6rem; font-variant-numeric: tabular-nums; }
   .ch__live b { color: var(--ink); }
 
   .sw { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: .4rem; }
   .sw--a { background: var(--glow-a); box-shadow: 0 0 8px var(--glow-a); }
   .sw--b { background: var(--glow-b); box-shadow: 0 0 8px var(--glow-b); }
 
-  .ch__delta { display: flex; align-items: center; gap: .5rem; }
-  .ch__meter { flex: 1; max-width: 140px; height: 2px; background: var(--line-2); }
-  .ch__meter i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--glow-b), var(--glow-a)); }
+  .ch__plot canvas { display: block; width: 240px; height: 96px; margin: .4rem 0; border-left: 1px solid var(--line-2); border-bottom: 1px solid var(--line-2); }
+  .ch__plot .hud { margin: 0; }
+  .ch__lyap b { color: var(--ink); }
 
-  .ch__ctl { display: grid; gap: .8rem; }
   .ch__btns { display: flex; flex-wrap: wrap; gap: .4rem; }
 
   .chip {
     padding: .38rem .7rem;
     border: 1px solid var(--line-2);
     border-radius: 999px;
-    background: transparent;
+    background: rgba(5, 6, 8, .6);
     color: var(--ink-dim);
     font-family: var(--font-mono);
     font-size: .68rem;
@@ -166,11 +151,11 @@ const words =
   .chip.is-on, .chip[aria-pressed='true'] { color: #07090c; background: var(--ink); border-color: var(--ink); }
   .chip--accent { color: var(--glow-a); border-color: rgba(255, 154, 77, .5); }
 
-  .ch__sliders { display: grid; gap: .35rem; }
+  .ch__sliders { display: grid; gap: .3rem; }
 
   .ch__sliders :global(label) {
     display: grid;
-    grid-template-columns: 1.4rem minmax(0, 1fr) 3.4rem;
+    grid-template-columns: 1.2rem minmax(0, 1fr) 3.4rem;
     gap: .6rem;
     align-items: center;
     font-family: var(--font-mono);
@@ -186,7 +171,6 @@ const words =
     width: 100%;
     height: 2px;
     background: var(--line-2);
-    outline-offset: 6px;
   }
 
   .ch__sliders :global(input[type='range']::-webkit-slider-thumb) {
@@ -195,27 +179,34 @@ const words =
     height: 12px;
     border-radius: 50%;
     background: var(--ink);
-    border: 0;
     cursor: pointer;
   }
 
   .ch__sliders :global(input[type='range']::-moz-range-thumb) {
     width: 12px;
     height: 12px;
+    border: 0;
     border-radius: 50%;
     background: var(--ink);
-    border: 0;
     cursor: pointer;
   }
 
-  @media (max-width: 860px) {
-    .ch__frame { grid-template-columns: minmax(0, 1fr); padding: 1rem; }
-    .ch__canvas-wrap { min-height: 360px; height: 62vh; }
+  @media (max-width: 1100px) {
+    .ch__plot { display: none; }
+  }
+
+  @media (max-width: 760px) {
+    .ch__top { top: 6.8rem; }
+    .ch__word { top: 50%; }
+    .ch__sys { bottom: 6.2rem; }
+    .ch__eq, .ch__params { display: none; }
+    .ch__ctl { left: clamp(1rem, 3vw, 2.2rem); right: auto; width: auto; bottom: 1.2rem; }
+    .ch__sliders, .ch__ctl .ch__btns + .ch__btns { display: none; }
   }
 </style>
 
 <script>
-  import { ScrollTrigger, fitCanvas, loop, reduceMotion, isSmall, clamp } from '../../scripts/motion';
+  import { ScrollTrigger, fitCanvas, loop, reduceMotion, isSmall, clamp, gsap } from '../../scripts/motion';
 
   type Vec3 = [number, number, number];
   type Sys = {
@@ -225,14 +216,14 @@ const words =
     params: { k: string; v: number; min: number; max: number; step: number }[];
     f: (s: Vec3, p: number[]) => Vec3;
     dt: number;
-    steps: number; // kare başına alt adım
+    steps: number;
     x0: Vec3;
   };
 
   const SYSTEMS: Record<string, Sys> = {
     lorenz: {
       name: 'Lorenz',
-      year: 'Edward Lorenz · 1963 · convection',
+      year: 'Edward Lorenz · 1963',
       eq: 'ẋ = σ(y − x)\nẏ = x(ρ − z) − y\nż = xy − βz',
       params: [
         { k: 'σ', v: 10, min: 4, max: 20, step: 0.1 },
@@ -241,7 +232,7 @@ const words =
       ],
       f: ([x, y, z], [s, r, b]) => [s * (y - x), x * (r - z) - y, x * y - b * z],
       dt: 0.005,
-      steps: 4,
+      steps: 5,
       x0: [1, 1, 1],
     },
     yuwang: {
@@ -256,17 +247,17 @@ const words =
       ],
       f: ([x, y, z], [a, b, c, d]) => [a * (y - x), b * x - c * x * z, Math.exp(x * y) - d * z],
       dt: 0.001,
-      steps: 12,
+      steps: 16,
       x0: [0.1, 0.1, 0.1],
     },
     thomas: {
       name: 'Thomas',
-      year: 'René Thomas · 1999 · cyclically symmetric',
+      year: 'René Thomas · 1999',
       eq: 'ẋ = sin y − bx\nẏ = sin z − by\nż = sin x − bz',
       params: [{ k: 'b', v: 0.208186, min: 0.16, max: 0.24, step: 0.0005 }],
       f: ([x, y, z], [b]) => [Math.sin(y) - b * x, Math.sin(z) - b * y, Math.sin(x) - b * z],
       dt: 0.04,
-      steps: 3,
+      steps: 4,
       x0: [0.1, 0, 0],
     },
   };
@@ -285,47 +276,62 @@ const words =
 
   const root = document.querySelector<HTMLElement>('[data-chaos]')!;
   const canvas = root.querySelector<HTMLCanvasElement>('[data-ch-canvas]')!;
+  const plot = root.querySelector<HTMLCanvasElement>('[data-ch-plot]')!;
   const $ = (s: string) => root.querySelector<HTMLElement>(s)!;
   const nameEl = $('[data-ch-name]'), yearEl = $('[data-ch-year]'), eqEl = $('[data-ch-eq]');
   const paramsEl = $('[data-ch-params]'), aEl = $('[data-ch-a]'), bEl = $('[data-ch-b]');
-  const dEl = $('[data-ch-d]'), tEl = $('[data-ch-t]'), meter = $('[data-ch-meter]');
+  const dEl = $('[data-ch-d]'), lEl = $('[data-ch-l]'), wordEl = $('[data-ch-word]');
   const sliders = $('[data-ch-sliders]');
   const soundBtn = root.querySelector<HTMLButtonElement>('[data-ch-sound]')!;
+  const words = [...root.querySelectorAll('.ch__words li')].map((li) => li.textContent ?? '');
 
   let sys = SYSTEMS.lorenz;
   let params: number[] = [];
-  let A: Vec3, B: Vec3, t = 0;
+  let A: Vec3 = [1, 1, 1], B: Vec3 = [1, 1, 1], t = 0;
   let trailA: Vec3[] = [], trailB: Vec3[] = [];
   let ghost: Vec3[] = [];
   let lo: Vec3 = [0, 0, 0], hi: Vec3 = [1, 1, 1];
-  let W = 0, H = 0;
+  let W = 0, H = 0, PW = 0, PH = 0;
   let yaw = 0.5, pitch = 0.2, userTurned = false;
-  const TRAIL = isSmall() ? 150 : 260;
+  let series: [number, number][] = [];   // (t, ln|Δ|)
+  let saturatedAt = -1;
+  // Benettin yöntemi: A'nın yanında sürekli yeniden ölçeklenen gölge nokta C
+  const D0 = 1e-8;
+  let C: Vec3 = [1, 1, 1], lsum = 0, lT = 0, lsteps = 0;
+  function resetLyap() {
+    C = [A[0] + D0, A[1], A[2]];
+    lsum = 0; lT = 0; lsteps = 0;
+    lEl.textContent = '—';
+  }
+  const TRAIL = isSmall() ? 180 : 320;
 
   const ctx = fitCanvas(canvas, (w, h) => { W = w; H = h; });
+  const pctx = fitCanvas(plot, (w, h) => { PW = w; PH = h; });
 
-  // --- sistem kurulumu -------------------------------------------------------
+  // --- sistem ---------------------------------------------------------------
   function computeGhost() {
     let s: Vec3 = [...sys.x0];
     const pts: Vec3[] = [];
     const l: Vec3 = [Infinity, Infinity, Infinity], h: Vec3 = [-Infinity, -Infinity, -Infinity];
-    const total = 26000;
-    for (let i = 0; i < total; i++) {
-      s = rk4(sys.f, s, params, sys.dt);
+    for (let i = 0; i < 30000; i++) {
+      s = rk4(sys.f, s, params, sys.dt * (sys.steps > 8 ? 2 : 1));
       if (!s.every(Number.isFinite)) break;
       if (i > 1500) {
         for (let k = 0; k < 3; k++) { l[k] = Math.min(l[k], s[k]); h[k] = Math.max(h[k], s[k]); }
-        if (i % 4 === 0) pts.push(s);
+        if (i % 3 === 0) pts.push(s);
       }
     }
     if (pts.length > 100) { ghost = pts; lo = l; hi = h; A = pts[pts.length - 1]; }
     else { ghost = []; A = [...sys.x0]; }
+    resetLyap();
     seed();
   }
 
   function seed() {
     B = [A[0] + 1e-6, A[1], A[2]];
     trailA = []; trailB = []; t = 0;
+    series = [];
+    saturatedAt = -1;
   }
 
   function renderSliders() {
@@ -340,11 +346,12 @@ const words =
         input.value = String(params[i]);
         input.setAttribute('aria-label', `Parameter ${p.k}`);
         const out = document.createElement('output');
-        out.textContent = params[i].toFixed(p.step < 0.01 ? 4 : 2);
+        const fmtP = () => params[i].toFixed(p.step < 0.01 ? 4 : 2);
+        out.textContent = fmtP();
         let timer = 0;
         input.addEventListener('input', () => {
           params[i] = Number(input.value);
-          out.textContent = params[i].toFixed(p.step < 0.01 ? 4 : 2);
+          out.textContent = fmtP();
           writeParams();
           clearTimeout(timer);
           timer = window.setTimeout(computeGhost, 120);
@@ -369,15 +376,13 @@ const words =
     renderSliders();
     computeGhost();
     root.querySelectorAll<HTMLButtonElement>('[data-sys]').forEach((b) => b.classList.toggle('is-on', b.dataset.sys === key));
-    nameEl.animate([{ filter: 'blur(8px)', opacity: 0 }, { filter: 'blur(0)', opacity: 1 }], { duration: 500 });
   }
 
   root.querySelectorAll<HTMLButtonElement>('[data-sys]').forEach((b) => b.addEventListener('click', () => useSystem(b.dataset.sys!)));
   root.querySelector('[data-ch-perturb]')!.addEventListener('click', seed);
 
-  // --- izdüşüm ----------------------------------------------------------------
+  // --- izdüşüm --------------------------------------------------------------
   function project(p: Vec3) {
-    // her ekseni [-1, 1] aralığına getir; z dikey eksen
     const nx = ((p[0] - lo[0]) / (hi[0] - lo[0] || 1)) * 2 - 1;
     const ny = ((p[1] - lo[1]) / (hi[1] - lo[1] || 1)) * 2 - 1;
     const nz = ((p[2] - lo[2]) / (hi[2] - lo[2] || 1)) * 2 - 1;
@@ -385,17 +390,18 @@ const words =
     const x1 = nx * cy - ny * sy;
     const y1 = nx * sy + ny * cy;
     const v = nz * cp - y1 * sp;
-    const depth = nz * sp + y1 * cp;
-    const s = Math.min(W, H) * 0.4;
-    return { x: W / 2 + x1 * s, y: H / 2 - v * s, d: depth };
+    const s = Math.min(W * 0.36, H * 0.34);
+    return { x: W / 2 + x1 * s, y: H * 0.44 - v * s };
   }
 
   function drawTrail(trail: Vec3[], color: string) {
+    ctx.strokeStyle = color;
+    ctx.lineCap = 'round';
     for (let i = 1; i < trail.length; i++) {
       const a = project(trail[i - 1]), b = project(trail[i]);
-      ctx.strokeStyle = color;
-      ctx.globalAlpha = (i / trail.length) * 0.9;
-      ctx.lineWidth = 0.6 + (i / trail.length) * 1.6;
+      const k = i / trail.length;
+      ctx.globalAlpha = k * k * 0.95;
+      ctx.lineWidth = 0.6 + k * 2.2;
       ctx.beginPath();
       ctx.moveTo(a.x, a.y);
       ctx.lineTo(b.x, b.y);
@@ -406,45 +412,68 @@ const words =
 
   function head(p: Vec3, color: string) {
     const q = project(p);
-    ctx.shadowColor = color;
-    ctx.shadowBlur = 18;
-    ctx.fillStyle = color;
+    const g = ctx.createRadialGradient(q.x, q.y, 0, q.x, q.y, 22);
+    g.addColorStop(0, color);
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
     ctx.beginPath();
-    ctx.arc(q.x, q.y, 3.6, 0, Math.PI * 2);
+    ctx.arc(q.x, q.y, 22, 0, Math.PI * 2);
     ctx.fill();
-    ctx.shadowBlur = 0;
     ctx.fillStyle = '#fff';
     ctx.beginPath();
-    ctx.arc(q.x, q.y, 1.4, 0, Math.PI * 2);
+    ctx.arc(q.x, q.y, 2.4, 0, Math.PI * 2);
     ctx.fill();
   }
 
-  const fmt = (v: number) => (v >= 0 ? ' ' : '−') + Math.abs(v).toFixed(3).padStart(6, ' ');
+  const fmt = (v: number) => (v >= 0 ? ' ' : '−') + Math.abs(v).toFixed(2).padStart(5, ' ');
+
+  // ln|Δ| grafiği; doğrusal büyüme bölgesinin eğimi en büyük Lyapunov üstelidir
+  function drawPlot() {
+    if (!PW) return;
+    pctx.clearRect(0, 0, PW, PH);
+    if (series.length < 2) return;
+    const tMax = Math.max(20, series[series.length - 1][0]);
+    const yMin = Math.log(1e-6) - 1, yMax = 4;
+    pctx.strokeStyle = '#ff9a4d';
+    pctx.lineWidth = 1.3;
+    pctx.beginPath();
+    series.forEach(([tt, y], i) => {
+      const x = (tt / tMax) * PW, yy = PH - ((y - yMin) / (yMax - yMin)) * PH;
+      if (i === 0) pctx.moveTo(x, yy);
+      else pctx.lineTo(x, yy);
+    });
+    pctx.stroke();
+  }
 
   function frame() {
-    if (!W || !A) return;
+    if (!W) return;
     for (let i = 0; i < sys.steps; i++) {
       A = rk4(sys.f, A, params, sys.dt);
       B = rk4(sys.f, B, params, sys.dt);
+      C = rk4(sys.f, C, params, sys.dt);
       t += sys.dt;
+      lT += sys.dt;
+      if (++lsteps % 10 === 0) {
+        const dc = Math.hypot(C[0] - A[0], C[1] - A[1], C[2] - A[2]) || D0;
+        lsum += Math.log(dc / D0);
+        C = [A[0] + ((C[0] - A[0]) * D0) / dc, A[1] + ((C[1] - A[1]) * D0) / dc, A[2] + ((C[2] - A[2]) * D0) / dc];
+      }
     }
-    if (!A.every(Number.isFinite) || !B.every(Number.isFinite)) { computeGhost(); return; }
+    if (!A.every(Number.isFinite) || !B.every(Number.isFinite) || !C.every(Number.isFinite)) { computeGhost(); return; }
+    if (lT > 5) lEl.textContent = (lsum / lT).toFixed(2);
     trailA.push(A); trailB.push(B);
     if (trailA.length > TRAIL) { trailA.shift(); trailB.shift(); }
     if (!userTurned) yaw += 0.0016;
 
-    ctx.clearRect(0, 0, W, H);
-    // eksen artısı
-    const o = project([(lo[0] + hi[0]) / 2, (lo[1] + hi[1]) / 2, (lo[2] + hi[2]) / 2]);
-    ctx.strokeStyle = 'rgba(236,232,223,.08)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(o.x - W * 0.45, o.y); ctx.lineTo(o.x + W * 0.45, o.y);
-    ctx.moveTo(o.x, o.y - H * 0.45); ctx.lineTo(o.x, o.y + H * 0.45);
-    ctx.stroke();
+    const d = Math.hypot(A[0] - B[0], A[1] - B[1], A[2] - B[2]);
+    if (d > 0) series.push([t, Math.log(d)]);
+    const span = Math.hypot(hi[0] - lo[0], hi[1] - lo[1], hi[2] - lo[2]);
+    if (saturatedAt < 0 && d > span * 0.3) saturatedAt = t;
+    // ayrıştıktan bir süre sonra baştan başla
+    if (saturatedAt > 0 && t - saturatedAt > 12 * (sys.dt * sys.steps * 60)) seed();
 
-    // hayalet yörünge: ince örümcek ağı
-    ctx.strokeStyle = 'rgba(236,232,223,.11)';
+    ctx.clearRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(236,232,223,.14)';
     ctx.lineWidth = 0.6;
     ctx.beginPath();
     const stride = isSmall() ? 2 : 1;
@@ -455,19 +484,17 @@ const words =
     }
     ctx.stroke();
 
+    ctx.globalCompositeOperation = 'lighter';
     drawTrail(trailB, '#39e0c4');
     drawTrail(trailA, '#ff9a4d');
-    head(B, '#39e0c4');
-    head(A, '#ff9a4d');
+    head(B, 'rgba(57,224,196,.9)');
+    head(A, 'rgba(255,154,77,.9)');
+    ctx.globalCompositeOperation = 'source-over';
 
-    // HUD
-    const d = Math.hypot(A[0] - B[0], A[1] - B[1], A[2] - B[2]);
-    const span = Math.hypot(hi[0] - lo[0], hi[1] - lo[1], hi[2] - lo[2]);
     aEl.textContent = `x${fmt(A[0])}  y${fmt(A[1])}  z${fmt(A[2])}`;
     bEl.textContent = `x${fmt(B[0])}  y${fmt(B[1])}  z${fmt(B[2])}`;
     dEl.textContent = d.toExponential(1);
-    tEl.textContent = t.toFixed(2);
-    meter.style.width = `${clamp((Math.log10(d / span) + 7) / 7) * 100}%`;
+    drawPlot();
     sound(A, B);
   }
 
@@ -487,7 +514,7 @@ const words =
   canvas.addEventListener('pointerup', end);
   canvas.addEventListener('pointercancel', end);
 
-  // --- ses: z → perde, x → stereo konum --------------------------------------
+  // --- ses: z → perde, x → stereo ------------------------------------------
   let audio: { ctx: AudioContext; oa: OscillatorNode; ob: OscillatorNode; pa: StereoPannerNode; pb: StereoPannerNode; g: GainNode } | null = null;
   let soundOn = false;
 
@@ -495,7 +522,6 @@ const words =
     if (!audio || !soundOn) return;
     const now = audio.ctx.currentTime;
     const n = (v: number, k: number) => clamp((v - lo[k]) / (hi[k] - lo[k] || 1));
-    // 146 Hz çevresinde, pentatoniğe kaymadan sürekli
     audio.oa.frequency.setTargetAtTime(110 + n(a[2], 2) * 330, now, 0.05);
     audio.ob.frequency.setTargetAtTime(110 + n(b[2], 2) * 330, now, 0.05);
     audio.pa.pan.setTargetAtTime(n(a[0], 0) * 2 - 1, now, 0.08);
@@ -530,30 +556,40 @@ const words =
     soundBtn.textContent = soundOn ? 'Sound on' : 'Sound off';
   });
 
+  // --- kaydırma: ortadaki tek kelime ---------------------------------------
+  let shownWord = -2;
+  function setWord(i: number) {
+    if (i === shownWord) return;
+    shownWord = i;
+    wordEl.textContent = i >= 0 ? words[i] : '';
+    if (i >= 0) {
+      gsap.fromTo(wordEl, { opacity: 0, filter: 'blur(12px)', scale: 1.06 }, { opacity: 1, filter: 'blur(0px)', scale: 1, duration: 0.35, ease: 'power2.out', overwrite: true });
+    }
+  }
+
   // --- başlangıç ------------------------------------------------------------
   useSystem('lorenz');
 
   if (reduceMotion) {
-    // tek kare çiz, harekete geçme
-    requestAnimationFrame(() => {
-      for (let i = 0; i < TRAIL; i++) frame();
-    });
-    root.querySelectorAll<HTMLElement>('.ch__w').forEach((w) => (w.style.opacity = '1'));
+    root.style.height = 'auto';
+    requestAnimationFrame(() => { for (let i = 0; i < TRAIL; i++) frame(); });
   } else {
     loop(canvas, frame);
-    // ekrandan çıkınca sesi kıs
     new IntersectionObserver(([e]) => {
       if (audio && soundOn) audio.g.gain.setTargetAtTime(e.isIntersecting ? 0.06 : 0, audio.ctx.currentTime, 0.2);
     }).observe(canvas);
-
-    // altyazı: kelimeler kaydırdıkça yanar
-    const ws = [...root.querySelectorAll<HTMLElement>('.ch__w')];
     ScrollTrigger.create({
-      trigger: root.querySelector('[data-ch-caption]')!,
-      start: 'top 85%',
-      end: 'bottom 35%',
+      trigger: root,
+      start: 'top top',
+      end: 'bottom bottom',
       scrub: true,
-      onUpdate: (s) => ws.forEach((w, i) => (w.style.opacity = String(0.12 + 0.88 * clamp(s.progress * ws.length * 1.1 - i)))),
+      onUpdate: (s) => {
+        // ilk %75'te kelimeler sırayla, sonra temiz ekran
+        const k = s.progress < 0.04 || s.progress > 0.78 ? -1 : Math.min(words.length - 1, Math.floor(((s.progress - 0.04) / 0.74) * words.length));
+        setWord(k);
+      },
     });
+    // bölüme girerken iki noktayı aynı yerden başlat ki ayrışma görülsün
+    ScrollTrigger.create({ trigger: root, start: 'top 60%', onEnter: seed, onEnterBack: seed });
   }
 </script>

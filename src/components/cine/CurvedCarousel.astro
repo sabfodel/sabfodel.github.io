@@ -22,11 +22,11 @@ const cards = [
   })),
   {
     href: '/lab/',
-    img: '',
-    alt: '',
+    img: '/img/work/bloch.svg',
+    alt: 'Bloch sphere with a qubit state vector',
     dark: true,
     title: 'Bloch sphere',
-    meta: 'Lab · exp. 001 · interactive',
+    meta: 'Lab · interactive',
   },
 ];
 ---
@@ -34,7 +34,7 @@ const cards = [
 <section class="cc pin section--paper" data-cc style={`height:${cards.length * 70 + 100}vh`} aria-labelledby="cc-title">
   <div class="pin__stage cc__stage">
     <header class="cc__head">
-      <p class="hud">§ 03 — featured work</p>
+      <p class="hud">§ 03 — projects</p>
       <h2 id="cc-title" class="cc__h wide-type">Selected<br />simulations</h2>
     </header>
 
@@ -45,18 +45,9 @@ const cards = [
             <li class="cc__card" data-cc-card>
               <a href={c.href} class="cc__link">
                 <div class:list={['cc__img', c.dark && 'cc__img--dark']}>
-                  {c.img ? (
-                    <img src={c.img} alt={c.alt} loading="lazy" decoding="async" />
-                  ) : (
-                    <svg viewBox="0 0 200 200" aria-hidden="true" class="cc__bloch">
-                      <circle cx="100" cy="100" r="70" />
-                      <ellipse cx="100" cy="100" rx="70" ry="20" />
-                      <ellipse cx="100" cy="100" rx="22" ry="70" />
-                      <line x1="100" y1="100" x2="146" y2="54" class="v" />
-                      <circle cx="146" cy="54" r="5" class="d" />
-                    </svg>
-                  )}
+                  <img src={c.img} alt={c.alt} loading="lazy" decoding="async" />
                   <span class="cc__over wide-type">{c.title}</span>
+                  <span class="cc__open" aria-hidden="true">Open →</span>
                 </div>
                 <p class="cc__meta hud">
                   <b>{String(i + 1).padStart(2, '0')}</b> {c.meta}
@@ -68,7 +59,7 @@ const cards = [
       </ul>
     </div>
 
-    <p class="cc__foot hud">Drag the page — each one is a write-up with method, results and limits</p>
+    <p class="cc__foot hud">Click a project to open it</p>
   </div>
 </section>
 
@@ -93,8 +84,6 @@ const cards = [
     position: relative;
     display: flex;
     align-items: center;
-    perspective: 1400px;
-    perspective-origin: 50% 50%;
     overflow: hidden;
   }
 
@@ -104,7 +93,8 @@ const cards = [
     margin: 0;
     padding: 0;
     list-style: none;
-    transform-style: preserve-3d;
+    /* Her kart kendi perspektifini taşır; şerit tıklamaları yutmasın */
+    pointer-events: none;
     will-change: transform;
   }
 
@@ -112,11 +102,33 @@ const cards = [
     flex: none;
     width: clamp(240px, 34vw, 520px);
     margin: 0;
-    transform-style: preserve-3d;
+    pointer-events: auto;
     will-change: transform;
   }
 
-  .cc__link { display: block; border: 0; color: inherit; }
+  .cc__link { display: block; border: 0; color: inherit; cursor: pointer; }
+
+  .cc__open {
+    position: absolute;
+    top: .7rem;
+    right: .7rem;
+    padding: .35rem .7rem;
+    border-radius: 999px;
+    background: #f3efe7;
+    color: #07090c;
+    font-family: var(--font-mono);
+    font-size: .68rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity .25s ease, transform .25s ease;
+  }
+
+  .cc__link:hover .cc__open,
+  .cc__link:focus-visible .cc__open { opacity: 1; transform: none; }
+
+  @media (hover: none) { .cc__open { opacity: 1; transform: none; } }
 
   .cc__img {
     position: relative;
@@ -140,10 +152,6 @@ const cards = [
     color: #fff;
     mix-blend-mode: difference;
   }
-
-  .cc__bloch { position: absolute; inset: 8% 25%; width: 50%; height: 84%; fill: none; stroke: rgba(236, 232, 223, .55); stroke-width: 1; }
-  .cc__bloch .v { stroke: var(--glow-a); stroke-width: 2.4; }
-  .cc__bloch .d { fill: var(--glow-a); stroke: none; }
 
   .cc__meta { margin: .7rem 0 0; }
 
@@ -173,7 +181,7 @@ const cards = [
       const rot = Math.max(-62, Math.min(62, d * 38));
       const z = -Math.abs(d) * cw * 0.55;
       c.style.marginRight = `${gap}px`;
-      c.style.transform = `translateZ(${z}px) rotateY(${-rot}deg)`;
+      c.style.transform = `perspective(1400px) translateZ(${z}px) rotateY(${-rot}deg)`;
       c.style.opacity = String(Math.max(0.25, 1 - Math.abs(d) * 0.35));
     });
   }

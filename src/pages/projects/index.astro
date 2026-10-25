@@ -11,13 +11,12 @@ const featured = projects.filter((p) => p.data.featured);
 const rest = projects.filter((p) => !p.data.featured);
 ---
 
-<Base title="work" description="Simulators, analyses and experiments — each with its method, results and limitations." wide>
+<Base title="work" description="Simulations and data projects, with method, results and limitations." wide>
   <header class="entry-head">
     <span class="kicker">work · {projects.length} projects</span>
-    <h1>Things I've built to understand</h1>
+    <h1>Work</h1>
     <p class="lede" style="margin:0">
-      Each one started with the same question: what would I learn if I wrote this myself? Every
-      write-up shows the physics, the method, what came out — and where it stops being right.
+      Things I've built. Each page covers the method, the results and the limitations.
     </p>
   </header>
 
@@ -30,8 +29,8 @@ const rest = projects.filter((p) => !p.data.featured);
       <section class="panel" style="margin-top:3rem">
         <header class="section-hd">
           <span class="label">§</span>
-          <h2>Smaller things</h2>
-          <span class="label">side projects</span>
+          <h2>Side projects</h2>
+          <span class="label"></span>
         </header>
         <ul class="grid-cards">
           {rest.map((p) => (

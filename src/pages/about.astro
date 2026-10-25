@@ -3,40 +3,40 @@ import Base from '../layouts/Base.astro';
 import { SITE } from '../site';
 ---
 
-<Base title="about" description="About sabfodel — physics undergraduate working on simulation and quantum computation.">
-  <article class="sheet">
-    <header class="entry-head">
-      <span class="kicker">about</span>
-      {/* TODO: Gerçek adını kullanmak istersen başlığı "Sabri …" gibi değiştir. */}
-      <h1>Hi — I'm sabfodel.</h1>
-      <p class="lede" style="margin:0">
-        Third-year physics undergraduate in Turkey. I understand things best once I've built
-        them, so most of what I learn ends up as code.
-      </p>
-    </header>
+<Base title="about" description="About sabfodel, physics student." wide>
+  <header class="entry-head">
+    <span class="kicker">about</span>
+    <h1>About me</h1>
+  </header>
 
-    <div class="prose">
-      <h2>What I work on</h2>
-      <p>
-        So far that has meant simulators written from first principles: light bending around a
-        Schwarzschild black hole, a solar system integrated for a century, and a quantum circuit
-        simulator that never builds a matrix it doesn't need. I care less about the pictures than
-        about checking them — conservation laws, analytical limits and known results are how I
-        decide whether code is telling the truth.
+  <div class="ab">
+    <figure class="ab__photo">
+      <img src="/img/me/me-portrait.jpg" alt="sabfodel on a balcony" width="900" height="1125" loading="eager" />
+    </figure>
+
+    <div class="prose ab__text">
+      {/* TODO: gerçek adını eklemek istersen buraya yaz. */}
+      <p class="lede">
+        I'm a third-year physics student in Turkey. I go by sabfodel online.
       </p>
       <p>
-        I'm moving toward <strong>quantum computation</strong>. I'm also exploring where
-        computational and quantum physics meet <strong>biology and medicine</strong> — molecular
-        simulation, medical physics, imaging. That part is early: I'm reading, not claiming.
+        I like to understand things by writing them as code. That's how I ended up with a black
+        hole ray tracer, an N-body solar system and a quantum circuit simulator, all in Rust and
+        without physics libraries. I check the results against things I know are true:
+        conservation laws, analytical solutions and known numbers.
+      </p>
+      <p>
+        I want to work on quantum computing. I'm also reading about physics in medicine and
+        biology, but that part is still new to me.
       </p>
 
-      <h2>Education &amp; training</h2>
+      <h2>Education</h2>
       {/* TODO: üniversite adını ve beklenen mezuniyet yılını ekle. */}
       <table>
         <tbody>
-          <tr><th scope="row">BSc Physics</th><td>3rd year, in progress</td></tr>
+          <tr><th scope="row">BSc Physics</th><td>3rd year</td></tr>
           <tr><th scope="row">Qiskit Global Summer School</th><td>completed</td></tr>
-          <tr><th scope="row">QWorld · QBronze</th><td>in progress</td></tr>
+          <tr><th scope="row">QWorld QBronze</th><td>in progress</td></tr>
         </tbody>
       </table>
 
@@ -44,26 +44,57 @@ import { SITE } from '../site';
       <table>
         <tbody>
           <tr><th scope="row">Languages</th><td>Rust, Python</td></tr>
-          <tr><th scope="row">Quantum</th><td>Qiskit, own state-vector simulator</td></tr>
-          <tr><th scope="row">Numerics</th><td>RK4 and friends, Monte Carlo sampling, Rayon parallelism</td></tr>
+          <tr><th scope="row">Quantum</th><td>Qiskit, my own state-vector simulator</td></tr>
+          <tr><th scope="row">Numerics</th><td>RK4, Monte Carlo sampling, Rayon</td></tr>
           <tr><th scope="row">Data</th><td>NumPy, pandas, scikit-learn, Matplotlib</td></tr>
-          <tr><th scope="row">Writing</th><td>Markdown, LaTeX / KaTeX, Emacs org-mode</td></tr>
+          <tr><th scope="row">Writing</th><td>LaTeX, Markdown, Emacs org-mode</td></tr>
         </tbody>
       </table>
 
       <h2>Contact</h2>
       <p>
-        Code lives on <a href={SITE.github}>GitHub</a>.
+        My code is on <a href={SITE.github}>GitHub</a>.
         {SITE.linkedin && <> I'm also on <a href={SITE.linkedin}>LinkedIn</a>.</>}
-        {SITE.cv && <> A one-page <a href={SITE.cv}>CV</a> is here.</>}
+        {SITE.cv && <> My <a href={SITE.cv}>CV</a> is here.</>}
       </p>
 
-      <h2>Off the clock</h2>
+      <h2>Outside physics</h2>
       <p>
-        I take photographs, read, and practise things that aren't physics. Those live in
-        <a href="/photos/">photos</a>, <a href="/reading/">reading</a> and
+        I take <a href="/photos/">photos</a>, keep a <a href="/reading/">reading</a> list and a
         <a href="/journal/">journal</a>.
       </p>
     </div>
-  </article>
+  </div>
 </Base>
+
+<style>
+  .ab {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+  }
+
+  .ab__photo {
+    position: sticky;
+    top: 6rem;
+    margin: 0;
+  }
+
+  .ab__photo img {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: contrast(1.05);
+    box-shadow: 0 40px 80px -40px rgba(0, 0, 0, .9);
+  }
+
+  .ab__photo figcaption { margin-top: .6rem; }
+
+  .ab__text { max-width: 62ch; }
+
+  @media (max-width: 820px) {
+    .ab { grid-template-columns: minmax(0, 1fr); }
+    .ab__photo { position: static; max-width: 420px; }
+  }
+</style>

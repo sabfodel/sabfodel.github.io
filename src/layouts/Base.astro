@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import '../styles/cine.css';
 import 'katex/dist/katex.min.css';
 import { SITE } from '../site';
 import Footer from '../components/Footer.astro';
@@ -10,7 +11,7 @@ interface Props {
   description?: string;
   /** Izgaralı sayfalar (fotoğraf, kitaplık) için geniş sütun */
   wide?: boolean;
-  /** Tam ekran, her zaman koyu, kaydırmaya bağlı ana sayfa */
+  /** Tam ekran, kaydırmaya bağlı ana sayfa */
   cinematic?: boolean;
 }
 
@@ -19,7 +20,7 @@ const pageTitle = title ? `${title} — ${SITE.title}` : `${SITE.title} — ${SI
 ---
 
 <!doctype html>
-<html lang={SITE.lang} data-cine={cinematic ? '' : undefined}>
+<html lang={SITE.lang} data-cine>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -29,7 +30,8 @@ const pageTitle = title ? `${title} — ${SITE.title}` : `${SITE.title} — ${SI
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <meta name="color-scheme" content="light dark" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#050608" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
     <link rel="alternate" type="application/rss+xml" title={SITE.title} href="/rss.xml" />
@@ -40,34 +42,19 @@ const pageTitle = title ? `${title} — ${SITE.title}` : `${SITE.title} — ${SI
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,700..900&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,600&display=swap"
     />
-
-    <!-- Kayıtlı tema tercihini boyamadan önce uygula (yanıp sönmeyi önler) -->
-    <script is:inline>
-      (() => {
-        try {
-          const t = localStorage.getItem('theme');
-          if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t;
-        } catch (e) {
-          /* localStorage kapalıysa sistem tercihiyle devam */
-        }
-      })();
-    </script>
   </head>
 
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
 
     {
       cinematic ? (
-        <>
-          <Header float />
-          <main id="main" class="cine">
-            <slot />
-          </main>
-        </>
+        <main id="main" class="cine">
+          <slot />
+        </main>
       ) : (
         <div class="shell">
-          <Header />
           <main id="main" class:list={[wide && 'wide']}>
             <slot />
           </main>
@@ -76,35 +63,49 @@ const pageTitle = title ? `${title} — ${SITE.title}` : `${SITE.title} — ${SI
       )
     }
 
-    <script is:inline>
-      (() => {
-        const btn = document.querySelector('[data-theme-toggle]');
-        if (!btn) return;
-        const root = document.documentElement;
+    <script>
+        import { initMotion, gsap, ScrollTrigger, reduceMotion } from '../scripts/motion';
 
-        const current = () =>
-          root.dataset.theme ||
-          (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        // İç sayfalar: aynı yumuşak kaydırma ve sade giriş animasyonları.
+        // Ana sayfanın kendi sahneleri var; orada çalışmaz.
+        const inner = !document.querySelector('main.cine');
+        if (inner) initMotion();
 
-        const sync = () => {
-          const isDark = current() === 'dark';
-          btn.setAttribute('aria-label', isDark ? 'Switch to light theme' : 'Switch to dark theme');
-        };
-
-        btn.addEventListener('click', () => {
-          const next = current() === 'dark' ? 'light' : 'dark';
-          root.dataset.theme = next;
-          document.dispatchEvent(new CustomEvent('themechange'));
-          try {
-            localStorage.setItem('theme', next);
-          } catch (e) {
-            /* kaydedemesek de o anki sayfada çalışır */
+        if (inner && !reduceMotion) {
+          // Sayfa başlığı kelime kelime bulanıktan netleşir
+          const h1 = document.querySelector<HTMLElement>('main h1');
+          if (h1 && !h1.querySelector('*')) {
+            const words = h1.textContent!.trim().split(/\s+/);
+            h1.textContent = '';
+            words.forEach((w, i) => {
+              const s = document.createElement('span');
+              s.className = 'blur-word';
+              s.textContent = w;
+              h1.append(s, i < words.length - 1 ? ' ' : '');
+            });
+            gsap.to(h1.querySelectorAll('.blur-word'), {
+              opacity: 1,
+              filter: 'blur(0px)',
+              y: 0,
+              duration: 1.1,
+              stagger: 0.07,
+              ease: 'power3.out',
+            });
           }
-          sync();
-        });
 
-        sync();
-      })();
-    </script>
+          // Liste ve figürler ekrana girerken yukarı süzülür
+          const items = document.querySelectorAll<HTMLElement>(
+            'main .work, main .entry, main .card, main .prose > *, main .frame, main .book, main [data-bloch], main .ab__photo, main .log li'
+          );
+          gsap.set(items, { opacity: 0, y: 28, filter: 'blur(6px)' });
+          ScrollTrigger.batch(items, {
+            start: 'top 92%',
+            once: true,
+            onEnter: (batch) =>
+              gsap.to(batch, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.8, stagger: 0.06, ease: 'power3.out' }),
+          });
+          addEventListener('load', () => ScrollTrigger.refresh());
+        }
+      </script>
   </body>
 </html>

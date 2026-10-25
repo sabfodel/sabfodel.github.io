@@ -5,18 +5,18 @@
  * kartla birlikte değişir.
  */
 const ITEMS = [
-  { href: '/projects/gargantua-rs/', img: '/img/work/gargantua-render.png', name: 'gargantua-rs', note: 'Null geodesics around a Schwarzschild black hole' },
-  { href: '/projects/qsim-rs/', img: '/img/work/qsim-bell.svg', name: 'qsim-rs', note: 'State-vector quantum circuits, no SDK' },
-  { href: '/projects/nbody-sim/', img: '/img/work/nbody-orbits.svg', name: 'nbody-sim', note: 'A century of solar system, energy drift 5×10⁻⁹' },
-  { href: '/projects/pulsar-htru2/', img: '/img/work/pulsar-feature-importance.png', name: 'Pulsar hunt', note: 'Recall 0.92 on 9%-positive radio data' },
-  { href: '/lab/', img: '', name: 'Bloch lab', note: 'Every single-qubit gate is a rotation' },
-  { href: '#chaos', img: '', name: 'Chaos', note: 'Two points, one equation, two fates' },
+  { href: '/projects/gargantua-rs/', img: '/img/work/gargantua-render.png', name: 'gargantua-rs', note: 'Light around a Schwarzschild black hole' },
+  { href: '/projects/qsim-rs/', img: '/img/work/qsim-bell.svg', name: 'qsim-rs', note: 'Quantum circuit simulator' },
+  { href: '/projects/nbody-sim/', img: '/img/work/nbody-orbits.svg', name: 'nbody-sim', note: '100 years of the solar system' },
+  { href: '/projects/pulsar-htru2/', img: '/img/work/pulsar-feature-importance.png', name: 'Pulsar search', note: 'HTRU2, recall 0.92' },
+  { href: '/lab/', img: '/img/work/bloch.svg', name: 'Bloch sphere', note: 'Interactive, in the lab' },
+  { href: '#chaos', img: '/img/work/chaos-lorenz.svg', name: 'Chaos', note: 'Lorenz, Yu-Wang, Thomas' },
 ];
 ---
 
 <section class="wr pin section--paper" data-wr aria-labelledby="wr-title">
   <div class="pin__stage wr__stage">
-    <p class="wr__kicker hud">§ 04 — index of works</p>
+    <p class="wr__kicker hud">§ 04 — all work</p>
 
     <div class="wr__label" aria-live="polite">
       <p class="hud" data-wr-idx>01 / 06</p>
@@ -31,23 +31,7 @@ const ITEMS = [
           ITEMS.map((it, i) => (
             <li class="wr__card" data-wr-card>
               <a href={it.href} class="wr__link" aria-label={`${it.name} — ${it.note}`}>
-                {it.img ? (
-                  <img src={it.img} alt="" loading="lazy" decoding="async" />
-                ) : (
-                  <span class="wr__gen" data-kind={i === 4 ? 'bloch' : 'chaos'} aria-hidden="true">
-                    <svg viewBox="0 0 160 100">
-                      {i === 4 ? (
-                        <g>
-                          <circle cx="80" cy="50" r="34" />
-                          <ellipse cx="80" cy="50" rx="34" ry="10" />
-                          <line x1="80" y1="50" x2="102" y2="26" class="v" />
-                        </g>
-                      ) : (
-                        <path d="M30 70 C 10 30, 70 20, 80 50 S 150 80, 130 30 S 60 10, 80 50 S 20 90, 30 70" />
-                      )}
-                    </svg>
-                  </span>
-                )}
+                <img src={it.img} alt="" loading="lazy" decoding="async" />
                 <span class="wr__tag hud">{String(i + 1).padStart(2, '0')}</span>
               </a>
             </li>
@@ -105,9 +89,11 @@ const ITEMS = [
     padding: 0;
     list-style: none;
     transform-style: preserve-3d;
+    pointer-events: none;
   }
 
   .wr__card {
+    pointer-events: auto;
     position: absolute;
     left: calc(var(--cw) / -2);
     top: calc(var(--ch) / -2);
@@ -122,6 +108,7 @@ const ITEMS = [
   }
 
   .wr__link {
+    cursor: pointer;
     position: relative;
     display: block;
     width: 100%;
@@ -133,11 +120,6 @@ const ITEMS = [
   }
 
   .wr__link img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-  .wr__gen { position: absolute; inset: 0; display: grid; place-items: center; background: #07090c; }
-  .wr__gen svg { width: 80%; height: 80%; fill: none; stroke: rgba(236, 232, 223, .6); stroke-width: 1; }
-  .wr__gen .v { stroke: var(--glow-a); stroke-width: 2; }
-  .wr__gen[data-kind='chaos'] svg { stroke: var(--glow-b); }
 
   .wr__tag {
     position: absolute;
