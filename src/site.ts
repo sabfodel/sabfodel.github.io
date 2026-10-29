@@ -6,6 +6,10 @@ export const SITE = {
   author: 'sabfodel',
   lang: 'en',
   github: 'https://github.com/sabfodel',
+  // E-posta HTML'de parçalı durur; mailto: bağlantısı tarayıcıda kurulur (basit
+  // botlar okuyamasın). Bkz. Base.astro'daki data-mail betiği.
+  mailUser: 'sabfodel',
+  mailDomain: 'gmail.com',
   // TODO: LinkedIn profilini açınca buraya ekle; alt bilgi ve /about/ otomatik gösterir.
   linkedin: '',
   // TODO: CV PDF'ini public/cv.pdf olarak koyunca '/cv.pdf' yaz.

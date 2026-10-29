@@ -7,7 +7,8 @@ const year = new Date().getFullYear();
   <p class="hud">contact</p>
   <a class="ft__big wide-type" href={SITE.github}>Let’s talk</a>
   <nav class="ft__pills" aria-label="Site">
-    <a class="pill" href={SITE.github}>GitHub ↗</a>
+    <a class="pill" data-mail-u={SITE.mailUser} data-mail-d={SITE.mailDomain} href="/about/#contact">Mail ↗</a>
+    <a class="pill pill--ghost" href={SITE.github}>GitHub ↗</a>
     {SITE.linkedin && <a class="pill pill--ghost" href={SITE.linkedin}>LinkedIn ↗</a>}
     {NAV.map((item) => <a class="pill pill--ghost" href={item.href}>{item.label}</a>)}
   </nav>

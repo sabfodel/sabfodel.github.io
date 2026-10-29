@@ -15,7 +15,8 @@ const year = new Date().getFullYear();
     Research, projects, or a question about physics.
   </p>
   <nav class="lt__pills" aria-label="Contact and site">
-    <a class="pill" href={SITE.github}>GitHub ↗</a>
+    <a class="pill" data-mail-u={SITE.mailUser} data-mail-d={SITE.mailDomain} href="/about/#contact">Mail ↗</a>
+    <a class="pill pill--ghost" href={SITE.github}>GitHub ↗</a>
     {SITE.linkedin && <a class="pill pill--ghost" href={SITE.linkedin}>LinkedIn ↗</a>}
     {SITE.cv && <a class="pill pill--ghost" href={SITE.cv}>CV</a>}
     <a class="pill pill--ghost" href="/projects/">Work</a>

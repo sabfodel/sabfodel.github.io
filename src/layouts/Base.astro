@@ -31,6 +31,12 @@ const pageTitle = title ? `${title} — ${SITE.title}` : `${SITE.title} — ${SI
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content={new URL(Astro.url.pathname, Astro.site)} />
+    <meta property="og:image" content={new URL('/og.png', Astro.site)} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="sabfodel — a black hole made of particles behind the words Built from first principles" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content="#050608" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -109,5 +115,13 @@ const pageTitle = title ? `${title} — ${SITE.title}` : `${SITE.title} — ${SI
           addEventListener('load', () => ScrollTrigger.refresh());
         }
       </script>
+    <script is:inline>
+      // E-posta bağlantılarını tarayıcıda kur
+      document.querySelectorAll('[data-mail-u]').forEach(function (a) {
+        var m = a.getAttribute('data-mail-u') + '@' + a.getAttribute('data-mail-d');
+        a.setAttribute('href', 'mailto:' + m);
+        if (a.hasAttribute('data-mail-show')) a.textContent = m;
+      });
+    </script>
   </body>
 </html>

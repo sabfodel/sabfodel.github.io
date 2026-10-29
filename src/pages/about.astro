@@ -51,8 +51,9 @@ import { SITE } from '../site';
         </tbody>
       </table>
 
-      <h2>Contact</h2>
+      <h2 id="contact">Contact</h2>
       <p>
+        Email me at <a data-mail-u={SITE.mailUser} data-mail-d={SITE.mailDomain} data-mail-show href="#contact">{SITE.mailUser} [at] {SITE.mailDomain}</a>.
         My code is on <a href={SITE.github}>GitHub</a>.
         {SITE.linkedin && <> I'm also on <a href={SITE.linkedin}>LinkedIn</a>.</>}
         {SITE.cv && <> My <a href={SITE.cv}>CV</a> is here.</>}
